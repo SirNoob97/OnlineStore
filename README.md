@@ -1,6 +1,10 @@
 # Online Store
 
-## Dependencies to use
+This project consists of the REST api for an online store using microservices architecture.
+
+My goal whit this project is to use all knowledge that i have acquired over the course of 7 months in a serlf-taught way to create what in my current perception is a rest-full professional application or at least try it.
+
+### Dependencies to use
 
   * Spring Boot Starter Web, JPA, Validation, Actuator, Security.
   * Spring Cloud Starter Config, Netflix Eureka Client and Server, Sleuth, Config Server, Gateway, Openfeign, Netflix Hystrix and Dashboard.
