@@ -4,7 +4,7 @@ server:
     include-message: always
     include-binding-errors: always
 
-# http://localhost:8092/h2-console
+# http://localhost:8085/h2-console
 spring:
   h2:
     console:
