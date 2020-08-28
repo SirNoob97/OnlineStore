@@ -7,7 +7,7 @@ import java.util.List;
 public interface IUserService {
   public User createUser(User user);
   public User updateUser(User user);
-  public User deleteUser(User user);
+  public User deleteUser(Long userId);
 
   public User getUser(Long id);
   public List<User> findUsersByAddress(Long addressId);

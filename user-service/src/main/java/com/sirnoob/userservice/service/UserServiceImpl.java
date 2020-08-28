@@ -18,14 +18,12 @@ public class UserServiceImpl implements IUserService {
   private static final String CREATED = "CREATED";
   private static final String DELETED = "DELETED";
 
-  private IAddresRepository iAddresRepository;
   private IUserRepository iUserRepository;
 
   private UserServiceImpl(){}
 
   @Autowired
-  public UserServiceImpl(IUserRepository iUserRepository, IAddresRepository iAddresRepository) {
-    this.iAddresRepository = iAddresRepository;
+  public UserServiceImpl(IUserRepository iUserRepository) {
     this.iUserRepository = iUserRepository;
   }
 
@@ -41,21 +39,33 @@ public class UserServiceImpl implements IUserService {
 
   @Override
   public User updateUser(User user) {
-    User userDB = iUserRepository.findByUserDni(user.getUserDni()).orElse(null);
-    if(userDB != null && userDB.getUserId() != user.getUserId())
-      throw new UserAlreadyExistsException("There is already a user with that DNI.");
+//    User userDB = iUserRepository.findByUserDni(user.getUserDni()).orElse(null);
+//    if(userDB != null && userDB.getUserId() != user.getUserId())
+//      throw new UserAlreadyExistsException("There is already a user with that DNI.");
+//
+//    userDB = iUserRepository.findByEmail(user.getEmail()).orElse(null);
+//    if(userDB != null && userDB.getUserId() != user.getUserId())
+//      throw new UserAlreadyExistsException("There is already a user with that Email.");
 
-    userDB = iUserRepository.findByEmail(user.getEmail()).orElse(null);
-    if(userDB != null && userDB.getUserId() != user.getUserId())
-      throw new UserAlreadyExistsException("There is already a user with that Email.");
+//    return iUserRepository.save(user);
+    User userDB = getUser(user.getUserId());
 
-    return iUserRepository.save(user);
+    userDB.setUserDni(user.getUserDni());
+    userDB.setUserName(user.getUserName());
+    userDB.setFirstName(userDB.getFirstName());
+    userDB.setLastName(user.getLastName());
+    userDB.setEmail(user.getEmail());
+    userDB.setAddress(user.getAddress());
+
+    return iUserRepository.save(userDB);
   }
 
   @Override
-  public User deleteUser(User user){
-    iUserRepository.deleteById(user.getUserId());
+  public User deleteUser(Long userId){
+    User user = getUser(userId);
     user.setStatus(DELETED);
+
+    iUserRepository.deleteById(userId);
 
     return user;
   }
@@ -67,9 +77,7 @@ public class UserServiceImpl implements IUserService {
 
   @Override
   public List<User> findUsersByAddress(Long addressId) {
-    Address address = iAddresRepository.findById(addressId).orElseThrow(() -> new AddressNotFoundException("Address not found with ID " + addressId));
-
-    return iUserRepository.findByAddress(address);
+    return iUserRepository.findByAddressAddressId(addressId);
   }
 
   @Override
