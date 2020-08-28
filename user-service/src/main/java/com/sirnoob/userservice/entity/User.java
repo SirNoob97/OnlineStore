@@ -51,14 +51,13 @@ public class User {
   public User() {
   }
 
-  public User(Long userId, String userDni, String userName, String firstName, String lastName, String email, String status, Address address) {
+  public User(Long userId, String userDni, String userName, String firstName, String lastName, String email, Address address) {
     this.userId = userId;
     this.userDni = userDni;
     this.userName = userName;
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
-    this.status = status;
     this.address = address;
   }
 
@@ -114,11 +113,11 @@ public class User {
     this.status = status;
   }
 
-  public Address getRegion() {
+  public Address getAddress() {
     return address;
   }
 
-  public void setRegion(Address address) {
+  public void setAddress(Address address) {
     this.address = address;
   }
 
