@@ -50,7 +50,7 @@ public class UserRepositoryTest {
 
   @Test
   public void findByAddress_andReturnUserList(){
-    List<User> userList = iUserRepository.findByAddress(Address.builder().addressId(3L).build());
+    List<User> userList = iUserRepository.findByAddressAddressId(3L);
     Assertions.assertThat(userList).isNotEmpty();
     Assertions.assertThat(userList.size()).isEqualTo(2);
 
