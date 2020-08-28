@@ -19,7 +19,7 @@ public class Address {
 
   @NotEmpty(message = "The Address is required.")
   @Size(min = 10, max = 60, message = "The Address must be 10 to 60 characters long.")
-  @Column(nullable = false, length = 60, unique = true)
+  @Column(nullable = false, length = 60)
   private String address;
 
   @NotNull(message = "The Zip Code is required.")
