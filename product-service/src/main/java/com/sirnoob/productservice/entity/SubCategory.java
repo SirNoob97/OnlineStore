@@ -6,19 +6,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import lombok.Builder;
-import lombok.Data;
-
-@Data
-@Builder
-@Table("categories")
-public class Category {
+@Table("sub_categories")
+public class SubCategory {
 
 	@Id
-	@Column("category_id")
-	private Long categoryId;
+	@Column("sub_category_id")
+	private Long subCategoryId;
 	
 	@NotNull(message = "The Category Name is required.")
-	@Column("category_name")
-	private String categoryName;
+	@Column("sub_category_name")
+	private String subCategoryName;
 }
