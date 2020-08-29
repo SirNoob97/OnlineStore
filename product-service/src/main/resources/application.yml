@@ -1,1 +1,19 @@
+server:
+  port: 8085
 
+spring:
+  h2:
+    console:
+      enabled: true 
+  r2dbc:
+    url: r2dbc:h2:mem//;
+    name: store
+    username: store 
+    password:
+    
+#spring:
+#  r2dbc:
+#    url: r2dbc:postgresql://localhost:5432/
+#    name: store
+#    username: postgres
+#    password: postgres
