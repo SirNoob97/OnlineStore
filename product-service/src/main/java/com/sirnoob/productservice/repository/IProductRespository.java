@@ -11,10 +11,10 @@ import reactor.core.publisher.Flux;
 public interface IProductRespository extends ReactiveCrudRepository<Product, Long>{
 
 	Flux<Product> findByProductNumber(Integer productNumberId);
-	
+
 	Flux<Product> findByCategoryCategoryId(Long categoryId);
-	
-	Flux<Product> findBySubCategoriesSubCategoryId(Long subCategoriesId);
-	
+
+//	Flux<Product> findBySubCategorySubCategoryId(Long subCategoriesId);
+
 	
 }
