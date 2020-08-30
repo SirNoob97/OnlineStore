@@ -30,7 +30,7 @@ ALTER TABLE categories ALTER COLUMN category_id SET DEFAULT NEXTVAL('sequence_ca
 CREATE TABLE IF NOT EXISTS sub_categories(
   sub_category_id bigint NOT NULL,
   sub_category_name character varying(30) NOT NULL,
-  category_id bigint NOT NULL;
+  category_id bigint NOT NULL,
   PRIMARY KEY (sub_category_id),
   CONSTRAINT unique_sub_category_name UNIQUE (sub_category_name));
 
