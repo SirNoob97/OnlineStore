@@ -17,11 +17,11 @@ INSERT INTO sub_categories (sub_category_id, sub_category_name, category_id) VAL
 INSERT INTO sub_categories (sub_category_id, sub_category_name, category_id) VALUES (3, 'Iphone', 2)
 
 
-INSERT INTO sub_categories_products (sub_category_id, product_id) SELECT sub_categories.sub_category_id, products.product_id 
-FROM sub_categories inner join products ON sub_categories.sub_category_id = 1 AND products.products_id = 2;
+INSERT INTO sub_categories_products (sub_category_id, product_id) SELECT sub_categories.sub_category_id, products.product_id
+FROM sub_categories inner join products ON sub_categories.sub_category_id = 1 AND products.product_id = 2;
 
-INSERT INTO sub_categories_products (sub_category_id, product_id) SELECT sub_categories.sub_category_id, products.product_id 
-FROM sub_categories inner join products ON sub_categories.sub_category_id = 2 AND products.products_id = 3;
+INSERT INTO sub_categories_products (sub_category_id, product_id) SELECT sub_categories.sub_category_id, products.product_id
+FROM sub_categories inner join products ON sub_categories.sub_category_id = 2 AND products.product_id = 3;
 
-INSERT INTO sub_categories_products (sub_category_id, product_id) SELECT sub_categories.sub_category_id, products.product_id 
-FROM sub_categories inner join products ON sub_categories.sub_category_id = 3 AND products.products_id = 1;
+INSERT INTO sub_categories_products (sub_category_id, product_id) SELECT sub_categories.sub_category_id, products.product_id
+FROM sub_categories inner join products ON sub_categories.sub_category_id = 3 AND products.product_id = 1;
