@@ -1,5 +1,6 @@
 package com.sirnoob.productservice.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,23 +15,26 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Builder;
 import lombok.Data;
+import reactor.core.publisher.Flux;
 
 @Data
 @Builder
 @Table("products")
-public class Product {
+public class Product implements Serializable{
 
-//	https://github.com/rxonda/webflux-with-jpa
+	private static final long serialVersionUID = 1L;
+
+	//	https://github.com/rxonda/webflux-with-jpa
 //	https://github.com/chang-chao/spring-webflux-reactive-jdbc-sample/blob/master/src/main/java/me/changchao/spring/springwebfluxasyncjdbcsample/service/CityServiceImpl.java
 	@Id
 	@Column("product_id")
 	private Long productId;
 	
-	@Digits(integer = 9, fraction = 0, message = "The Number Id must be 9 digits.")
+	@Digits(integer = 7, fraction = 0, message = "The Number Id must be 9 digits.")
 	@NotNull(message = "The Number is required.")
 	@Column("product_number")
 	private Integer productNumber;
-	
+
 	@NotNull(message = "The Name is required.")
 	@NotEmpty(message = "The Name is required.")
 	@Column("product_name")
@@ -40,10 +44,13 @@ public class Product {
 	private String productDescription;
 	
 	@Positive(message = "The Product Stock must be positive.")
+	@Digits(integer = 7, fraction = 0)
 	@NotNull(message = "The Product Stock is required.")
 	@Column("product_stock")
 	private Integer productStock;
-	
+
+	@Positive(message = "The Product Price must be positive.")
+	@NotNull(message = "The Product Price is required.")
 	@Digits(integer = 5, fraction = 2)
 	@Column("product_price")
 	private Double productPrice;
@@ -52,7 +59,6 @@ public class Product {
 	private LocalDate createAt;
 	
 	private Category category;
-	
-	private List<SubCategory> subCategories;
+	private Flux<SubCategory> subCategories;
 	
 }
