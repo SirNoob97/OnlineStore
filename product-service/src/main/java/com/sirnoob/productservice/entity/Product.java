@@ -2,7 +2,6 @@ package com.sirnoob.productservice.entity;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.List;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
@@ -24,8 +23,6 @@ public class Product implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 
-	//	https://github.com/rxonda/webflux-with-jpa
-//	https://github.com/chang-chao/spring-webflux-reactive-jdbc-sample/blob/master/src/main/java/me/changchao/spring/springwebfluxasyncjdbcsample/service/CityServiceImpl.java
 	@Id
 	@Column("product_id")
 	private Long productId;
@@ -58,7 +55,7 @@ public class Product implements Serializable{
 	@Column("create_at")
 	private LocalDate createAt;
 	
-	private Category category;
+	private MainCategory mainCategory;
 	private Flux<SubCategory> subCategories;
 	
 }
