@@ -11,8 +11,8 @@ import lombok.Data;
 
 @Data
 @Builder
-@Table("categories")
-public class Category {
+@Table("main_categories")
+public class MainCategory {
 
 	@Id
 	@Column("category_id")
