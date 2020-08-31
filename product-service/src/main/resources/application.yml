@@ -1,6 +1,13 @@
 server:
   port: 8085
 
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          r2dbc: DEBUG
 #spring:
 #  h2:
 #    console:
