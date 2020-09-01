@@ -27,22 +27,15 @@ public class Product implements Serializable{
 	@Column("product_id")
 	private Long productId;
 	
-	@Digits(integer = 7, fraction = 0, message = "The Number Id must be 9 digits.")
-	@NotNull(message = "The Number is required.")
 	@Column("product_number")
 	private Integer productNumber;
 
-	@NotNull(message = "The Name is required.")
-	@NotEmpty(message = "The Name is required.")
 	@Column("product_name")
 	private String productName;
 	
 	@Column("product_description")
 	private String productDescription;
 	
-	@Positive(message = "The Product Stock must be positive.")
-	@Digits(integer = 7, fraction = 0)
-	@NotNull(message = "The Product Stock is required.")
 	@Column("product_stock")
 	private Integer productStock;
 
