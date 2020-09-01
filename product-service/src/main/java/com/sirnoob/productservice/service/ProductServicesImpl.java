@@ -33,16 +33,17 @@ public class ProductServicesImpl implements IProductService {
 				+ "WHERE products.product_number = :productNumber";
 
 		return transactionalOperator.execute(tx -> {
-			Mono<Void> insert = databaseClient.execute(insertQuery).bind("productNumber", productRequest.getProductNumber())
+			Mono<Void> insert = databaseClient.execute(insertQuery)
+					.bind("productNumber", productRequest.getProductNumber())
 					.bind("productName", productRequest.getProductName())
 					.bind("productDescription", productRequest.getProductDescription())
 					.bind("productStock", productRequest.getProductStock())
-					.bind("productPrice", productRequest.getProductPrice()).bind("createAt", Instant.now())
+					.bind("productPrice", productRequest.getProductPrice())
+					.bind("createAt", Instant.now())
 					.bind("categoryId", productRequest.getCategoryId()).then();
 
 			Mono<ProductResponse> select = databaseClient.execute(selectQuery)
-					.bind("productNumber", productRequest.getProductNumber()).map(iProductMapper::mapToProductResponse)
-					.one();
+					.bind("productNumber", productRequest.getProductNumber()).map(iProductMapper::mapToProductResponse).one();
 
 			return insert.then(select);
 		}).next();
@@ -59,13 +60,14 @@ public class ProductServicesImpl implements IProductService {
 	}
 
 	@Override
-	public Mono<Product> deleteProduct(Long productId) {
-		return null;
+	public Mono<Void> deleteProduct(Integer productNumber) {
+		final String query = "DELETE FROM products WHERE products.product_number = :productNumber";
+		return databaseClient.execute(query).bind("productNumber", productNumber).then();
 	}
 
 	@Override
 	public Mono<ProductInvoiceResponse> getProductInvoiceResponseById(Long productId) {
-		final String query = "SELECT * FROM PRODUCTS INNER JOIN main_categories ON products.category_id = main_categories.category_id "
+		final String query = "SELECT * FROM products INNER JOIN main_categories ON products.category_id = main_categories.category_id "
 				+ "WHERE products.product_id = :productId";
 		return databaseClient.execute(query).bind("productId", productId).map(iProductMapper::mapToInvoiceResponse)
 				.first();
@@ -76,14 +78,14 @@ public class ProductServicesImpl implements IProductService {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON products.category_id = main_categories.category_id";
 		return databaseClient.execute(query).map(iProductMapper::mapToProductResponse).all();
 	}
-	
+
 	@Override
 	public Flux<ProductResponse> getProductByName(String productName) {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON products.category_id = main_categories.category_id WHERE product_name ~* :productName";
 		return databaseClient.execute(query).bind("productName", productName).map(iProductMapper::mapToProductResponse)
 				.all();
 	}
-	
+
 	@Override
 	public Flux<ProductResponse> getProductByMainCategory(Long categoryId) {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON main_categories.category_id = products.category_id "

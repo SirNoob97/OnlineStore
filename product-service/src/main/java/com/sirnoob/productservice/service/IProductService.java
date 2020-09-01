@@ -16,7 +16,7 @@ public interface IProductService {
 	
 	public Mono<Product> updateStock(Long id, Integer quantity);
 
-	public Mono<Product> deleteProduct(Long productId);
+	public Mono<Void> deleteProduct(Integer productNumber);
 
 	public Mono<ProductInvoiceResponse> getProductInvoiceResponseById(Long productId);
 	

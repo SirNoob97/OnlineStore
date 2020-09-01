@@ -2,6 +2,7 @@ package com.sirnoob.productservice.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,12 +32,17 @@ public class ProductRestController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(iProductService.createProduct(productRequest));
 	}
 	
+	@DeleteMapping("/deleteproduct/{productNumber}")
+	public ResponseEntity<Mono<Void>> deleteByProductNumber(@PathVariable Integer productNumber) {
+		return ResponseEntity.ok().body(iProductService.deleteProduct(productNumber));
+	}
+	
 	@GetMapping
 	public ResponseEntity<Flux<ProductResponse>> listAll(){
 		return ResponseEntity.ok().body(iProductService.listAll());
 	}
 	@GetMapping("/findbyid/{id}")
-	public ResponseEntity<Mono<ProductInvoiceResponse>> getProduct(@PathVariable("id") Long id) {
+	public ResponseEntity<Mono<ProductInvoiceResponse>> getProduct(@PathVariable Long id) {
 		return ResponseEntity.ok().body(iProductService.getProductInvoiceResponseById(id));
 	}
 
@@ -45,13 +51,13 @@ public class ProductRestController {
 		return ResponseEntity.ok().body(iProductService.getProductByName(productName));
 	}
 	
-	@GetMapping("/findbynumber/{product_number}")
-	public ResponseEntity<Mono<ProductResponse>> findByProductNumber(@PathVariable("product_number") Integer poductNumber){
-		return ResponseEntity.ok().body(iProductService.getProductByProductNumber(poductNumber));
+	@GetMapping("/findbynumber/{productNumber}")
+	public ResponseEntity<Mono<ProductResponse>> findByProductNumber(@PathVariable Integer productNumber){
+		return ResponseEntity.ok().body(iProductService.getProductByProductNumber(productNumber));
 	}
 	
 	@GetMapping("/findbycategory/{id}")
-	public ResponseEntity<Flux<ProductResponse>> findByCategory(@PathVariable("id") Long id){
+	public ResponseEntity<Flux<ProductResponse>> findByCategory(@PathVariable Long id){
 		return ResponseEntity.ok().body(iProductService.getProductByMainCategory(id));
 	}
 }
