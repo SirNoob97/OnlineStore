@@ -4,16 +4,31 @@ import java.time.LocalDate;
 
 import org.springframework.stereotype.Component;
 
+import com.sirnoob.productservice.dto.template.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.template.ProductResponse;
 import com.sirnoob.productservice.entity.MainCategory;
 
 import io.r2dbc.spi.Row;
 
 @Component
-public class ProductMapperImpl implements IProductMapper{
+public class ProductMapperImpl implements IProductMapper {
 
-	public ProductResponse mapToProductResponse(Row row) {
+	@Override
+	public ProductInvoiceResponse mapToInvoiceResponse(Row row) {
 		
+		ProductInvoiceResponse productInvoiceResponse = ProductInvoiceResponse.builder()
+				.productNumber(row.get("product_number", Integer.class))
+				.productName(row.get("product_name", String.class))
+				.productDescription(row.get("product_description", String.class))
+				.productPrice(row.get("product_price", Double.class))
+				.mainCategory(row.get("category_name", String.class)).build();
+		
+		return productInvoiceResponse;
+	}
+
+	@Override
+	public ProductResponse mapToProductResponse(Row row) {
+
 		ProductResponse productResponse = ProductResponse.builder().productId(row.get("product_id", Long.class))
 				.productNumber(row.get("product_number", Integer.class))
 				.productName(row.get("product_name", String.class))
