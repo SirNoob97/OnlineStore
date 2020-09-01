@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sirnoob.productservice.dto.template.ProductInvoiceResponse;
@@ -30,14 +31,18 @@ public class ProductRestController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(iProductService.createProduct(productRequest));
 	}
 	
+	@GetMapping
+	public ResponseEntity<Flux<ProductResponse>> listAll(){
+		return ResponseEntity.ok().body(iProductService.listAll());
+	}
 	@GetMapping("/findbyid/{id}")
 	public ResponseEntity<Mono<ProductInvoiceResponse>> getProduct(@PathVariable("id") Long id) {
 		return ResponseEntity.ok().body(iProductService.getProductInvoiceResponseById(id));
 	}
-	
-	@GetMapping
-	public ResponseEntity<Flux<ProductResponse>> listAll(){
-		return ResponseEntity.ok().body(iProductService.listAll());
+
+	@GetMapping("/findbyname/")
+	public ResponseEntity<Flux<ProductResponse>> findByName(@RequestParam(name = "product_name", required = true) String productName) {
+		return ResponseEntity.ok().body(iProductService.getProductByName(productName));
 	}
 	
 	@GetMapping("/findbynumber/{product_number}")
@@ -47,6 +52,6 @@ public class ProductRestController {
 	
 	@GetMapping("/findbycategory/{id}")
 	public ResponseEntity<Flux<ProductResponse>> findByCategory(@PathVariable("id") Long id){
-		return ResponseEntity.ok().body(iProductService.findByMainCategory(id));
+		return ResponseEntity.ok().body(iProductService.getProductByMainCategory(id));
 	}
 }

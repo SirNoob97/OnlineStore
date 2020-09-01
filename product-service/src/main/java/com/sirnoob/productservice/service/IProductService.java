@@ -19,10 +19,12 @@ public interface IProductService {
 	public Mono<Product> deleteProduct(Long productId);
 
 	public Mono<ProductInvoiceResponse> getProductInvoiceResponseById(Long productId);
-
+	
 	public Flux<ProductResponse> listAll();
+	
+	public Flux<ProductResponse> getProductByName(String productName);
 
-	public Flux<ProductResponse> findByMainCategory(Long categoryId);
+	public Flux<ProductResponse> getProductByMainCategory(Long categoryId);
 
 	public Mono<ProductResponse> getProductByProductNumber(Integer productNumber);
 
