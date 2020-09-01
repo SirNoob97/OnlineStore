@@ -1,11 +1,16 @@
 package com.sirnoob.productservice.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sirnoob.productservice.dto.template.ProductInvoiceResponse;
+import com.sirnoob.productservice.dto.template.ProductRequest;
 import com.sirnoob.productservice.dto.template.ProductResponse;
 import com.sirnoob.productservice.service.IProductService;
 
@@ -20,17 +25,27 @@ public class ProductRestController {
 
 	private final IProductService iProductService;
 	
+	@PostMapping
+	public ResponseEntity<Mono<ProductResponse>> createProduct(@RequestBody ProductRequest productRequest) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(iProductService.createProduct(productRequest));
+	}
+	
+	@GetMapping("/findbyid/{id}")
+	public ResponseEntity<Mono<ProductInvoiceResponse>> getProduct(@PathVariable("id") Long id) {
+		return ResponseEntity.ok().body(iProductService.getProductInvoiceResponseById(id));
+	}
+	
 	@GetMapping
 	public ResponseEntity<Flux<ProductResponse>> listAll(){
 		return ResponseEntity.ok().body(iProductService.listAll());
 	}
 	
-	@GetMapping("/{product_number}")
+	@GetMapping("/findbynumber/{product_number}")
 	public ResponseEntity<Mono<ProductResponse>> findByProductNumber(@PathVariable("product_number") Integer poductNumber){
 		return ResponseEntity.ok().body(iProductService.getProductByProductNumber(poductNumber));
 	}
 	
-	@GetMapping("/category/{id}")
+	@GetMapping("/findbycategory/{id}")
 	public ResponseEntity<Flux<ProductResponse>> findByCategory(@PathVariable("id") Long id){
 		return ResponseEntity.ok().body(iProductService.findByMainCategory(id));
 	}
