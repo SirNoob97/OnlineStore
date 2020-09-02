@@ -1,4 +1,4 @@
-package com.sirnoob.productservice.dto.template;
+package com.sirnoob.productservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

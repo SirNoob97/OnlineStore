@@ -1,4 +1,4 @@
-package com.sirnoob.productservice.dto.template;
+package com.sirnoob.productservice.dto;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;

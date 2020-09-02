@@ -1,11 +1,11 @@
-package com.sirnoob.productservice.dto.mapper;
+package com.sirnoob.productservice.mapper;
 
 import java.time.LocalDate;
 
 import org.springframework.stereotype.Component;
 
-import com.sirnoob.productservice.dto.template.ProductInvoiceResponse;
-import com.sirnoob.productservice.dto.template.ProductResponse;
+import com.sirnoob.productservice.dto.ProductInvoiceResponse;
+import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.entity.MainCategory;
 
 import io.r2dbc.spi.Row;
@@ -36,6 +36,7 @@ public class ProductMapperImpl implements IProductMapper {
 				.productPrice(row.get("product_price", Double.class))
 				.productStock(row.get("product_stock", Integer.class))
 				.createAt(LocalDate.from(row.get("create_at", LocalDate.class)))
+				.productStatus(row.get("product_status", String.class))
 				.mainCategory(MainCategory.builder().categoryId(row.get("category_id", Long.class))
 						.categoryName(row.get("category_name", String.class)).build())
 				.build();

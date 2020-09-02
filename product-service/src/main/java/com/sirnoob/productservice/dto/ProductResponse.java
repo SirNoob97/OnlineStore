@@ -1,4 +1,4 @@
-package com.sirnoob.productservice.dto.template;
+package com.sirnoob.productservice.dto;
 
 import java.time.LocalDate;
 
@@ -23,6 +23,7 @@ public class ProductResponse {
 	private Integer productStock;
 	private Double productPrice;
 	private LocalDate createAt;
+	private String productStatus;
 	private MainCategory mainCategory;
 
 }
