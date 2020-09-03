@@ -4,22 +4,18 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-@Builder
+@Getter
 public class ProductRequest {
 
-	@Digits(integer = 7, fraction = 0, message = "The Number Id must be 9 digits.")
+	@PositiveOrZero(message = "The Bar Code must be positive.")
+	@Digits(integer = 13, fraction = 0, message = "The Bar Code must be 9 digits.")
 	@NotNull(message = "The Number is required.")
-	private Integer productNumber;
+	private Long productBarCode;
 	
 	@NotNull(message = "The Name is required.")
 	@NotEmpty(message = "The Name is required.")
@@ -27,12 +23,12 @@ public class ProductRequest {
 	private String productName;
 	private String productDescription;
 	
-	@Positive(message = "The Product Stock must be positive.")
+	@Positive(message = "The Product Stock must be greater than zero.")
 	@NotNull(message = "The Product Stock is required.")
 	@Digits(integer = 4, fraction = 0, message = "The Stock must be an integer and its maximum is 9999.")
 	private Integer productStock;
 	
-	@Positive(message = "The Product Price must be positive.")
+	@PositiveOrZero(message = "The Product Price must be positive.")
 	@NotNull(message = "The Product Price is required.")
 	@Digits(integer = 6, fraction = 2, message = "The Price can only have 2 decimal places and its maximum is 999999.99")
 	private Double productPrice;
