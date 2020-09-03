@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class ProductInvoiceResponse {
 
-	private Integer productNumber;
+	private Long productBarCode;
 	private String productName;
 	private String productDescription;
 	private Double productPrice;
