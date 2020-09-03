@@ -29,48 +29,56 @@ import reactor.core.publisher.Mono;
 public class ProductRestController {
 
 	private final IProductService iProductService;
-	
+
 	@PostMapping("/createproduct")
 	public ResponseEntity<Mono<ProductResponse>> createProduct(@Valid @RequestBody ProductRequest productRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(iProductService.createProduct(productRequest));
 	}
-	
-	@DeleteMapping("/deleteproduct/{productNumber}")
-	public ResponseEntity<Mono<ProductResponse>> deleteByProductNumber(@PathVariable Integer productNumber) {
-		return ResponseEntity.ok().body(iProductService.deleteProduct(productNumber));
+
+	@DeleteMapping("/deleteproduct/{productBarCode}")
+	public ResponseEntity<Mono<ProductResponse>> deleteProductByBarCodeBar(@PathVariable Long productBarCode) {
+		return ResponseEntity.ok().body(iProductService.deleteProduct(productBarCode));
 	}
-	
+
 	@PutMapping("/updateproduct")
-	public ResponseEntity<Mono<ProductResponse>> updateProduct(@Valid @RequestBody ProductRequest productRequest){
+	public ResponseEntity<Mono<ProductResponse>> updateProduct(@Valid @RequestBody ProductRequest productRequest) {
 		return ResponseEntity.ok().body(iProductService.updateProduct(productRequest));
 	}
-	
-	@PutMapping("/updateproductstock/{productNumber}")
-	public ResponseEntity<Mono<ProductResponse>> updateProductStock(@PathVariable Integer productNumber, @RequestParam(name = "quantity", required = true) Integer quantity) {
-		return ResponseEntity.ok().body(iProductService.updateStock(productNumber, quantity));
+
+	@PutMapping("/updateproductstock/{productBarCode}")
+	public ResponseEntity<Mono<ProductResponse>> updateProductStock(@PathVariable Long productBarCode,
+			@RequestParam(name = "quantity", required = true) Integer quantity) {
+		return ResponseEntity.ok().body(iProductService.updateStock(productBarCode, quantity));
 	}
 	
-	@GetMapping
-	public ResponseEntity<Flux<ProductResponse>> listAll(){
-		return ResponseEntity.ok().body(iProductService.listAll());
+	@PutMapping("/suspendproduct/{productBarCode}")
+	public ResponseEntity<Mono<ProductResponse>> suspendProductStock(@PathVariable Long productBarCode) {
+		return ResponseEntity.ok().body(iProductService.suspendProduct(productBarCode));
 	}
-	@GetMapping("/findbyid/{id}")
-	public ResponseEntity<Mono<ProductInvoiceResponse>> getProduct(@PathVariable Long id) {
+
+	@GetMapping("/getallproducts")
+	public ResponseEntity<Flux<ProductResponse>> getAllProducts() {
+		return ResponseEntity.ok().body(iProductService.getAllProducts());
+	}
+
+	@GetMapping("/findproductbyid/{id}")
+	public ResponseEntity<Mono<ProductInvoiceResponse>> findProductById(@PathVariable Long id) {
 		return ResponseEntity.ok().body(iProductService.getProductInvoiceResponseById(id));
 	}
 
-	@GetMapping("/findbyname/")
-	public ResponseEntity<Flux<ProductResponse>> findByName(@RequestParam(name = "product_name", required = true) String productName) {
+	@GetMapping("/findproductbyname/")
+	public ResponseEntity<Flux<ProductResponse>> findProductByName(
+			@RequestParam(name = "product_name", required = true) String productName) {
 		return ResponseEntity.ok().body(iProductService.getProductByName(productName));
 	}
-	
-	@GetMapping("/findbynumber/{productNumber}")
-	public ResponseEntity<Mono<ProductResponse>> findByProductNumber(@PathVariable Integer productNumber){
-		return ResponseEntity.ok().body(iProductService.getProductByProductNumber(productNumber));
+
+	@GetMapping("/findproductbybarcode/{productBarCode}")
+	public ResponseEntity<Mono<ProductResponse>> findProductByproductBarCode(@PathVariable Long productBarCode) {
+		return ResponseEntity.ok().body(iProductService.getProductByproductBarCode(productBarCode));
 	}
-	
-	@GetMapping("/findbycategory/{id}")
-	public ResponseEntity<Flux<ProductResponse>> findByCategory(@PathVariable Long id){
+
+	@GetMapping("/findproductbycategory/{id}")
+	public ResponseEntity<Flux<ProductResponse>> findProductByCategory(@PathVariable Long id) {
 		return ResponseEntity.ok().body(iProductService.getProductByMainCategory(id));
 	}
 }
