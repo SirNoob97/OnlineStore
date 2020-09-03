@@ -3,8 +3,10 @@ package com.sirnoob.productservice.service;
 import java.time.Instant;
 
 import org.springframework.data.r2dbc.core.DatabaseClient;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductRequest;
@@ -44,7 +46,8 @@ public class ProductServicesImpl implements IProductService {
 					.bind("productBarCode", productRequest.getProductBarCode())
 					.map(iProductMapper::mapToProductResponse).one();
 
-			return insert.then(select);
+			return insert.then(select.switchIfEmpty(
+					Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found."))));
 		}).next();
 	}
 
@@ -68,7 +71,8 @@ public class ProductServicesImpl implements IProductService {
 					.bind("productBarCode", productRequest.getProductBarCode())
 					.map(iProductMapper::mapToProductResponse).one();
 
-			return update.then(select);
+			return update.then(select.switchIfEmpty(
+					Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found."))));
 		}).next();
 	}
 
@@ -85,7 +89,8 @@ public class ProductServicesImpl implements IProductService {
 			Mono<ProductResponse> select = databaseClient.execute(selectQuery).bind("productBarCode", productBarCode)
 					.map(iProductMapper::mapToProductResponse).one();
 
-			return updateStock.then(select);
+			return updateStock.then(select.switchIfEmpty(
+					Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found."))));
 		}).next();
 	}
 
@@ -101,7 +106,8 @@ public class ProductServicesImpl implements IProductService {
 			Mono<ProductResponse> select = databaseClient.execute(selectQuery).bind("productBarCode", productBarCode)
 					.map(iProductMapper::mapToProductResponse).one();
 
-			return updateStock.then(select);
+			return updateStock.then(select.switchIfEmpty(
+					Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found."))));
 		}).next();
 	}
 
@@ -114,7 +120,7 @@ public class ProductServicesImpl implements IProductService {
 			ProductResponse product = iProductMapper.mapToProductResponse(productDB);
 			product.setProductStatus("DELETED");
 			return product;
-		}).first();
+		}).first().switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found.")));
 	}
 
 	@Override
@@ -122,7 +128,8 @@ public class ProductServicesImpl implements IProductService {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON products.category_id = main_categories.category_id "
 				+ "WHERE products.product_id = :productId";
 		return databaseClient.execute(query).bind("productId", productId).map(iProductMapper::mapToInvoiceResponse)
-				.first();
+				.first()
+				.switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found.")));
 	}
 
 	@Override
@@ -135,7 +142,8 @@ public class ProductServicesImpl implements IProductService {
 	public Flux<ProductResponse> getProductByName(String productName) {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON products.category_id = main_categories.category_id WHERE product_name ~* :productName";
 		return databaseClient.execute(query).bind("productName", productName).map(iProductMapper::mapToProductResponse)
-				.all();
+				.all()
+				.switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found.")));
 	}
 
 	@Override
@@ -143,7 +151,8 @@ public class ProductServicesImpl implements IProductService {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON main_categories.category_id = products.category_id "
 				+ "WHERE products.category_id = :categoryId";
 		return databaseClient.execute(query).bind("categoryId", categoryId).map(iProductMapper::mapToProductResponse)
-				.all();
+				.all()
+				.switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found.")));
 	}
 
 	@Override
@@ -151,7 +160,8 @@ public class ProductServicesImpl implements IProductService {
 		final String query = "SELECT * FROM products JOIN main_categories ON products.category_id = main_categories.category_id "
 				+ "WHERE products. product_bar_code = :productBarCode";
 		return databaseClient.execute(query).bind("productBarCode", productBarCode)
-				.map(iProductMapper::mapToProductResponse).one();
+				.map(iProductMapper::mapToProductResponse).first()
+				.switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found.")));
 	}
 
 }
