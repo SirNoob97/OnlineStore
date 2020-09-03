@@ -11,20 +11,22 @@ public interface IProductService {
 
 	public Mono<ProductResponse> createProduct(ProductRequest productRequest);
 
-	public Mono<ProductResponse> updateProduct(ProductRequest productRequest);
-	
-	public Mono<ProductResponse> updateStock(Integer productNumber, Integer quantity);
+	public Mono<ProductResponse> deleteProduct(Long productBarCode);
 
-	public Mono<ProductResponse> deleteProduct(Integer productNumber);
-
-	public Mono<ProductInvoiceResponse> getProductInvoiceResponseById(Long productId);
-	
-	public Flux<ProductResponse> listAll();
+	public Flux<ProductResponse> getProductByMainCategory(Long categoryId);
 	
 	public Flux<ProductResponse> getProductByName(String productName);
 
-	public Flux<ProductResponse> getProductByMainCategory(Long categoryId);
+	public Mono<ProductResponse> getProductByproductBarCode(Long productBarCode);
 
-	public Mono<ProductResponse> getProductByProductNumber(Integer productNumber);
+	public Mono<ProductInvoiceResponse> getProductInvoiceResponseById(Long productId);
+	
+	public Flux<ProductResponse> getAllProducts();
+	
+	public Mono<ProductResponse> suspendProduct(Long productBarCode);
+
+	public Mono<ProductResponse> updateProduct(ProductRequest productRequest);
+
+	public Mono<ProductResponse> updateStock(Long productBarCode, Integer quantity);
 
 }

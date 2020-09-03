@@ -25,15 +25,15 @@ public class ProductServicesImpl implements IProductService {
 
 	@Override
 	public Mono<ProductResponse> createProduct(ProductRequest productRequest) {
-		final String insertQuery = "INSERT INTO products (product_number, product_name, product_description, product_stock, product_price, product_status, create_at, category_id) "
-				+ "VALUES (:productNumber, :productName, :productDescription, :productStock, :productPrice, 'CREATED', :createAt, :categoryId)";
+		final String insertQuery = "INSERT INTO products ( product_bar_code, product_name, product_description, product_stock, product_price, product_status, create_at, category_id) "
+				+ "VALUES (:productBarCode, :productName, :productDescription, :productStock, :productPrice, 'CREATED', :createAt, :categoryId)";
 
 		final String selectQuery = "SELECT * FROM products JOIN main_categories ON products.category_id = main_categories.category_id "
-				+ "WHERE products.product_number = :productNumber";
+				+ "WHERE products. product_bar_code = :productBarCode";
 
 		return transactionalOperator.execute(transaction -> {
 			Mono<Void> insert = databaseClient.execute(insertQuery)
-					.bind("productNumber", productRequest.getProductNumber())
+					.bind("productBarCode", productRequest.getProductBarCode())
 					.bind("productName", productRequest.getProductName())
 					.bind("productDescription", productRequest.getProductDescription())
 					.bind("productStock", productRequest.getProductStock())
@@ -41,8 +41,8 @@ public class ProductServicesImpl implements IProductService {
 					.bind("categoryId", productRequest.getCategoryId()).then();
 
 			Mono<ProductResponse> select = databaseClient.execute(selectQuery)
-					.bind("productNumber", productRequest.getProductNumber()).map(iProductMapper::mapToProductResponse)
-					.one();
+					.bind("productBarCode", productRequest.getProductBarCode())
+					.map(iProductMapper::mapToProductResponse).one();
 
 			return insert.then(select);
 		}).next();
@@ -50,14 +50,14 @@ public class ProductServicesImpl implements IProductService {
 
 	@Override
 	public Mono<ProductResponse> updateProduct(ProductRequest productRequest) {
-		final String updateQuery = "UPDATE products SET product_number = :productNumber, product_name = :productName, product_description = :productDescription, product_stock = :productStock, "
-				+ "product_price = :productPrice, product_status = 'UPDATED', category_id = :categoryId WHERE products.product_number = :productNumber";
+		final String updateQuery = "UPDATE products SET  product_bar_code = :productBarCode, product_name = :productName, product_description = :productDescription, product_stock = :productStock, "
+				+ "product_price = :productPrice, product_status = 'UPDATED', category_id = :categoryId WHERE products. product_bar_code = :productBarCode";
 		final String selectQuery = "SELECT * FROM products JOIN main_categories ON products.category_id = main_categories.category_id "
-				+ "WHERE products.product_number = :productNumber";
+				+ "WHERE products. product_bar_code = :productBarCode";
 
 		return transactionalOperator.execute(transaction -> {
 			Mono<Void> update = databaseClient.execute(updateQuery)
-					.bind("productNumber", productRequest.getProductNumber())
+					.bind("productBarCode", productRequest.getProductBarCode())
 					.bind("productName", productRequest.getProductName())
 					.bind("productDescription", productRequest.getProductDescription())
 					.bind("productStock", productRequest.getProductStock())
@@ -65,24 +65,24 @@ public class ProductServicesImpl implements IProductService {
 					.bind("categoryId", productRequest.getCategoryId()).then();
 
 			Mono<ProductResponse> select = databaseClient.execute(selectQuery)
-					.bind("productNumber", productRequest.getProductNumber()).map(iProductMapper::mapToProductResponse)
-					.one();
+					.bind("productBarCode", productRequest.getProductBarCode())
+					.map(iProductMapper::mapToProductResponse).one();
 
 			return update.then(select);
 		}).next();
 	}
 
 	@Override
-	public Mono<ProductResponse> updateStock(Integer productNumber, Integer quantity) {
-		final String updateQuery = "UPDATE products SET product_stock = :quantity, product_status = 'UPDATED' WHERE product_number = :productNumber";
+	public Mono<ProductResponse> updateStock(Long productBarCode, Integer quantity) {
+		final String updateQuery = "UPDATE products SET product_stock = :quantity, product_status = 'UPDATED' WHERE  product_bar_code = :productBarCode";
 		final String selectQuery = "SELECT * FROM products JOIN main_categories ON products.category_id = main_categories.category_id "
-				+ "WHERE products.product_number = :productNumber";
+				+ "WHERE products.product_bar_code = :productBarCode";
 
 		return transactionalOperator.execute(transaction -> {
-			Mono<Void> updateStock = databaseClient.execute(updateQuery).bind("productNumber", productNumber)
+			Mono<Void> updateStock = databaseClient.execute(updateQuery).bind("productBarCode", productBarCode)
 					.bind("quantity", quantity).then();
 
-			Mono<ProductResponse> select = databaseClient.execute(selectQuery).bind("productNumber", productNumber)
+			Mono<ProductResponse> select = databaseClient.execute(selectQuery).bind("productBarCode", productBarCode)
 					.map(iProductMapper::mapToProductResponse).one();
 
 			return updateStock.then(select);
@@ -90,11 +90,27 @@ public class ProductServicesImpl implements IProductService {
 	}
 
 	@Override
-	public Mono<ProductResponse> deleteProduct(Integer productNumber) {
-		final String query = "WITH q AS (DELETE FROM products WHERE products.product_number = :productNumber RETURNING *) "
-				+ "SELECT * FROM products INNER JOIN main_categories ON main_categories.category_id = products.category_id WHERE products.product_number = "
-				+ "(SELECT product_number FROM q)";
-		return databaseClient.execute(query).bind("productNumber", productNumber).map(productDB -> {
+	public Mono<ProductResponse> suspendProduct(Long productBarCode) {
+		final String updateQuery = "UPDATE products SET product_status = 'SUSPENDED' WHERE  product_bar_code = :productBarCode";
+		final String selectQuery = "SELECT * FROM products JOIN main_categories ON products.category_id = main_categories.category_id "
+				+ "WHERE products.product_bar_code = :productBarCode";
+
+		return transactionalOperator.execute(transaction -> {
+			Mono<Void> updateStock = databaseClient.execute(updateQuery).bind("productBarCode", productBarCode).then();
+
+			Mono<ProductResponse> select = databaseClient.execute(selectQuery).bind("productBarCode", productBarCode)
+					.map(iProductMapper::mapToProductResponse).one();
+
+			return updateStock.then(select);
+		}).next();
+	}
+
+	@Override
+	public Mono<ProductResponse> deleteProduct(Long productBarCode) {
+		final String query = "WITH q AS (DELETE FROM products WHERE products. product_bar_code = :productBarCode RETURNING *) "
+				+ "SELECT * FROM products INNER JOIN main_categories ON main_categories.category_id = products.category_id WHERE products. product_bar_code = "
+				+ "(SELECT  product_bar_code FROM q)";
+		return databaseClient.execute(query).bind("productBarCode", productBarCode).map(productDB -> {
 			ProductResponse product = iProductMapper.mapToProductResponse(productDB);
 			product.setProductStatus("DELETED");
 			return product;
@@ -110,7 +126,7 @@ public class ProductServicesImpl implements IProductService {
 	}
 
 	@Override
-	public Flux<ProductResponse> listAll() {
+	public Flux<ProductResponse> getAllProducts() {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON products.category_id = main_categories.category_id";
 		return databaseClient.execute(query).map(iProductMapper::mapToProductResponse).all();
 	}
@@ -131,10 +147,10 @@ public class ProductServicesImpl implements IProductService {
 	}
 
 	@Override
-	public Mono<ProductResponse> getProductByProductNumber(Integer productNumber) {
+	public Mono<ProductResponse> getProductByproductBarCode(Long productBarCode) {
 		final String query = "SELECT * FROM products JOIN main_categories ON products.category_id = main_categories.category_id "
-				+ "WHERE products.product_number = :productNumber";
-		return databaseClient.execute(query).bind("productNumber", productNumber)
+				+ "WHERE products. product_bar_code = :productBarCode";
+		return databaseClient.execute(query).bind("productBarCode", productBarCode)
 				.map(iProductMapper::mapToProductResponse).one();
 	}
 
