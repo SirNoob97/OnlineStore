@@ -1,5 +1,6 @@
 package com.sirnoob.productservice.dto;
 
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -13,13 +14,13 @@ import lombok.Getter;
 public class ProductRequest {
 
 	@PositiveOrZero(message = "The Bar Code must be positive.")
-	@Digits(integer = 13, fraction = 0, message = "The Bar Code must be 9 digits.")
-	@NotNull(message = "The Number is required.")
+	@Digits(integer = 13, fraction = 0, message = "The Bar Code must be {integer} digits.")
+	@NotNull(message = "The Bar Code is required.")
 	private Long productBarCode;
 	
 	@NotNull(message = "The Name is required.")
 	@NotEmpty(message = "The Name is required.")
-	@Size(min = 5, max = 30, message = "The Name must be between 5 and 30 characters long.")
+	@Size(max = 30, message = "The Name must be a maximum of 30 characters.")
 	private String productName;
 	private String productDescription;
 	
@@ -28,7 +29,7 @@ public class ProductRequest {
 	@Digits(integer = 4, fraction = 0, message = "The Stock must be an integer and its maximum is 9999.")
 	private Integer productStock;
 	
-	@PositiveOrZero(message = "The Product Price must be positive.")
+	@DecimalMin(value = "0.0", message = "The Product Price must be positive.")
 	@NotNull(message = "The Product Price is required.")
 	@Digits(integer = 6, fraction = 2, message = "The Price can only have 2 decimal places and its maximum is 999999.99")
 	private Double productPrice;
