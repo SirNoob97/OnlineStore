@@ -23,7 +23,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 @Component
-@Order(-2)
+@Order(-3)
 public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
 
 	public GlobalExceptionHandler(ErrorAttributes errorAttributes, ResourceProperties resourceProperties,
@@ -40,19 +40,17 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
 	private Mono<ServerResponse> formatErrorResponse(ServerRequest serverRequest) {
 		String query = serverRequest.uri().getQuery();
 
-		ErrorAttributeOptions errorAttributeOptions = isTraceEnabled(query)
-				? ErrorAttributeOptions.of(Include.STACK_TRACE)
-				: ErrorAttributeOptions.defaults();
+		ErrorAttributeOptions errorAttributeOptions = isTraceTrue(query) ? ErrorAttributeOptions.of(Include.STACK_TRACE)
+						: ErrorAttributeOptions.defaults();
 
 		Map<String, Object> errorAttributes = getErrorAttributes(serverRequest, errorAttributeOptions);
-		int status = (int)Optional.ofNullable(errorAttributes.get("status")).orElse(500);
+		int status = (int) Optional.ofNullable(errorAttributes.get("status")).orElse(500);
 
-		return ServerResponse
-				.status(status).contentType(MediaType.APPLICATION_JSON)
+		return ServerResponse.status(status).contentType(MediaType.APPLICATION_JSON)
 				.body(BodyInserters.fromValue(errorAttributes));
 	}
 
-	private boolean isTraceEnabled(String query) {
-		return !query.isEmpty() && query.contains("trace=true");
+	private boolean isTraceTrue(String query) {
+		return !(query == null || query.isEmpty()) && query.contains("trace=true");
 	}
 }
