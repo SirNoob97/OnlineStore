@@ -3,14 +3,13 @@ package com.sirnoob.productservice.service;
 import java.time.Instant;
 
 import org.springframework.data.r2dbc.core.DatabaseClient;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
+import com.sirnoob.productservice.exception.ICustomException;
 import com.sirnoob.productservice.mapper.IProductMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,8 @@ public class ProductServicesImpl implements IProductService {
 	private final IProductMapper iProductMapper;
 	private final TransactionalOperator transactionalOperator;
 	private final DatabaseClient databaseClient;
-
+	private final ICustomException iCustomException;
+	
 	@Override
 	public Mono<ProductResponse> createProduct(ProductRequest productRequest) {
 		final String insertQuery = "INSERT INTO products ( product_bar_code, product_name, product_description, product_stock, product_price, product_status, create_at, category_id) "
@@ -46,8 +46,7 @@ public class ProductServicesImpl implements IProductService {
 					.bind("productBarCode", productRequest.getProductBarCode())
 					.map(iProductMapper::mapToProductResponse).one();
 
-			return insert.then(select.switchIfEmpty(
-					Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found."))));
+			return insert.then(select.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found")));
 		}).next();
 	}
 
@@ -71,8 +70,7 @@ public class ProductServicesImpl implements IProductService {
 					.bind("productBarCode", productRequest.getProductBarCode())
 					.map(iProductMapper::mapToProductResponse).one();
 
-			return update.then(select.switchIfEmpty(
-					Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found."))));
+			return update.then(select.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found")));
 		}).next();
 	}
 
@@ -89,8 +87,7 @@ public class ProductServicesImpl implements IProductService {
 			Mono<ProductResponse> select = databaseClient.execute(selectQuery).bind("productBarCode", productBarCode)
 					.map(iProductMapper::mapToProductResponse).one();
 
-			return updateStock.then(select.switchIfEmpty(
-					Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found."))));
+			return updateStock.then(select.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found")));
 		}).next();
 	}
 
@@ -106,8 +103,7 @@ public class ProductServicesImpl implements IProductService {
 			Mono<ProductResponse> select = databaseClient.execute(selectQuery).bind("productBarCode", productBarCode)
 					.map(iProductMapper::mapToProductResponse).one();
 
-			return updateStock.then(select.switchIfEmpty(
-					Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found."))));
+			return updateStock.then(select.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found")));
 		}).next();
 	}
 
@@ -120,7 +116,7 @@ public class ProductServicesImpl implements IProductService {
 			ProductResponse product = iProductMapper.mapToProductResponse(productDB);
 			product.setProductStatus("DELETED");
 			return product;
-		}).first().switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found.")));
+		}).first().switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found"));
 	}
 
 	@Override
@@ -129,13 +125,15 @@ public class ProductServicesImpl implements IProductService {
 				+ "WHERE products.product_id = :productId";
 		return databaseClient.execute(query).bind("productId", productId).map(iProductMapper::mapToInvoiceResponse)
 				.first()
-				.switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found.")));
+				.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found"));
 	}
 
 	@Override
 	public Flux<ProductResponse> getAllProducts() {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON products.category_id = main_categories.category_id";
-		return databaseClient.execute(query).map(iProductMapper::mapToProductResponse).all();
+		return databaseClient.execute(query).map(iProductMapper::mapToProductResponse)
+				.all()
+				.switchIfEmpty(iCustomException.fluxElementsCustomNotFoundException("Empty Record."));
 	}
 
 	@Override
@@ -143,7 +141,7 @@ public class ProductServicesImpl implements IProductService {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON products.category_id = main_categories.category_id WHERE product_name ~* :productName";
 		return databaseClient.execute(query).bind("productName", productName).map(iProductMapper::mapToProductResponse)
 				.all()
-				.switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found.")));
+				.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found"));
 	}
 
 	@Override
@@ -152,7 +150,7 @@ public class ProductServicesImpl implements IProductService {
 				+ "WHERE products.category_id = :categoryId";
 		return databaseClient.execute(query).bind("categoryId", categoryId).map(iProductMapper::mapToProductResponse)
 				.all()
-				.switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found.")));
+				.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found"));
 	}
 
 	@Override
@@ -161,7 +159,7 @@ public class ProductServicesImpl implements IProductService {
 				+ "WHERE products. product_bar_code = :productBarCode";
 		return databaseClient.execute(query).bind("productBarCode", productBarCode)
 				.map(iProductMapper::mapToProductResponse).first()
-				.switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found.")));
+				.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found"));
 	}
 
 }
