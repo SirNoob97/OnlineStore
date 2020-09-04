@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS products(
   product_stock integer NOT NULL,
   create_at date NOT NULL,
   category_id bigint NOT NULL,
+  product_status character varying(15) NOT NULL,
   PRIMARY KEY (product_id),
   CONSTRAINT unique_product_name UNIQUE (product_name),
   CONSTRAINT unique_product_number UNIQUE (product_number));
