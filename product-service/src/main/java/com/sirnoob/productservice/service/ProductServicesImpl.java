@@ -24,14 +24,11 @@ public class ProductServicesImpl implements IProductService {
 	private final TransactionalOperator transactionalOperator;
 	private final DatabaseClient databaseClient;
 	private final ICustomException iCustomException;
-	
+
 	@Override
 	public Mono<ProductResponse> createProduct(ProductRequest productRequest) {
 		final String insertQuery = "INSERT INTO products ( product_bar_code, product_name, product_description, product_stock, product_price, product_status, create_at, category_id) "
 				+ "VALUES (:productBarCode, :productName, :productDescription, :productStock, :productPrice, 'CREATED', :createAt, :categoryId)";
-
-		final String selectQuery = "SELECT * FROM products JOIN main_categories ON products.category_id = main_categories.category_id "
-				+ "WHERE products. product_bar_code = :productBarCode";
 
 		return transactionalOperator.execute(transaction -> {
 			Mono<Void> insert = databaseClient.execute(insertQuery)
@@ -42,11 +39,7 @@ public class ProductServicesImpl implements IProductService {
 					.bind("productPrice", productRequest.getProductPrice()).bind("createAt", Instant.now())
 					.bind("categoryId", productRequest.getCategoryId()).then();
 
-			Mono<ProductResponse> select = databaseClient.execute(selectQuery)
-					.bind("productBarCode", productRequest.getProductBarCode())
-					.map(iProductMapper::mapToProductResponse).one();
-
-			return insert.then(select.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found")));
+			return insert.then(getProductByproductBarCode(productRequest.getProductBarCode()));
 		}).next();
 	}
 
@@ -54,8 +47,6 @@ public class ProductServicesImpl implements IProductService {
 	public Mono<ProductResponse> updateProduct(ProductRequest productRequest) {
 		final String updateQuery = "UPDATE products SET  product_bar_code = :productBarCode, product_name = :productName, product_description = :productDescription, product_stock = :productStock, "
 				+ "product_price = :productPrice, product_status = 'UPDATED', category_id = :categoryId WHERE products. product_bar_code = :productBarCode";
-		final String selectQuery = "SELECT * FROM products JOIN main_categories ON products.category_id = main_categories.category_id "
-				+ "WHERE products. product_bar_code = :productBarCode";
 
 		return transactionalOperator.execute(transaction -> {
 			Mono<Void> update = databaseClient.execute(updateQuery)
@@ -66,44 +57,30 @@ public class ProductServicesImpl implements IProductService {
 					.bind("productPrice", productRequest.getProductPrice())
 					.bind("categoryId", productRequest.getCategoryId()).then();
 
-			Mono<ProductResponse> select = databaseClient.execute(selectQuery)
-					.bind("productBarCode", productRequest.getProductBarCode())
-					.map(iProductMapper::mapToProductResponse).one();
-
-			return update.then(select.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found")));
+			return update.then(getProductByproductBarCode(productRequest.getProductBarCode()));
 		}).next();
 	}
 
 	@Override
 	public Mono<ProductResponse> updateStock(Long productBarCode, Integer quantity) {
 		final String updateQuery = "UPDATE products SET product_stock = :quantity, product_status = 'UPDATED' WHERE  product_bar_code = :productBarCode";
-		final String selectQuery = "SELECT * FROM products JOIN main_categories ON products.category_id = main_categories.category_id "
-				+ "WHERE products.product_bar_code = :productBarCode";
 
 		return transactionalOperator.execute(transaction -> {
 			Mono<Void> updateStock = databaseClient.execute(updateQuery).bind("productBarCode", productBarCode)
 					.bind("quantity", quantity).then();
 
-			Mono<ProductResponse> select = databaseClient.execute(selectQuery).bind("productBarCode", productBarCode)
-					.map(iProductMapper::mapToProductResponse).one();
-
-			return updateStock.then(select.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found")));
+			return updateStock.then(getProductByproductBarCode(productBarCode));
 		}).next();
 	}
 
 	@Override
 	public Mono<ProductResponse> suspendProduct(Long productBarCode) {
 		final String updateQuery = "UPDATE products SET product_status = 'SUSPENDED' WHERE  product_bar_code = :productBarCode";
-		final String selectQuery = "SELECT * FROM products JOIN main_categories ON products.category_id = main_categories.category_id "
-				+ "WHERE products.product_bar_code = :productBarCode";
 
 		return transactionalOperator.execute(transaction -> {
 			Mono<Void> updateStock = databaseClient.execute(updateQuery).bind("productBarCode", productBarCode).then();
 
-			Mono<ProductResponse> select = databaseClient.execute(selectQuery).bind("productBarCode", productBarCode)
-					.map(iProductMapper::mapToProductResponse).one();
-
-			return updateStock.then(select.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found")));
+			return updateStock.then(getProductByproductBarCode(productBarCode));
 		}).next();
 	}
 
@@ -124,15 +101,13 @@ public class ProductServicesImpl implements IProductService {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON products.category_id = main_categories.category_id "
 				+ "WHERE products.product_id = :productId";
 		return databaseClient.execute(query).bind("productId", productId).map(iProductMapper::mapToInvoiceResponse)
-				.first()
-				.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found"));
+				.first().switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found"));
 	}
 
 	@Override
 	public Flux<ProductResponse> getAllProducts() {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON products.category_id = main_categories.category_id";
-		return databaseClient.execute(query).map(iProductMapper::mapToProductResponse)
-				.all()
+		return databaseClient.execute(query).map(iProductMapper::mapToProductResponse).all()
 				.switchIfEmpty(iCustomException.fluxElementsCustomNotFoundException("Empty Record."));
 	}
 
@@ -140,8 +115,7 @@ public class ProductServicesImpl implements IProductService {
 	public Flux<ProductResponse> getProductByName(String productName) {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON products.category_id = main_categories.category_id WHERE product_name ~* :productName";
 		return databaseClient.execute(query).bind("productName", productName).map(iProductMapper::mapToProductResponse)
-				.all()
-				.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found"));
+				.all().switchIfEmpty(iCustomException.fluxElementsCustomNotFoundException("Product Not Found"));
 	}
 
 	@Override
@@ -149,8 +123,7 @@ public class ProductServicesImpl implements IProductService {
 		final String query = "SELECT * FROM products INNER JOIN main_categories ON main_categories.category_id = products.category_id "
 				+ "WHERE products.category_id = :categoryId";
 		return databaseClient.execute(query).bind("categoryId", categoryId).map(iProductMapper::mapToProductResponse)
-				.all()
-				.switchIfEmpty(iCustomException.monoElementCustomNotFoundException("Product Not Found"));
+				.all().switchIfEmpty(iCustomException.fluxElementsCustomNotFoundException("Product Not Found"));
 	}
 
 	@Override
