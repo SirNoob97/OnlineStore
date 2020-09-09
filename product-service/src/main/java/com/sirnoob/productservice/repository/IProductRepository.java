@@ -1,6 +1,7 @@
 package com.sirnoob.productservice.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.sirnoob.productservice.entity.Product;
 
@@ -10,9 +11,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IProductRepository extends JpaRepository<Product, Long>{
 
-  public Product findByProductName(String productName);
+  public Optional<Product> findByProductName(String productName);
 
-  public Product findByProductBarCode(Long productBarCode);
+  public Optional<Product> findByProductBarCode(Long productBarCode);
 
   public List<Product> findByMainCategoryMainCategoryId(Long categoryId);
 }
