@@ -14,6 +14,8 @@ import lombok.Getter;
 @Getter
 public class ProductRequest{
 
+  private Long productId;
+
   @PositiveOrZero(message = "The Bar Code must be positive.")
   @Digits(integer = 13, fraction = 0, message = "The Bar Code must be {integer} digits.")
   @NotNull(message = "The Bar Code is required.")
@@ -39,5 +41,5 @@ public class ProductRequest{
   private Long mainCategoryId;
 
   @Size(min = 1, message = "The Product must belong at least {min} Sub Category.")
-  private Long[] subcategoryId;
+  private Long[] subCategoriesId;
 }
