@@ -5,14 +5,15 @@ import java.util.List;
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
+import com.sirnoob.productservice.entity.Product;
 
 public interface IProductService {
 
   public ProductResponse createProduct(ProductRequest productRequest);
 
-  public ProductInvoiceResponse getProductById(Long productId);
+  public ProductInvoiceResponse getProductForInvoice(Long productBarCode);
 
-  public ProductResponse getProductByBarCode(Long productBarCode);
+  public Product getProductByBarCode(Long productBarCode);
 
   public ProductResponse updateProduct(ProductRequest productRequest);
 
