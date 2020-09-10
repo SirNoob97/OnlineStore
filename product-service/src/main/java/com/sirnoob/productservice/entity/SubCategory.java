@@ -29,11 +29,11 @@ public class SubCategory{
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "sub_category_id")
   private Long subCategoryId;
-  
+ 
   @NotNull(message = "The Sub Category Name is required.")
   @NotEmpty(message = "The Sub Category Name is required.")
   @Size(max = 30, message = "The Sub Category must be a maximum of 30 characters.")
-  @Column(name = "sun_category_name", nullable = false, unique = true, length = 30)
+  @Column(name = "sub_category_name", nullable = false, unique = true, length = 30)
   private String subCategoryName;
 
   @NotNull(message = "The Sub Category must belong to a Main Category.")
