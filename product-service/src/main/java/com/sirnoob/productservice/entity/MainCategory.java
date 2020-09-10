@@ -15,7 +15,7 @@ import lombok.Data;
 @Data
 @Builder
 @Entity
-@Table
+@Table(name = "main_categories")
 public class MainCategory{
 
   @Id
