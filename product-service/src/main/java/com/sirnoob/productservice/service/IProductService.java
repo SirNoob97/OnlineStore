@@ -17,7 +17,7 @@ public interface IProductService {
 
   public ProductResponse updateProduct(ProductRequest productRequest);
 
-  public ProductResponse updateProductStock(Long productBarCode, Integer quantity);
+  public void updateProductStock(Long productBarCode, Integer quantity);
 
   public List<ProductResponse> getAllProducts();
 

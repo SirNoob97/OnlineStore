@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
@@ -37,7 +39,7 @@ public class ProductServiceImpl implements IProductService {
     MainCategory mainCategory = getMainCategoryById(productRequest.getMainCategoryId());
 
     Set<SubCategory> subCategories = getSubcategoriesById(productRequest.getSubCategoriesId());
-    
+
     Product product = iProductMapper.mapProductRequestToProduct(productRequest, mainCategory, subCategories);
 
     product.setProductStatus("CREATED");
@@ -75,10 +77,10 @@ public class ProductServiceImpl implements IProductService {
     return iProductMapper.mapProductToProductResponse(iProductRepository.save(product));
   }
 
+  @Transactional
   @Override
-  public ProductResponse updateProductStock(Long productBarCode, Integer quantity) {
-
-    return null;
+  public void updateProductStock(Long productBarCode, Integer quantity) {
+    iProductRepository.updateProductStockForProductBarCode(quantity, productBarCode);
   }
 
   @Override
