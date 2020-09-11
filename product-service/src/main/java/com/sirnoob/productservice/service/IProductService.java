@@ -5,6 +5,7 @@ import java.util.List;
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
+import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.entity.Product;
 
 public interface IProductService {
@@ -15,13 +16,17 @@ public interface IProductService {
 
   public Product getProductByBarCode(Long productBarCode);
 
+  public ProductListView getProductByName(String productName);
+
+  public List<ProductListView> listByName(String productName, int page);
+
   public ProductResponse updateProduct(ProductRequest productRequest);
 
   public void updateProductStock(Long productBarCode, Integer quantity);
 
-  public List<ProductResponse> getAllProducts();
+  public List<ProductListView> getAllProducts(int page);
 
-  public List<ProductResponse> getProductsByMainCategoryId(Long mainCategoryId);
+  public List<ProductListView> getProductsByMainCategory(String mainCategoryName, int page);
 
-  public List<ProductResponse> getProductsBySubCategoryId(Long subCategoryId);
+  public List<ProductListView> getProductsBySubCategory(String[] subCategoryName);
 }

@@ -4,10 +4,12 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
+import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.entity.MainCategory;
@@ -18,6 +20,7 @@ import com.sirnoob.productservice.repository.IMainCategoryRepository;
 import com.sirnoob.productservice.repository.IProductRepository;
 import com.sirnoob.productservice.repository.ISubCategoryRepository;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -36,9 +39,9 @@ public class ProductServiceImpl implements IProductService {
   @Override
   public ProductResponse createProduct(ProductRequest productRequest) {
 
-    MainCategory mainCategory = getMainCategoryById(productRequest.getMainCategoryId());
+    MainCategory mainCategory = getMainCategoryByName(productRequest.getMainCategoryName());
 
-    Set<SubCategory> subCategories = getSubcategoriesById(productRequest.getSubCategoriesId());
+    Set<SubCategory> subCategories = getSubcategoriesByName(productRequest.getSubCategoriesNames());
 
     Product product = iProductMapper.mapProductRequestToProduct(productRequest, mainCategory, subCategories);
 
@@ -51,6 +54,16 @@ public class ProductServiceImpl implements IProductService {
   @Override
   public ProductInvoiceResponse getProductForInvoice(Long productBarCode) {
     return iProductMapper.mapProductToProductInvoiceResponse(getProductByBarCode(productBarCode));
+  }
+
+  @Override
+  public ProductListView getProductByName(String productName){
+    return iProductRepository.findByProductName(productName).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found with Name " + productName));
+  }
+
+  @Override
+  public List<ProductListView> listByName(String productName, int page) {
+    return iProductRepository.listByName(productName, PageRequest.of(page, 25));
   }
 
   @Override
@@ -70,9 +83,8 @@ public class ProductServiceImpl implements IProductService {
     product.setProductDescription(productRequest.getProductDescription());
     product.setProductStock(productRequest.getProductStock());
     product.setProductPrice(productRequest.getProductPrice());
-    product.setProductStatus("UPDATED");
-    product.setMainCategory(getMainCategoryById(productRequest.getMainCategoryId()));
-    product.setSubCategories(getSubcategoriesById(productRequest.getSubCategoriesId()));
+    product.setMainCategory(getMainCategoryByName(productRequest.getMainCategoryName()));
+    product.setSubCategories(getSubcategoriesByName(productRequest.getSubCategoriesNames()));
 
     return iProductMapper.mapProductToProductResponse(iProductRepository.save(product));
   }
@@ -84,38 +96,44 @@ public class ProductServiceImpl implements IProductService {
   }
 
   @Override
-  public List<ProductResponse> getAllProducts() {
-    // TODO Auto-generated method stub
-    return null;
+  public List<ProductListView> getAllProducts(int page) {
+    return iProductRepository.getAll(PageRequest.of(page, 25));
   }
 
   @Override
-  public List<ProductResponse> getProductsByMainCategoryId(Long mainCategoryId) {
-    // TODO Auto-generated method stub
-    return null;
+  public List<ProductListView> getProductsByMainCategory(String mainCategoryName, int page) {
+    return iProductRepository.findByMainCategory(getMainCategoryByName(mainCategoryName), PageRequest.of(page, 10));
   }
 
   @Override
-  public List<ProductResponse> getProductsBySubCategoryId(Long subCategoryId) {
-    // TODO Auto-generated method stub
-    return null;
+  public List<ProductListView> getProductsBySubCategory(String[] subCategoriesNames) {
+    List<Product> products = iProductRepository.findAll();
+    Set<SubCategory> subCategories = getSubcategoriesByName(subCategoriesNames);
+
+    return products.stream().filter(prs -> {
+      for (SubCategory sc : subCategories) {
+        if(prs.getSubCategories().contains(sc))
+          return true;
+      }
+      return false;
+    })
+    .map(prs -> new ProductListView(prs.getProductName(), prs.getProductDescription(), prs.getProductPrice()))
+    .collect(Collectors.toList());
   }
 
+  private MainCategory getMainCategoryByName(String mainCategoryName) {
 
-
-  private MainCategory getMainCategoryById(Long mainCategoryId) {
-
-    return iMainCategoryRepository.findById(mainCategoryId).orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Main Category Not Found with Id " + mainCategoryId));
+    return iMainCategoryRepository.findByMainCategoryName(mainCategoryName).orElseThrow(
+        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Main Category " + mainCategoryName + " Not Found"));
   }
 
-  private Set<SubCategory> getSubcategoriesById(Long[] subCategoriesId) {
+  private Set<SubCategory> getSubcategoriesByName(String[] subCategoriesNames) {
 
     Set<SubCategory> subCategories = new HashSet<>();
 
-    for (Long sc : subCategoriesId) {
-      subCategories.add(iSubCategoryRepository.findById(sc).orElseThrow(
-          () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sub Category Not Found with Id " + sc)));
+    for (String sc : subCategoriesNames) {
+      subCategories.add(iSubCategoryRepository.findBySubCategoryName(sc).orElseThrow(
+          () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sub Category " + sc + " Not Found")));
     }
 
     return subCategories;
