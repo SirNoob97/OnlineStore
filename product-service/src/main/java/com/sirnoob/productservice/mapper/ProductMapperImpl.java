@@ -12,53 +12,36 @@ import com.sirnoob.productservice.entity.SubCategory;
 
 import org.springframework.stereotype.Component;
 
-import lombok.RequiredArgsConstructor;
-
 @Component
 public class ProductMapperImpl implements IProductMapper {
 
+  @Override
+  public Product mapProductRequestToProduct(ProductRequest productRequest, MainCategory mainCategory,
+      Set<SubCategory> subCategories) {
 
-	@Override
-	public Product mapProductRequestToProduct(ProductRequest productRequest, MainCategory mainCategory, Set<SubCategory> subCategories) {
+    return Product.builder().productBarCode(productRequest.getProductBarCode())
+        .productName(productRequest.getProductName()).productDescription(productRequest.getProductDescription())
+        .productStock(productRequest.getProductStock()).productPrice(productRequest.getProductPrice())
+        .mainCategory(mainCategory).subCategories(subCategories).build();
 
-    return Product.builder()
-      .productBarCode(productRequest.getProductBarCode()) 
-      .productName(productRequest.getProductName())
-      .productDescription(productRequest.getProductDescription())
-      .productStock(productRequest.getProductStock())
-      .productPrice(productRequest.getProductPrice())
-      .mainCategory(mainCategory)
-      .subCategories(subCategories)
-      .build();
+  }
 
-	}
+  @Override
+  public ProductResponse mapProductToProductResponse(Product product) {
 
-	@Override
-	public ProductResponse mapProductToProductResponse(Product product) {
-		
-    return ProductResponse.builder()
-      .productId(product.getProductId())
-      .productBarCode(product.getProductBarCode())
-      .productName(product.getProductName())
-      .productDescription(product.getProductDescription())
-      .productStock(product.getProductStock())
-      .productPrice(product.getProductPrice())
-      .createAt(product.getCreateAt())
-      .productStatus(product.getProductStatus())
-      .mainCategoryName(product.getMainCategory().getMainCategoryName())
-      .subCategories(product.getSubCategories().stream().map(SubCategory::getSubCategoryName).collect(Collectors.toSet()))
-      .build();
-	}
+    return ProductResponse.builder().productId(product.getProductId()).productBarCode(product.getProductBarCode())
+        .productName(product.getProductName()).productDescription(product.getProductDescription())
+        .productStock(product.getProductStock()).productPrice(product.getProductPrice()).createAt(product.getCreateAt())
+        .productStatus(product.getProductStatus()).mainCategoryName(product.getMainCategory().getMainCategoryName())
+        .subCategories(
+            product.getSubCategories().stream().map(SubCategory::getSubCategoryName).collect(Collectors.toSet()))
+        .build();
+  }
 
-	@Override
-	public ProductInvoiceResponse mapProductToProductInvoiceResponse(Product product) {
+  @Override
+  public ProductInvoiceResponse mapProductToProductInvoiceResponse(Product product) {
 
-		return ProductInvoiceResponse.builder()
-      .productBarCode(product.getProductBarCode())
-      .productName(product.getProductName())
-      .productPrice(product.getProductPrice())
-      .mainCategoryName(product.getMainCategory().getMainCategoryName())
-      .build();
-	}
-  
+    return ProductInvoiceResponse.builder().productName(product.getProductName())
+        .productPrice(product.getProductPrice()).build();
+  }
 }
