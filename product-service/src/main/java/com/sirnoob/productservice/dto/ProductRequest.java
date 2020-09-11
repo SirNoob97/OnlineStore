@@ -38,8 +38,8 @@ public class ProductRequest{
   private Double productPrice;
 
   @NotNull(message = "The Product must belong to a Main Category.")
-  private Long mainCategoryId;
+  private String mainCategoryName;
 
   @Size(min = 1, message = "The Product must belong at least {min} Sub Category.")
-  private Long[] subCategoriesId;
+  private String[] subCategoriesNames;
 }
