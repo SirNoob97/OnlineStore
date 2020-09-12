@@ -16,10 +16,14 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,7 +38,7 @@ public class Product {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "product_id", updatable = false)
   private Long productId;
-    
+
   @Column(name = "product_bar_code", nullable = false, unique = true)
   private Long productBarCode;
 
@@ -43,10 +47,10 @@ public class Product {
 
   @Lob
   private String productDescription;
-  
+
   @Column(name = "product_stock", nullable = false)
   private Integer productStock;
-  
+
   @Column(name = "product_price", nullable = false)
   private Double productPrice;
 
@@ -55,15 +59,19 @@ public class Product {
 
   @Column(name = "product_status")
   private String productStatus;
- 
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   @ManyToOne(fetch =FetchType.LAZY)
   @JoinColumn(name = "category_id")
   private MainCategory mainCategory;
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @JsonIgnoreProperties("products")
   @ManyToMany
-  @JoinTable(name = "sub_categories_products", 
-              joinColumns = { @JoinColumn(name = "fk_product") }, 
+  @JoinTable(name = "sub_categories_products",
+              joinColumns = { @JoinColumn(name = "fk_product") },
               inverseJoinColumns = { @JoinColumn(name = "fk_sub_category") })
   private Set<SubCategory> subCategories;
 }
