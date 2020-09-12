@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -12,6 +11,7 @@ import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
+import com.sirnoob.productservice.dto.ProductView;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
@@ -52,18 +52,9 @@ public class ProductServiceImpl implements IProductService {
   }
 
   @Override
-  public ProductInvoiceResponse getProductForInvoice(Long productBarCode) {
-    return iProductMapper.mapProductToProductInvoiceResponse(getProductByBarCode(productBarCode));
-  }
-
-  @Override
-  public ProductListView getProductByName(String productName){
-    return iProductRepository.findByProductName(productName).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found with Name " + productName));
-  }
-
-  @Override
-  public List<ProductListView> listByName(String productName, int page) {
-    return iProductRepository.listByName(productName, PageRequest.of(page, 25));
+  public Product getProductByName(String productName){
+    return iProductRepository.findByProductName(productName).orElseThrow(
+        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found with Name " + productName));
   }
 
   @Override
@@ -75,8 +66,9 @@ public class ProductServiceImpl implements IProductService {
   @Override
   public ProductResponse updateProduct(ProductRequest productRequest) {
 
-
-    Product product = iProductRepository.findById(productRequest.getProductId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found with Id " + productRequest.getProductId()));
+    Product product = iProductRepository.findById(productRequest.getProductId())
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "Product Not Found with Id " + productRequest.getProductId()));
 
     product.setProductBarCode(productRequest.getProductBarCode());
     product.setProductName(productRequest.getProductName());
@@ -92,33 +84,44 @@ public class ProductServiceImpl implements IProductService {
   @Transactional
   @Override
   public void updateProductStock(Long productBarCode, Integer quantity) {
-    iProductRepository.updateProductStockForProductBarCode(quantity, productBarCode);
+    iProductRepository.updateProductStockByProductBarCode(quantity, productBarCode);
   }
 
   @Override
-  public List<ProductListView> getAllProducts(int page) {
+  public ProductInvoiceResponse getProductForInvoiceResponse(Long productBarCode, String productName) {
+    return !productName.equals(" ") ? iProductMapper.mapProductToProductInvoiceResponse(getProductByName(productName))
+                                    : iProductMapper.mapProductToProductInvoiceResponse(getProductByBarCode(productBarCode));
+  }
+
+
+
+  @Override
+  public ProductView findProductViewByName(String productName) {
+    return iProductMapper.mapProductToProductView(getProductByName(productName));
+  }
+
+  @Override
+  public List<ProductListView> getProductListViewByName(String productName, int page) {
+    return iProductRepository.listByName(productName, PageRequest.of(page, 25));
+  }
+
+  @Override
+  public List<ProductListView> getPageOfProductListView(int page) {
     return iProductRepository.getAll(PageRequest.of(page, 25));
   }
 
   @Override
-  public List<ProductListView> getProductsByMainCategory(String mainCategoryName, int page) {
+  public List<ProductListView> getProductListViewByMainCategory(String mainCategoryName, int page) {
     return iProductRepository.findByMainCategory(getMainCategoryByName(mainCategoryName), PageRequest.of(page, 10));
   }
 
   @Override
-  public List<ProductListView> getProductsBySubCategory(String[] subCategoriesNames) {
-    List<Product> products = iProductRepository.findAll();
-    Set<SubCategory> subCategories = getSubcategoriesByName(subCategoriesNames);
-
-    return products.stream().filter(prs -> {
-      for (SubCategory sc : subCategories) {
-        if(prs.getSubCategories().contains(sc))
-          return true;
-      }
-      return false;
-    })
-    .map(prs -> new ProductListView(prs.getProductName(), prs.getProductDescription(), prs.getProductPrice()))
-    .collect(Collectors.toList());
+  public Set<ProductListView> getProductListViewBySubCategory(String[] subCategoriesNames) {
+    Set<ProductListView> products = new HashSet<>();
+    for (SubCategory sc : getSubcategoriesByName(subCategoriesNames)) {
+      products.add(iProductRepository.findBySubCategory(sc));
+    }
+    return products;
   }
 
   private MainCategory getMainCategoryByName(String mainCategoryName) {
@@ -132,8 +135,8 @@ public class ProductServiceImpl implements IProductService {
     Set<SubCategory> subCategories = new HashSet<>();
 
     for (String sc : subCategoriesNames) {
-      subCategories.add(iSubCategoryRepository.findBySubCategoryName(sc).orElseThrow(
-          () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sub Category " + sc + " Not Found")));
+      subCategories.add(iSubCategoryRepository.findBySubCategoryName(sc)
+          .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sub Category " + sc + " Not Found")));
     }
 
     return subCategories;
