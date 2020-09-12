@@ -3,6 +3,7 @@ package com.sirnoob.productservice.dto;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -17,6 +18,7 @@ public class ProductRequest{
   private Long productId;
 
   @PositiveOrZero(message = "The Bar Code must be positive.")
+  @Min(value = 1000000000000L,message = "The Bar Code must be 13 digits.")
   @Digits(integer = 13, fraction = 0, message = "The Bar Code must be {integer} digits.")
   @NotNull(message = "The Bar Code is required.")
   private Long productBarCode;
@@ -40,6 +42,7 @@ public class ProductRequest{
   @NotNull(message = "The Product must belong to a Main Category.")
   private String mainCategoryName;
 
+  @NotNull(message = "The Product must belong to a Sub Category.")
   @Size(min = 1, message = "The Product must belong at least {min} Sub Category.")
   private String[] subCategoriesNames;
 }
