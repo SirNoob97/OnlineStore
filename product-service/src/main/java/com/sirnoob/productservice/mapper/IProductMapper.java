@@ -5,6 +5,7 @@ import java.util.Set;
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
+import com.sirnoob.productservice.dto.ProductView;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
@@ -15,6 +16,8 @@ public interface IProductMapper {
       Set<SubCategory> subCategories);
 
   public ProductResponse mapProductToProductResponse(Product product);
+
+  public ProductView mapProductToProductView(Product product);
 
   public ProductInvoiceResponse mapProductToProductInvoiceResponse(Product product);
 }
