@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ProductView {
 
+  private Long productBarCode;
   private String productName;
   private String productDescription;
   private Double productPrice;

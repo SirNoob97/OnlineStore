@@ -15,8 +15,6 @@ import lombok.Getter;
 @Getter
 public class ProductRequest{
 
-  private Long productId;
-
   @PositiveOrZero(message = "The Bar Code must be positive.")
   @Min(value = 1000000000000L,message = "The Bar Code must be 13 digits.")
   @Digits(integer = 13, fraction = 0, message = "The Bar Code must be {integer} digits.")
@@ -28,12 +26,12 @@ public class ProductRequest{
   @Size(max = 30, message = "The Name must be a maximum of 30 characters.")
   private String productName;
   private String productDescription;
-  
+
   @Positive(message = "The Product Stock must be greater than zero.")
   @NotNull(message = "The Product Stock is required.")
   @Digits(integer = 4, fraction = 0, message = "The Stock must be an integer and its maximum is 9999.")
   private Integer productStock;
-  
+
   @DecimalMin(value = "0.0", message = "The Product Price must be positive.")
   @NotNull(message = "The Product Price is required.")
   @Digits(integer = 6, fraction = 2, message = "The Price can only have 2 decimal places and its maximum is 999999.99")
