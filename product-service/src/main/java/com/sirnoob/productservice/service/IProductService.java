@@ -8,19 +8,16 @@ import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.dto.ProductView;
-import com.sirnoob.productservice.entity.Product;
 
 public interface IProductService {
 
   public ProductResponse createProduct(ProductRequest productRequest);
 
-  public ProductResponse updateProduct(ProductRequest productRequest);
+  public ProductResponse updateProduct(Long productId, ProductRequest productRequest);
+
+  public ProductResponse getProductResponseByBarCodeOrProductName(Long productBarCode, String productName);
 
   public ProductInvoiceResponse getProductForInvoiceResponse(Long productBarCode, String productName);
-
-  public Product getProductByBarCode(Long productBarCode);
-
-  public Product getProductByName(String productName);
 
   public ProductView findProductViewByName(String productName);
 
@@ -32,5 +29,7 @@ public interface IProductService {
 
   public Set<ProductListView> getProductListViewBySubCategory(String[] subCategoryName);
 
-  public void updateProductStock(Long productBarCode, Integer quantity);
+  public int updateProductStock(Long productBarCode, Integer quantity);
+
+  public void deleteProductById(Long productId);
 }

@@ -52,23 +52,19 @@ public class ProductServiceImpl implements IProductService {
   }
 
   @Override
-  public Product getProductByName(String productName){
-    return iProductRepository.findByProductName(productName).orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found with Name " + productName));
+  public ProductResponse getProductResponseByBarCodeOrProductName(Long productBarCode, String productName) {
+    return iProductMapper
+        .mapProductToProductResponse(iProductRepository.findByProductBarCodeOrProductName(productBarCode, productName)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Product " + productName + " Not Found with Bar Code " + productBarCode)));
   }
 
   @Override
-  public Product getProductByBarCode(Long productBarCode) {
-    return iProductRepository.findByProductBarCode(productBarCode).orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found with Bar Code " + productBarCode));
-  }
+  public ProductResponse updateProduct(Long productId, ProductRequest productRequest) {
 
-  @Override
-  public ProductResponse updateProduct(ProductRequest productRequest) {
-
-    Product product = iProductRepository.findById(productRequest.getProductId())
+    Product product = iProductRepository.findById(productId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-            "Product Not Found with Id " + productRequest.getProductId()));
+            "Product Not Found with Id " + productId));
 
     product.setProductBarCode(productRequest.getProductBarCode());
     product.setProductName(productRequest.getProductName());
@@ -83,21 +79,28 @@ public class ProductServiceImpl implements IProductService {
 
   @Transactional
   @Override
-  public void updateProductStock(Long productBarCode, Integer quantity) {
-    iProductRepository.updateProductStockByProductBarCode(quantity, productBarCode);
+  public int updateProductStock(Long productBarCode, Integer quantity) {
+    return iProductRepository.updateProductStockByProductBarCode(quantity, productBarCode);
   }
 
   @Override
   public ProductInvoiceResponse getProductForInvoiceResponse(Long productBarCode, String productName) {
-    return !productName.equals(" ") ? iProductMapper.mapProductToProductInvoiceResponse(getProductByName(productName))
-                                    : iProductMapper.mapProductToProductInvoiceResponse(getProductByBarCode(productBarCode));
+    return iProductRepository.findProductForInvoice(productBarCode, productName)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "Product " + productName + " With BarCode " + productBarCode + " NOT FOUND."));
   }
 
+  @Override
+  public void deleteProductById(Long productId) {
+    iProductRepository.delete(iProductRepository.findById(productId).orElseThrow(
+        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product NOT FOUND with ID " + productId)));
+  }
 
 
   @Override
   public ProductView findProductViewByName(String productName) {
-    return iProductMapper.mapProductToProductView(getProductByName(productName));
+    return iProductMapper.mapProductToProductView(iProductRepository.findByProductName(productName).orElseThrow(
+        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found with Name " + productName)));
   }
 
   @Override
@@ -123,6 +126,8 @@ public class ProductServiceImpl implements IProductService {
     }
     return products;
   }
+
+
 
   private MainCategory getMainCategoryByName(String mainCategoryName) {
 
