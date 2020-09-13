@@ -2,7 +2,6 @@ package com.sirnoob.productservice.mapper;
 
 import java.util.Set;
 
-import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.dto.ProductView;
@@ -19,5 +18,4 @@ public interface IProductMapper {
 
   public ProductView mapProductToProductView(Product product);
 
-  public ProductInvoiceResponse mapProductToProductInvoiceResponse(Product product);
 }

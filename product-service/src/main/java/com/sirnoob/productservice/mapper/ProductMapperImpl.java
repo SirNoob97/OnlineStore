@@ -3,7 +3,6 @@ package com.sirnoob.productservice.mapper;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.dto.ProductView;
@@ -48,18 +47,10 @@ public class ProductMapperImpl implements IProductMapper {
   }
 
   @Override
-  public ProductInvoiceResponse mapProductToProductInvoiceResponse(Product product) {
-
-    return ProductInvoiceResponse.builder()
-                                 .productName(product.getProductName())
-                                 .productPrice(product.getProductPrice())
-                                 .build();
-  }
-
-  @Override
   public ProductView mapProductToProductView(Product product) {
 
     return ProductView.builder()
+                      .productBarCode(product.getProductBarCode())
                       .productName(product.getProductName())
                       .productDescription(product.getProductDescription())
                       .productPrice(product.getProductPrice())
