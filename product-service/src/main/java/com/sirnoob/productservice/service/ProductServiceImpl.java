@@ -16,7 +16,6 @@ import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.mapper.IProductMapper;
-import com.sirnoob.productservice.repository.IMainCategoryRepository;
 import com.sirnoob.productservice.repository.IProductRepository;
 import com.sirnoob.productservice.repository.ISubCategoryRepository;
 
@@ -31,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ProductServiceImpl implements IProductService {
 
-  private final IMainCategoryRepository iMainCategoryRepository;
+  private final IMainCategoryService iMainCategoryService;
   private final ISubCategoryRepository iSubCategoryRepository;
   private final IProductRepository iProductRepository;
   private final IProductMapper iProductMapper;
@@ -39,7 +38,7 @@ public class ProductServiceImpl implements IProductService {
   @Override
   public ProductResponse createProduct(ProductRequest productRequest) {
 
-    MainCategory mainCategory = getMainCategoryByName(productRequest.getMainCategoryName());
+    MainCategory mainCategory = iMainCategoryService.getMainCategoryByName(productRequest.getMainCategoryName());
 
     Set<SubCategory> subCategories = getSubcategoriesByName(productRequest.getSubCategoriesNames());
 
@@ -71,7 +70,7 @@ public class ProductServiceImpl implements IProductService {
     product.setProductDescription(productRequest.getProductDescription());
     product.setProductStock(productRequest.getProductStock());
     product.setProductPrice(productRequest.getProductPrice());
-    product.setMainCategory(getMainCategoryByName(productRequest.getMainCategoryName()));
+    product.setMainCategory(iMainCategoryService.getMainCategoryByName(productRequest.getMainCategoryName()));
     product.setSubCategories(getSubcategoriesByName(productRequest.getSubCategoriesNames()));
 
     return iProductMapper.mapProductToProductResponse(iProductRepository.save(product));
@@ -115,7 +114,7 @@ public class ProductServiceImpl implements IProductService {
 
   @Override
   public List<ProductListView> getProductListViewByMainCategory(String mainCategoryName, int page) {
-    return iProductRepository.findByMainCategory(getMainCategoryByName(mainCategoryName), PageRequest.of(page, 10));
+    return iProductRepository.findByMainCategory(iMainCategoryService.getMainCategoryByName(mainCategoryName), PageRequest.of(page, 10));
   }
 
   @Override
@@ -129,11 +128,6 @@ public class ProductServiceImpl implements IProductService {
 
 
 
-  private MainCategory getMainCategoryByName(String mainCategoryName) {
-
-    return iMainCategoryRepository.findByMainCategoryName(mainCategoryName).orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Main Category " + mainCategoryName + " Not Found"));
-  }
 
   private Set<SubCategory> getSubcategoriesByName(String[] subCategoriesNames) {
 
