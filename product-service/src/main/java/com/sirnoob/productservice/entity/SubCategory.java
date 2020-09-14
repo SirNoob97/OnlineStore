@@ -47,8 +47,9 @@ public class SubCategory{
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @NotNull(message = "The Sub Category must belong to a Main Category.")
-  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "category_id")
+  @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+  @ManyToOne(fetch = FetchType.LAZY)
   private MainCategory mainCategory;
 
   @ToString.Exclude
