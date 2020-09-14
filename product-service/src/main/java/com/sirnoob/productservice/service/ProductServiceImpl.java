@@ -2,7 +2,6 @@ package com.sirnoob.productservice.service;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.transaction.Transactional;
@@ -17,7 +16,6 @@ import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.mapper.IProductMapper;
 import com.sirnoob.productservice.repository.IProductRepository;
-import com.sirnoob.productservice.repository.ISubCategoryRepository;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -31,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductServiceImpl implements IProductService {
 
   private final IMainCategoryService iMainCategoryService;
-  private final ISubCategoryRepository iSubCategoryRepository;
+  private final ISubCategoryService iSubCategoryService;
   private final IProductRepository iProductRepository;
   private final IProductMapper iProductMapper;
 
@@ -40,7 +38,7 @@ public class ProductServiceImpl implements IProductService {
 
     MainCategory mainCategory = iMainCategoryService.getMainCategoryByName(productRequest.getMainCategoryName());
 
-    Set<SubCategory> subCategories = getSubcategoriesByName(productRequest.getSubCategoriesNames());
+    Set<SubCategory> subCategories = iSubCategoryService.getSubcategoriesByName(productRequest.getSubCategoriesNames());
 
     Product product = iProductMapper.mapProductRequestToProduct(productRequest, mainCategory, subCategories);
 
@@ -71,7 +69,7 @@ public class ProductServiceImpl implements IProductService {
     product.setProductStock(productRequest.getProductStock());
     product.setProductPrice(productRequest.getProductPrice());
     product.setMainCategory(iMainCategoryService.getMainCategoryByName(productRequest.getMainCategoryName()));
-    product.setSubCategories(getSubcategoriesByName(productRequest.getSubCategoriesNames()));
+    product.setSubCategories(iSubCategoryService.getSubcategoriesByName(productRequest.getSubCategoriesNames()));
 
     return iProductMapper.mapProductToProductResponse(iProductRepository.save(product));
   }
@@ -103,42 +101,26 @@ public class ProductServiceImpl implements IProductService {
   }
 
   @Override
-  public List<ProductListView> getProductListViewByName(String productName, int page) {
-    return iProductRepository.listByName(productName, PageRequest.of(page, 25));
+  public Set<ProductListView> getProductListViewByName(String productName, int page) {
+    return iProductRepository.listByName(productName, PageRequest.of(page, 25)).toSet();
   }
 
   @Override
-  public List<ProductListView> getPageOfProductListView(int page) {
-    return iProductRepository.getAll(PageRequest.of(page, 25));
+  public Set<ProductListView> getPageOfProductListView(int page) {
+    return iProductRepository.getAll(PageRequest.of(page, 25)).toSet();
   }
 
   @Override
-  public List<ProductListView> getProductListViewByMainCategory(String mainCategoryName, int page) {
-    return iProductRepository.findByMainCategory(iMainCategoryService.getMainCategoryByName(mainCategoryName), PageRequest.of(page, 10));
+  public Set<ProductListView> getProductListViewByMainCategory(String mainCategoryName, int page) {
+    return iProductRepository.findByMainCategory(iMainCategoryService.getMainCategoryByName(mainCategoryName), PageRequest.of(page, 10)).toSet();
   }
 
   @Override
   public Set<ProductListView> getProductListViewBySubCategory(String[] subCategoriesNames) {
     Set<ProductListView> products = new HashSet<>();
-    for (SubCategory sc : getSubcategoriesByName(subCategoriesNames)) {
+    for (SubCategory sc : iSubCategoryService.getSubcategoriesByName(subCategoriesNames)) {
       products.add(iProductRepository.findBySubCategory(sc));
     }
     return products;
   }
-
-
-
-
-  private Set<SubCategory> getSubcategoriesByName(String[] subCategoriesNames) {
-
-    Set<SubCategory> subCategories = new HashSet<>();
-
-    for (String sc : subCategoriesNames) {
-      subCategories.add(iSubCategoryRepository.findBySubCategoryName(sc)
-          .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sub Category " + sc + " Not Found")));
-    }
-
-    return subCategories;
-  }
-
 }

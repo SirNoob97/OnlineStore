@@ -1,6 +1,5 @@
 package com.sirnoob.productservice.service;
 
-import java.util.List;
 import java.util.Set;
 
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
@@ -21,11 +20,11 @@ public interface IProductService {
 
   public ProductView findProductViewByName(String productName);
 
-  public List<ProductListView> getProductListViewByName(String productName, int page);
+  public Set<ProductListView> getProductListViewByName(String productName, int page);
 
-  public List<ProductListView> getPageOfProductListView(int page);
+  public Set<ProductListView> getPageOfProductListView(int page);
 
-  public List<ProductListView> getProductListViewByMainCategory(String mainCategoryName, int page);
+  public Set<ProductListView> getProductListViewByMainCategory(String mainCategoryName, int page);
 
   public Set<ProductListView> getProductListViewBySubCategory(String[] subCategoryName);
 
