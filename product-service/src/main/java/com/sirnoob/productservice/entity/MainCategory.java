@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "main_categories")
-public class MainCategory{
+public class MainCategory {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
