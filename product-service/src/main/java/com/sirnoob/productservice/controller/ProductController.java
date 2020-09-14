@@ -1,6 +1,5 @@
 package com.sirnoob.productservice.controller;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -67,12 +66,12 @@ public class ProductController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ProductListView>> listAllProducts(@RequestParam(defaultValue = "0") int page){
+  public ResponseEntity<Set<ProductListView>> listAllProducts(@RequestParam(defaultValue = "0") int page){
     return ResponseEntity.ok().body(iProductService.getPageOfProductListView(page));
   }
 
   @GetMapping("/main-categories/{page}")
-  public ResponseEntity<List<ProductListView>> listProductsByMainCategoryId(@RequestParam(required = true) String mainCategoryName, @PathVariable int page){
+  public ResponseEntity<Set<ProductListView>> listProductsByMainCategoryId(@RequestParam(required = true) String mainCategoryName, @PathVariable int page){
     return ResponseEntity.ok().body(iProductService.getProductListViewByMainCategory(mainCategoryName, page));
   }
 
@@ -87,7 +86,7 @@ public class ProductController {
   }
 
   @GetMapping("/names/{page}")
-  public ResponseEntity<List<ProductListView>> listByProductNameCoincidences(@RequestParam(required = true) String productName, @PathVariable int page){
+  public ResponseEntity<Set<ProductListView>> listByProductNameCoincidences(@RequestParam(required = true) String productName, @PathVariable int page){
     return ResponseEntity.ok().body(iProductService.getProductListViewByName(productName, page));
   }
 }
