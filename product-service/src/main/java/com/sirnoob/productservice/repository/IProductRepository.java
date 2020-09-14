@@ -1,14 +1,13 @@
 package com.sirnoob.productservice.repository;
 
-import java.util.List;
 import java.util.Optional;
-
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -27,12 +26,12 @@ public interface IProductRepository extends JpaRepository<Product, Long>{
   public Optional<ProductInvoiceResponse> findProductForInvoice(@Param("productBarCode") Long productBarCode, @Param("productName") String productName);
 
   @Query("SELECT new com.sirnoob.productservice.dto.ProductListView(p.productName, p.productDescription, p.productPrice) FROM Product p")
-  public List<ProductListView> getAll(Pageable pageable);
+  public Page<ProductListView> getAll(Pageable pageable);
 
   @Query("SELECT new com.sirnoob.productservice.dto.ProductListView(p.productName, p.productDescription, p.productPrice) FROM Product p WHERE p.productName LIKE :productName%")
-  public List<ProductListView> listByName(@Param("productName") String productName, Pageable pageable);
+  public Page<ProductListView> listByName(@Param("productName") String productName, Pageable pageable);
 
-  public List<ProductListView> findByMainCategory(MainCategory mainCategory, Pageable pageable);
+  public Page<ProductListView> findByMainCategory(MainCategory mainCategory, Pageable pageable);
 
   @Query("SELECT new com.sirnoob.productservice.dto.ProductListView(p.productName, p.productDescription, p.productPrice) FROM Product p WHERE :subCategory MEMBER p.subCategories")
   public ProductListView findBySubCategory(@Param("subCategory") SubCategory subCategory);
