@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class MainCategoryServiceImpl implements IMainCategoryService {
 
+  private final ISubCategoryService iSubCategoryService;
   private final IMainCategoryRepository iMainCategoryRepository;
 
   @Override
@@ -34,9 +35,17 @@ public class MainCategoryServiceImpl implements IMainCategoryService {
 
   @Transactional
   @Override
-  public void deleteMainCategry(Long mainCategoryId) {
-    iMainCategoryRepository.delete(iMainCategoryRepository.findById(mainCategoryId).orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Main Category NOT FOUND with id " + mainCategoryId)));
+  public void deleteMainCategory(Long mainCategoryId) {
+    MainCategory mainCategory = getMainCategoryById(mainCategoryId);
+    iSubCategoryService.getSubCategoryByMainCategory(mainCategory).forEach(sc -> iSubCategoryService.deleteSubCategory(sc.getSubCategoryId()));
+
+    iMainCategoryRepository.delete(mainCategory);
+  }
+
+  @Override
+  public MainCategory getMainCategoryById(Long mainCategoryId) {
+  return iMainCategoryRepository.findById(mainCategoryId).orElseThrow(
+        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Main Category NOT FOUND with id " + mainCategoryId));
   }
 
   @Override
@@ -50,5 +59,4 @@ public class MainCategoryServiceImpl implements IMainCategoryService {
     return iMainCategoryRepository.findAll(PageRequest.of(page, 10)).stream().map(MainCategory::getMainCategoryName)
         .collect(Collectors.toSet());
   }
-
 }

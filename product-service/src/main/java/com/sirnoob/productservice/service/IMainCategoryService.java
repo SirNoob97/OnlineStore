@@ -10,7 +10,9 @@ public interface IMainCategoryService {
 
   public int updateMainCategoryName(Long mainCategoryId, String mainCategoryName);
 
-  public void deleteMainCategry(Long mainCategoryId);
+  public void deleteMainCategory(Long mainCategoryId);
+
+  public MainCategory getMainCategoryById(Long mainCategoryId);
 
   public MainCategory getMainCategoryByName(String mainCategoryName);
 
