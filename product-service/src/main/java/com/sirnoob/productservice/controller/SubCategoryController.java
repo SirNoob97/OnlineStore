@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
+import com.sirnoob.productservice.dto.SubCategoryResponse;
 import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.service.ISubCategoryService;
 
@@ -53,7 +54,7 @@ public class SubCategoryController {
   }
 
   @GetMapping("/{subCategoryName}")
-  public ResponseEntity<SubCategory> getSubCategoryByName(@PathVariable String subCategoryName) {
-    return ResponseEntity.ok().body(iSubCategoryService.getSubCategoryByName(subCategoryName));
+  public ResponseEntity<SubCategoryResponse> getSubCategoryResponseByName(@PathVariable String subCategoryName) {
+    return ResponseEntity.ok().body(iSubCategoryService.getSubCategoryResponseByName(subCategoryName));
   }
 }
