@@ -1,5 +1,6 @@
 package com.sirnoob.productservice.service;
 
+import java.util.List;
 import java.util.Set;
 
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
@@ -7,8 +8,12 @@ import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.dto.ProductView;
+import com.sirnoob.productservice.entity.MainCategory;
+import com.sirnoob.productservice.entity.Product;
 
 public interface IProductService {
+
+  public List<Product> getProductByMainCategory(MainCategory mainCategory);
 
   public ProductResponse createProduct(ProductRequest productRequest);
 
@@ -24,7 +29,7 @@ public interface IProductService {
 
   public Set<ProductListView> getPageOfProductListView(int page);
 
-  public Set<ProductListView> getProductListViewByMainCategory(String mainCategoryName, int page);
+  public Set<ProductListView> getProductListViewByMainCategory(String mainCategory, int page);
 
   public Set<ProductListView> getProductListViewBySubCategory(String[] subCategoryName);
 

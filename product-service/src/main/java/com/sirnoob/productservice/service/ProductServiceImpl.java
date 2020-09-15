@@ -1,8 +1,9 @@
 package com.sirnoob.productservice.service;
 
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -60,8 +61,7 @@ public class ProductServiceImpl implements IProductService {
   public ProductResponse updateProduct(Long productId, ProductRequest productRequest) {
 
     Product product = iProductRepository.findById(productId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-            "Product Not Found with Id " + productId));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found with Id " + productId));
 
     product.setProductBarCode(productRequest.getProductBarCode());
     product.setProductName(productRequest.getProductName());
@@ -93,6 +93,10 @@ public class ProductServiceImpl implements IProductService {
         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product NOT FOUND with ID " + productId)));
   }
 
+  @Override
+  public List<Product> getProductByMainCategory(MainCategory mainCategory) {
+    return iProductRepository.findByMainCategory(mainCategory);
+  }
 
   @Override
   public ProductView findProductViewByName(String productName) {
@@ -117,10 +121,9 @@ public class ProductServiceImpl implements IProductService {
 
   @Override
   public Set<ProductListView> getProductListViewBySubCategory(String[] subCategoriesNames) {
-    Set<ProductListView> products = new HashSet<>();
-    for (SubCategory sc : iSubCategoryService.getSubcategoriesByName(subCategoriesNames)) {
-      products.add(iProductRepository.findBySubCategory(sc));
-    }
-    return products;
+    return iSubCategoryService.getSubcategoriesByName(subCategoriesNames).stream()
+                                          .map(sc -> iProductRepository.findBySubCategory(sc))
+                                          .flatMap(pdv -> pdv.stream())
+                                          .collect(Collectors.toSet());
   }
 }
