@@ -2,12 +2,15 @@ package com.sirnoob.productservice.service;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import com.sirnoob.productservice.dto.SubCategoryResponse;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
+import com.sirnoob.productservice.mapper.ISubCategoryMapper;
 import com.sirnoob.productservice.repository.ISubCategoryRepository;
 
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class SubCategoryServiceImpl implements ISubCategoryService {
 
+  private final ISubCategoryMapper iSubCategoryMapper;
   private final ISubCategoryRepository iSubCategoryRepository;
 
   @Override
@@ -51,6 +55,12 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sub Category NOT FOUND with id " + subCategoryId));
   }
 
+
+  @Override
+  public SubCategoryResponse getSubCategoryResponseByName(String subCategoryName) {
+    return iSubCategoryMapper.mapSubCategoryToSubCategoryResponse(getSubCategoryByName(subCategoryName));
+  }
+
   @Override
   public SubCategory getSubCategoryByName(String subCategoryName) {
     return iSubCategoryRepository.findBySubCategoryName(subCategoryName).orElseThrow(
@@ -76,6 +86,7 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
   @Override
   public Set<SubCategory> getSubCategoryByMainCategory(MainCategory mainCategory) {
-    return iSubCategoryRepository.findByMainCategory(mainCategory);
+    return iSubCategoryRepository.findByMainCategory(mainCategory).stream().collect(Collectors.toSet());
   }
+
 }

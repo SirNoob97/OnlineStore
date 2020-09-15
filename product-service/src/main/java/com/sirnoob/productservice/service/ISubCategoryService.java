@@ -2,6 +2,7 @@ package com.sirnoob.productservice.service;
 
 import java.util.Set;
 
+import com.sirnoob.productservice.dto.SubCategoryResponse;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.SubCategory;
 
@@ -13,6 +14,8 @@ public interface ISubCategoryService {
   public int updateSubCategoryName(Long subCategoryId, String subCategoryName);
 
   public void deleteSubCategory(Long subCategoryId);
+
+  public SubCategoryResponse getSubCategoryResponseByName(String subCategoryName);
 
   public SubCategory getSubCategoryByName(String subCategoryName);
 
