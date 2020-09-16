@@ -32,7 +32,7 @@ public interface IProductRepository extends JpaRepository<Product, Long>{
   @Query("SELECT new com.sirnoob.productservice.dto.ProductListView(p.productName, p.productDescription, p.productPrice) FROM Product p")
   public Page<ProductListView> getAll(Pageable pageable);
 
-  @Query("SELECT new com.sirnoob.productservice.dto.ProductListView(p.productName, p.productDescription, p.productPrice) FROM Product p WHERE p.productName LIKE :productName%")
+  @Query("SELECT new com.sirnoob.productservice.dto.ProductListView(p.productName, p.productDescription, p.productPrice) FROM Product p WHERE LOWER(p.productName) LIKE LOWER(CONCAT('%', :productName, '%'))")
   public Page<ProductListView> listByName(@Param("productName") String productName, Pageable pageable);
 
   public Page<ProductListView> findByMainCategory(MainCategory mainCategory, Pageable pageable);
