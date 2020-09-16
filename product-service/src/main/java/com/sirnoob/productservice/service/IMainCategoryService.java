@@ -8,13 +8,13 @@ public interface IMainCategoryService {
 
   public String createMainCategory(MainCategory mainCategory);
 
-  public int updateMainCategoryName(Long mainCategoryId, String mainCategoryName);
-
-  public void deleteMainCategory(Long mainCategoryId);
-
   public MainCategory getMainCategoryById(Long mainCategoryId);
 
   public MainCategory getMainCategoryByName(String mainCategoryName);
 
   public Set<String> getAllMainCategory(int page);
+
+  public void updateMainCategoryName(Long mainCategoryId, String mainCategoryName);
+  
+  public void deleteMainCategory(Long mainCategoryId);
 }

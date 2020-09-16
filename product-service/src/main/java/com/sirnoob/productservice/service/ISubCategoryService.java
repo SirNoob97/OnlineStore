@@ -8,12 +8,7 @@ import com.sirnoob.productservice.entity.SubCategory;
 
 public interface ISubCategoryService {
 
-
   public String createSubCategory(SubCategory subCategory);
-
-  public int updateSubCategoryName(Long subCategoryId, String subCategoryName);
-
-  public void deleteSubCategory(Long subCategoryId);
 
   public SubCategoryResponse getSubCategoryResponseByName(String subCategoryName);
 
@@ -26,4 +21,8 @@ public interface ISubCategoryService {
   public Set<SubCategory> getSubcategoriesByName(String[] subCategoriesNames);
 
   public Set<SubCategory> getSubCategoryByMainCategory (MainCategory mainCategory);
+
+  public void updateSubCategoryName(Long subCategoryId, String subCategoryName);
+  
+  public void deleteSubCategory(Long subCategoryId);
 }
