@@ -6,7 +6,7 @@ import java.util.Set;
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
 
 public class CollectionValidator {
-		
+
 	public static <T> Set<T> throwExceptionIfSetIsEmpty(Set<T> set, String message){
 		if(!set.isEmpty()) return set;
 		throw new ResourceNotFoundException(message);
