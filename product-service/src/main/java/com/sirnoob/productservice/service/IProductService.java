@@ -13,6 +13,8 @@ import com.sirnoob.productservice.entity.Product;
 
 public interface IProductService {
 
+  public Product getProductById(Long productId);
+
   public List<Product> getProductByMainCategory(MainCategory mainCategory);
 
   public ProductResponse createProduct(ProductRequest productRequest);
@@ -33,7 +35,7 @@ public interface IProductService {
 
   public Set<ProductListView> getProductListViewBySubCategory(String[] subCategoryName);
 
-  public int updateProductStock(Long productBarCode, Integer quantity);
+  public void updateProductStock(Long productBarCode, Integer quantity);
 
   public void deleteProductById(Long productId);
 }

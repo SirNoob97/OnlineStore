@@ -11,7 +11,6 @@ import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.dto.ProductView;
 import com.sirnoob.productservice.service.IProductService;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,9 +42,9 @@ public class ProductController {
   }
 
   @PutMapping("/{productBarCode}/stock")
-  public ResponseEntity<String> updateProductStock(@PathVariable Long productBarCode, @RequestParam(required = true) Integer quantity){
-   return iProductService.updateProductStock(productBarCode, quantity) > 0 ? ResponseEntity.noContent().build()
-                                                                            : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product Not Found");
+  public ResponseEntity<Void> updateProductStock(@PathVariable Long productBarCode, @RequestParam(required = true) Integer quantity){
+    iProductService.updateProductStock(productBarCode, quantity);
+    return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/responses")
