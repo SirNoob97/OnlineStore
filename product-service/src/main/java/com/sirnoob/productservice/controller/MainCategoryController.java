@@ -34,9 +34,9 @@ public class MainCategoryController {
   }
 
   @PutMapping("/{mainCategoryId}")
-  public ResponseEntity<String> updateMainCategory(@PathVariable Long mainCategoryId, @RequestParam(required = true) String mainCategoryName){
-    return iMainCategoryService.updateMainCategoryName(mainCategoryId, mainCategoryName) > 0 ? ResponseEntity.noContent().build()
-                                                                                            : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category NOT FOUND with id " + mainCategoryId);
+  public ResponseEntity<Void> updateMainCategory(@PathVariable Long mainCategoryId, @RequestParam(required = true) String mainCategoryName){
+    iMainCategoryService.updateMainCategoryName(mainCategoryId, mainCategoryName);  
+    return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping("/{mainCategoryId}")

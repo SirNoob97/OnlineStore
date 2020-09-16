@@ -35,11 +35,9 @@ public class SubCategoryController {
   }
 
   @PutMapping("/{subCategoryId}")
-  public ResponseEntity<String> updateSubCategoryName(@PathVariable Long subCategoryId,
-      @RequestParam(required = true) String subCategoryName) {
-    return iSubCategoryService.updateSubCategoryName(subCategoryId, subCategoryName) > 0
-        ? ResponseEntity.noContent().build()
-        : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sub Category NOT FOUND with id " + subCategoryId);
+  public ResponseEntity<Void> updateSubCategoryName(@PathVariable Long subCategoryId, @RequestParam(required = true) String subCategoryName) {
+    iSubCategoryService.updateSubCategoryName(subCategoryId, subCategoryName);
+    return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping("/{subCategoryId}")
