@@ -35,6 +35,7 @@ public class ProductServiceImpl implements IProductService {
 	private final IProductMapper iProductMapper;
 
 	private static final String PRODUCTNOTFOUND = "Product Not Found";
+	private static final String NOPRODUCTSFOUND = "No Products Found";
 
 	@Transactional
 	@Override
@@ -101,8 +102,7 @@ public class ProductServiceImpl implements IProductService {
 
 	@Override
 	public List<Product> getProductByMainCategory(MainCategory mainCategory) {
-		List<Product> products = iProductRepository.findByMainCategory(mainCategory);
-		return CollectionValidator.throwExceptionIfListIsEmpty(products);
+		return iProductRepository.findByMainCategory(mainCategory);
 	}
 
 	@Override
@@ -114,20 +114,20 @@ public class ProductServiceImpl implements IProductService {
 	@Override
 	public Set<ProductListView> getProductListViewByName(String productName, int page) {
 		Set<ProductListView> products = iProductRepository.listByName(productName, PageRequest.of(page, 25)).toSet();
-		return CollectionValidator.throwExceptionIfSetIsEmpty(products);
+		return CollectionValidator.throwExceptionIfSetIsEmpty(products, NOPRODUCTSFOUND);
 	}
 
 	@Override
 	public Set<ProductListView> getPageOfProductListView(int page) {
 		Set<ProductListView> products = iProductRepository.getAll(PageRequest.of(page, 25)).toSet();
-		return CollectionValidator.throwExceptionIfSetIsEmpty(products);
+		return CollectionValidator.throwExceptionIfSetIsEmpty(products, NOPRODUCTSFOUND);
 	}
 
 	@Override
 	public Set<ProductListView> getProductListViewByMainCategory(String mainCategoryName, int page) {
-		Set<ProductListView> products = iProductRepository.findByMainCategory(iMainCategoryService.getMainCategoryByName(mainCategoryName),
-				PageRequest.of(page, 10)).toSet();
-		return CollectionValidator.throwExceptionIfSetIsEmpty(products);
+		Set<ProductListView> products = iProductRepository.findByMainCategory(
+				iMainCategoryService.getMainCategoryByName(mainCategoryName), PageRequest.of(page, 10)).toSet();
+		return CollectionValidator.throwExceptionIfSetIsEmpty(products, NOPRODUCTSFOUND);
 	}
 
 	@Override
@@ -136,6 +136,6 @@ public class ProductServiceImpl implements IProductService {
 															.map(sc -> iProductRepository.findBySubCategory(sc))
 															.flatMap(pdv -> pdv.stream())
 															.collect(Collectors.toSet());
-		return CollectionValidator.throwExceptionIfSetIsEmpty(products);
-	}
+    return CollectionValidator.throwExceptionIfSetIsEmpty(products, NOPRODUCTSFOUND);
+  }
 }
