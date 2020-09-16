@@ -6,16 +6,15 @@ import java.util.Set;
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
 
 public class CollectionValidator {
-	
-	private static final String NOPRODUCTSFOUND = "No Products Found";
-	
-	public static <T> Set<T> throwExceptionIfSetIsEmpty(Set<T> set){
+		
+	public static <T> Set<T> throwExceptionIfSetIsEmpty(Set<T> set, String message){
 		if(!set.isEmpty()) return set;
-		throw new ResourceNotFoundException(NOPRODUCTSFOUND);
+		throw new ResourceNotFoundException(message);
 	}
+
 	
-	public static <T> List<T> throwExceptionIfListIsEmpty(List<T> list){
+	public static <T> List<T> throwExceptionIfListIsEmpty(List<T> list, String message){
 		if(!list.isEmpty()) return list;
-		throw new ResourceNotFoundException(NOPRODUCTSFOUND);
+		throw new ResourceNotFoundException(message);
 	}
 }
