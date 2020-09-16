@@ -41,15 +41,14 @@ public class SubCategory{
   @Column(name = "sub_category_id")
   private Long subCategoryId;
 
-  @NotNull(message = "The Sub Category Name is required.")
-  @NotEmpty(message = "The Sub Category Name is required.")
-  @Size(max = 30, message = "The Sub Category must be a maximum of 30 characters.")
+  @NotEmpty(message = "The Sub Category Name is required")
+  @Size(max = 30, message = "The Sub Category must be a maximum of 30 characters")
   @Column(name = "sub_category_name", nullable = false, unique = true, length = 30)
   private String subCategoryName;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @NotNull(message = "The Sub Category must belong to a Main Category.")
+  @NotNull(message = "The Sub Category must belong to a Main Category")
   @JoinColumn(name = "category_id")
   @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
   @ManyToOne(fetch = FetchType.LAZY)

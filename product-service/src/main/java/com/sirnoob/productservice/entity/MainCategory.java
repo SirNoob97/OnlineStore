@@ -7,7 +7,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,8 +26,7 @@ public class MainCategory {
   @Column(name = "category_id")
   private Long mainCategoryId;
 
-  @NotNull(message = "The Category Name is required.")
-  @NotEmpty(message = "The Category Name is required.")
+  @NotEmpty(message = "The Category Name is required")
   @Column(name = "category_name", nullable = false, unique = true, length = 30)
   private String mainCategoryName;
 }
