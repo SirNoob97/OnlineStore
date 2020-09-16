@@ -30,6 +30,7 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
   private static final String SUBCATEGORYNOTFOUND = "Sub Category Not Found";
   private static final String NOSUBCATEGORIESFOUND = "No Sub Categories Found";
 
+  @Transactional
   @Override
   public String createSubCategory(SubCategory subCategory) {
     return iSubCategoryRepository.save(subCategory).getSubCategoryName();

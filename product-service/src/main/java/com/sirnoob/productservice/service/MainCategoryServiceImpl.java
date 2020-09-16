@@ -31,6 +31,7 @@ public class MainCategoryServiceImpl implements IMainCategoryService {
 		this.iMainCategoryRepository = iMainCategoryRepository;
 	}
 
+	@Transactional
 	@Override
 	public String createMainCategory(MainCategory mainCategory) {
 		return iMainCategoryRepository.save(mainCategory).getMainCategoryName();
