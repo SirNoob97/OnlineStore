@@ -23,6 +23,6 @@ public interface ISubCategoryService {
   public Set<SubCategory> getSubCategoryByMainCategory (MainCategory mainCategory);
 
   public void updateSubCategoryName(Long subCategoryId, String subCategoryName);
-  
+
   public void deleteSubCategory(Long subCategoryId);
 }

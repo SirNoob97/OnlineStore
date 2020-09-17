@@ -26,7 +26,7 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
   private final ISubCategoryMapper iSubCategoryMapper;
   private final ISubCategoryRepository iSubCategoryRepository;
-  
+
   private static final String SUBCATEGORYNOTFOUND = "Sub Category Not Found";
   private static final String NOSUBCATEGORIESFOUND = "No Sub Categories Found";
 
