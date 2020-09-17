@@ -1,9 +1,10 @@
 package com.sirnoob.productservice.validator;
 
-import java.util.List;
 import java.util.Set;
 
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
+
+import org.springframework.data.domain.Page;
 
 public class CollectionValidator {
 
@@ -12,9 +13,8 @@ public class CollectionValidator {
 		throw new ResourceNotFoundException(message);
 	}
 
-	
-	public static <T> List<T> throwExceptionIfListIsEmpty(List<T> list, String message){
-		if(!list.isEmpty()) return list;
+	public static <T> Page<T> throwExceptionIfPageIsEmpty(Page<T> page, String message){
+		if(!page.isEmpty()) return page;
 		throw new ResourceNotFoundException(message);
 	}
 }
