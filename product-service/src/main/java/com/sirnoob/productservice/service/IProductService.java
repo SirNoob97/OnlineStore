@@ -11,6 +11,9 @@ import com.sirnoob.productservice.dto.ProductView;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface IProductService {
 
   public Product getProductById(Long productId);
@@ -27,11 +30,11 @@ public interface IProductService {
 
   public ProductView findProductViewByName(String productName);
 
-  public Set<ProductListView> getProductListViewByName(String productName, int page);
+  public Page<ProductListView> getProductListViewByName(String productName, Pageable pageable);
 
-  public Set<ProductListView> getPageOfProductListView(int page);
+  public Page<ProductListView> getPageOfProductListView(Pageable pageable);
 
-  public Set<ProductListView> getProductListViewByMainCategory(String mainCategory, int page);
+  public Page<ProductListView> getProductListViewByMainCategory(String mainCategory, Pageable pageable);
 
   public Set<ProductListView> getProductListViewBySubCategory(String[] subCategoryName);
 

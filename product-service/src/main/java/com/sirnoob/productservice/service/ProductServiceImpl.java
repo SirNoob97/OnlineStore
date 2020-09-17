@@ -7,7 +7,8 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
@@ -113,23 +114,22 @@ public class ProductServiceImpl implements IProductService {
   }
 
   @Override
-  public Set<ProductListView> getProductListViewByName(String productName, int page) {
-    Set<ProductListView> products = iProductRepository.listByName(productName, PageRequest.of(page, 25)).toSet();
-    return CollectionValidator.throwExceptionIfSetIsEmpty(products, NOPRODUCTSFOUND);
+  public Page<ProductListView> getProductListViewByName(String productName, Pageable pageable) {
+    Page<ProductListView> products = iProductRepository.listByName(productName, pageable);
+    return CollectionValidator.throwExceptionIfPageIsEmpty(products, NOPRODUCTSFOUND);
   }
 
   @Override
-  public Set<ProductListView> getPageOfProductListView(int page) {
-    Set<ProductListView> products = iProductRepository.getAll(PageRequest.of(page, 25)).toSet();
-    return CollectionValidator.throwExceptionIfSetIsEmpty(products, NOPRODUCTSFOUND);
+  public Page<ProductListView> getPageOfProductListView(Pageable pageable) {
+    Page<ProductListView> products = iProductRepository.getAll(pageable);
+    return CollectionValidator.throwExceptionIfPageIsEmpty(products, NOPRODUCTSFOUND);
   }
 
   @Override
-  public Set<ProductListView> getProductListViewByMainCategory(String mainCategoryName, int page) {
-    Set<ProductListView> products = iProductRepository
-        .findByMainCategory(iMainCategoryService.getMainCategoryByName(mainCategoryName), PageRequest.of(page, 10))
-        .toSet();
-    return CollectionValidator.throwExceptionIfSetIsEmpty(products, NOPRODUCTSFOUND);
+  public Page<ProductListView> getProductListViewByMainCategory(String mainCategoryName, Pageable pageable) {
+    Page<ProductListView> products = iProductRepository
+        .findByMainCategory(iMainCategoryService.getMainCategoryByName(mainCategoryName), pageable);
+    return CollectionValidator.throwExceptionIfPageIsEmpty(products, NOPRODUCTSFOUND);
   }
 
   @Override

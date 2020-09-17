@@ -11,6 +11,8 @@ import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.dto.ProductView;
 import com.sirnoob.productservice.service.IProductService;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,13 +67,13 @@ public class ProductController {
   }
 
   @GetMapping
-  public ResponseEntity<Set<ProductListView>> listAllProducts(@RequestParam(defaultValue = "0") int page){
-    return ResponseEntity.ok().body(iProductService.getPageOfProductListView(page));
+  public ResponseEntity<Page<ProductListView>> listAllProducts(Pageable pageable){
+    return ResponseEntity.ok().body(iProductService.getPageOfProductListView(pageable));
   }
 
-  @GetMapping("/main-categories/{page}")
-  public ResponseEntity<Set<ProductListView>> listProductsByMainCategoryId(@RequestParam(required = true) String mainCategoryName, @PathVariable int page){
-    return ResponseEntity.ok().body(iProductService.getProductListViewByMainCategory(mainCategoryName, page));
+  @GetMapping("/main-categories")
+  public ResponseEntity<Page<ProductListView>> listProductsByMainCategoryId(@RequestParam(required = true) String mainCategoryName, Pageable pageable){
+    return ResponseEntity.ok().body(iProductService.getProductListViewByMainCategory(mainCategoryName, pageable));
   }
 
   @GetMapping("/sub-categories")
@@ -84,8 +86,8 @@ public class ProductController {
     return ResponseEntity.ok().body(iProductService.findProductViewByName(productName));
   }
 
-  @GetMapping("/names/{page}")
-  public ResponseEntity<Set<ProductListView>> listByProductNameCoincidences(@RequestParam(required = true) String productName, @PathVariable int page){
-    return ResponseEntity.ok().body(iProductService.getProductListViewByName(productName, page));
+  @GetMapping("/names/search")
+  public ResponseEntity<Page<ProductListView>> listByProductNameCoincidences(@RequestParam(required = true) String productName, Pageable pageable){
+    return ResponseEntity.ok().body(iProductService.getProductListViewByName(productName, pageable));
   }
 }
