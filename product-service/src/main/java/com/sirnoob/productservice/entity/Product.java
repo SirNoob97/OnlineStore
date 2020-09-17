@@ -45,7 +45,7 @@ public class Product {
   @Column(name = "product_bar_code", nullable = false, unique = true)
   private Long productBarCode;
 
-  @Column(name = "product_name", nullable = false, unique = true, length = 30)
+  @Column(name = "product_name", nullable = false, unique = true, length = 130)
   private String productName;
 
   @Lob

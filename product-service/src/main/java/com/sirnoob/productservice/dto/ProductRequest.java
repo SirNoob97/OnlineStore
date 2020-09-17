@@ -22,7 +22,7 @@ public class ProductRequest{
   private Long productBarCode;
 
   @NotEmpty(message = "The Name is required")
-  @Size(max = 30, message = "The Name must be a maximum of 30 characters")
+  @Size(max = 130, message = "The Name must be a maximum of {max} characters")
   private String productName;
   private String productDescription;
 
@@ -33,7 +33,7 @@ public class ProductRequest{
 
   @DecimalMin(value = "0.0", message = "The Product Price must be positive")
   @NotNull(message = "The Product Price is required")
-  @Digits(integer = 6, fraction = 2, message = "The Price can only have 2 decimal places and its maximum is 999999.99")
+  @Digits(integer = 6, fraction = 2, message = "The Price can only have {fraction} decimal places and its maximum is 999999.99")
   private Double productPrice;
 
   @NotNull(message = "The Product must belong to a Main Category")
