@@ -35,8 +35,8 @@ public class ProductServiceImpl implements IProductService {
   private final IProductRepository iProductRepository;
   private final IProductMapper iProductMapper;
 
-  private static final String PRODUCTNOTFOUND = "Product Not Found";
-  private static final String NOPRODUCTSFOUND = "No Products Found";
+  private static final String PRODUCT_NOT_FOUND = "Product Not Found";
+  private static final String NO_PRODUCTS_FOUND = "No Products Found";
 
   @Transactional
   @Override
@@ -75,7 +75,7 @@ public class ProductServiceImpl implements IProductService {
   @Override
   public void updateProductStock(Long productBarCode, Integer quantity) {
     if (iProductRepository.updateProductStockByProductBarCode(quantity, productBarCode) < 1)
-      throw new ResourceNotFoundException(PRODUCTNOTFOUND);
+      throw new ResourceNotFoundException(PRODUCT_NOT_FOUND);
   }
 
   @Transactional
@@ -88,18 +88,18 @@ public class ProductServiceImpl implements IProductService {
   public ProductResponse getProductResponseByBarCodeOrProductName(Long productBarCode, String productName) {
     return iProductMapper
         .mapProductToProductResponse(iProductRepository.findByProductBarCodeOrProductName(productBarCode, productName)
-            .orElseThrow(() -> new ResourceNotFoundException(PRODUCTNOTFOUND)));
+            .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND)));
   }
 
   @Override
   public ProductInvoiceResponse getProductForInvoiceResponse(Long productBarCode, String productName) {
     return iProductRepository.findProductForInvoice(productBarCode, productName)
-        .orElseThrow(() -> new ResourceNotFoundException(PRODUCTNOTFOUND));
+        .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND));
   }
 
   @Override
   public Product getProductById(Long productId) {
-    return iProductRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException(PRODUCTNOTFOUND));
+    return iProductRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND));
   }
 
   @Override
@@ -110,26 +110,26 @@ public class ProductServiceImpl implements IProductService {
   @Override
   public ProductView findProductViewByName(String productName) {
     return iProductMapper.mapProductToProductView(iProductRepository.findByProductName(productName)
-        .orElseThrow(() -> new ResourceNotFoundException(PRODUCTNOTFOUND)));
+        .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND)));
   }
 
   @Override
   public Page<ProductListView> getProductListViewByName(String productName, Pageable pageable) {
     Page<ProductListView> products = iProductRepository.listByName(productName, pageable);
-    return CollectionValidator.throwExceptionIfPageIsEmpty(products, NOPRODUCTSFOUND);
+    return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
   @Override
   public Page<ProductListView> getPageOfProductListView(Pageable pageable) {
     Page<ProductListView> products = iProductRepository.getAll(pageable);
-    return CollectionValidator.throwExceptionIfPageIsEmpty(products, NOPRODUCTSFOUND);
+    return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
   @Override
   public Page<ProductListView> getProductListViewByMainCategory(String mainCategoryName, Pageable pageable) {
     Page<ProductListView> products = iProductRepository
         .findByMainCategory(iMainCategoryService.getMainCategoryByName(mainCategoryName), pageable);
-    return CollectionValidator.throwExceptionIfPageIsEmpty(products, NOPRODUCTSFOUND);
+    return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
   @Override
@@ -138,6 +138,6 @@ public class ProductServiceImpl implements IProductService {
         .map(sc -> iProductRepository.findBySubCategory(sc))
         .flatMap(pdv -> pdv.stream())
         .collect(Collectors.toSet());
-    return CollectionValidator.throwExceptionIfSetIsEmpty(products, NOPRODUCTSFOUND);
+    return CollectionValidator.throwExceptionIfSetIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 }

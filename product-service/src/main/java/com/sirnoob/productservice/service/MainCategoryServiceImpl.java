@@ -21,9 +21,9 @@ public class MainCategoryServiceImpl implements IMainCategoryService {
 	private final ISubCategoryService iSubCategoryService;
 	private final IMainCategoryRepository iMainCategoryRepository;
 
-	private static final String MAINCATEGORYNOTFOUND = "Main Category Not Found";
-	private static final String NOMAINCATEGORIESFOUND = "No Main Categories Found";
-	
+	private static final String MAIN_CATEGORY_NOT_FOUND = "Main Category Not Found";
+	private static final String NO_MAIN_CATEGORIES_FOUND = "No Main Categories Found";
+
 	public MainCategoryServiceImpl(@Lazy IProductService iProductService, ISubCategoryService iSubCategoryService,
 			IMainCategoryRepository iMainCategoryRepository) {
 		this.iProductService = iProductService;
@@ -41,7 +41,7 @@ public class MainCategoryServiceImpl implements IMainCategoryService {
 	@Override
 	public void updateMainCategoryName(Long mainCategoryId, String mainCategoryName) {
 		if(iMainCategoryRepository.updateMainCategoryName(mainCategoryName, mainCategoryId) < 1)
-			throw new ResourceNotFoundException(MAINCATEGORYNOTFOUND);
+			throw new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND);
 	}
 
 	@Transactional
@@ -56,19 +56,19 @@ public class MainCategoryServiceImpl implements IMainCategoryService {
 	@Override
 	public MainCategory getMainCategoryById(Long mainCategoryId) {
 		return iMainCategoryRepository.findById(mainCategoryId)
-				.orElseThrow(() -> new ResourceNotFoundException(MAINCATEGORYNOTFOUND));
+				.orElseThrow(() -> new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
 	}
 
 	@Override
 	public MainCategory getMainCategoryByName(String mainCategoryName) {
 		return iMainCategoryRepository.findByMainCategoryName(mainCategoryName)
-				.orElseThrow(() -> new ResourceNotFoundException(MAINCATEGORYNOTFOUND));
+				.orElseThrow(() -> new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
 	}
 
 	@Override
 	public Set<String> getAllMainCategory(int page) {
 		Set<String> mainCategories = iMainCategoryRepository.findAll(PageRequest.of(page, 10)).stream().map(MainCategory::getMainCategoryName)
 				.collect(Collectors.toSet());
-		return CollectionValidator.throwExceptionIfSetIsEmpty(mainCategories, NOMAINCATEGORIESFOUND);
+		return CollectionValidator.throwExceptionIfSetIsEmpty(mainCategories, NO_MAIN_CATEGORIES_FOUND);
 	}
 }
