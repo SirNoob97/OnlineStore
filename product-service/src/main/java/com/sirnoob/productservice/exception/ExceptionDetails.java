@@ -12,6 +12,6 @@ public class ExceptionDetails {
   protected String title;
   protected int status;
   protected String detail;
-  protected String devMessage;
+  protected String exceptionClassName;
   protected LocalDateTime timestamp;
 }
