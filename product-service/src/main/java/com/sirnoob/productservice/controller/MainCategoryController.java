@@ -35,7 +35,7 @@ public class MainCategoryController {
 
   @PutMapping("/{mainCategoryId}")
   public ResponseEntity<Void> updateMainCategory(@PathVariable Long mainCategoryId, @RequestParam(required = true) String mainCategoryName){
-    iMainCategoryService.updateMainCategoryName(mainCategoryId, mainCategoryName);  
+    iMainCategoryService.updateMainCategoryName(mainCategoryId, mainCategoryName);
     return ResponseEntity.noContent().build();
   }
 
