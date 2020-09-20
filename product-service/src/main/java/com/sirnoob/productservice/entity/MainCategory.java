@@ -27,6 +27,6 @@ public class MainCategory {
   private Long mainCategoryId;
 
   @NotEmpty(message = "The Category Name is required")
-  @Column(name = "category_name", nullable = false, unique = true, length = 30)
+  @Column(name = "category_name", nullable = false, unique = true, length = 50)
   private String mainCategoryName;
 }
