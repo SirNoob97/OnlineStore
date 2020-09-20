@@ -51,7 +51,6 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
     if(!subCategory.getProducts().isEmpty()){
       for (Product p : subCategory.getProducts()) {
         p.getSubCategories().remove(subCategory);
-        subCategory.getProducts().remove(p);
       }
     }
     iSubCategoryRepository.delete(subCategory);
