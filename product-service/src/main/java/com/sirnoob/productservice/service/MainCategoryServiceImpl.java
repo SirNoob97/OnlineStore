@@ -48,7 +48,7 @@ public class MainCategoryServiceImpl implements IMainCategoryService {
 	@Override
 	public void deleteMainCategory(Long mainCategoryId) {
 		MainCategory mainCategory = getMainCategoryById(mainCategoryId);
-		iSubCategoryService.getSubCategoryByMainCategory(mainCategory).forEach(sc -> sc.getProducts().clear());
+		iSubCategoryService.getSubCategoryByMainCategory(mainCategory).forEach(sc -> iSubCategoryService.deleteSubCategory(sc.getSubCategoryId()));
 		iProductService.getProductByMainCategory(mainCategory).forEach(prs -> prs.getSubCategories().clear());
 		iMainCategoryRepository.delete(mainCategory);
 	}
