@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,24 +37,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
                                 .exceptionClassName(exception.getClass().getName()).build());
   }
 
-  @ExceptionHandler(ConstraintViolationException.class)
-  public ResponseEntity<ConstraintViolationExceptionDetails> handleConstraintViolationException(ConstraintViolationException exception){
-    int endTitle = exception.getCause().getLocalizedMessage().indexOf(":");
-    String title = exception.getCause().getLocalizedMessage().substring(0, endTitle);
-
-    int endDetail = exception.getConstraintName().lastIndexOf(";");
-    String detail = exception.getConstraintName().substring(0, endDetail);
-
-    int beginSql = exception.getSQLException().getMessage().indexOf("SQL statement");
-    String sql = exception.getSQLException().getMessage().substring(beginSql);
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<ConstraintViolationExceptionDetails> handleConstraintViolationException(DataIntegrityViolationException exception){
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                           .body(ConstraintViolationExceptionDetails.builder()
-                                  .title(title)
-                                  .detail(detail)
+                                  .title(exception.getRootCause().getLocalizedMessage())
+                                  .detail(exception.getMessage())
                                   .exceptionClassName(exception.getClass().getName())
                                   .status(HttpStatus.BAD_REQUEST.value())
                                   .timestamp(LocalDateTime.now())
-                                  .constraintName(sql).build());
+                                  .constraintName("a").build());
   }
 
   @Override
