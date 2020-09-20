@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.sirnoob.productservice.exception.ConstraintViolationExceptionDetails;
 import com.sirnoob.productservice.exception.ExceptionDetails;
-import com.sirnoob.productservice.exception.ResourceNotFoundDetails;
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
 import com.sirnoob.productservice.exception.ValidationExceptionDetails;
 
@@ -26,9 +24,9 @@ import com.sirnoob.productservice.exception.ValidationExceptionDetails;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler{
 
   @ExceptionHandler(ResourceNotFoundException.class)
-  public ResponseEntity<ResourceNotFoundDetails> handleResourceNotFoundException(ResourceNotFoundException exception) {
+  public ResponseEntity<ExceptionDetails> handleResourceNotFoundException(ResourceNotFoundException exception) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                          .body(ResourceNotFoundDetails.builder()
+                          .body(ExceptionDetails.builder()
                                 .timestamp(LocalDateTime.now())
                                 .status(HttpStatus.NOT_FOUND.value())
                                 .title("Resource Not Found")
@@ -36,24 +34,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
                                 .exceptionClassName(exception.getClass().getName()).build());
   }
 
-  @ExceptionHandler(ConstraintViolationException.class)
-  public ResponseEntity<ConstraintViolationExceptionDetails> handleConstraintViolationException(ConstraintViolationException exception){
-    int endTitle = exception.getCause().getLocalizedMessage().indexOf(":");
-    String title = exception.getCause().getLocalizedMessage().substring(0, endTitle);
-
-    int endDetail = exception.getConstraintName().lastIndexOf(";");
-    String detail = exception.getConstraintName().substring(0, endDetail);
-
-    int beginSql = exception.getSQLException().getMessage().indexOf("SQL statement");
-    String sql = exception.getSQLException().getMessage().substring(beginSql);
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<ExceptionDetails> handleConstraintViolationException(DataIntegrityViolationException exception){
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                          .body(ConstraintViolationExceptionDetails.builder()
-                                  .title(title)
-                                  .detail(detail)
+                          .body(ExceptionDetails.builder()
+                                  .title(exception.getRootCause().getLocalizedMessage())
+                                  .detail(exception.getMessage())
                                   .exceptionClassName(exception.getClass().getName())
                                   .status(HttpStatus.BAD_REQUEST.value())
                                   .timestamp(LocalDateTime.now())
-                                  .constraintName(sql).build());
+                                  .build());
   }
 
   @Override
