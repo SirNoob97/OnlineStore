@@ -89,12 +89,12 @@ class ProductRepositoryTest {
   public void findByProductName_ReturnEmptyOptionalProduct_WhenSuccessful() {
     Product productSaved = iProductRepository.save(createProduct());
 
-    String name = productSaved.getProductName();
-
-    Optional<Product> productOptional = iProductRepository.findByProductName(name + "TEST");
+    Optional<Product> productOptional = iProductRepository.findByProductName(productSaved.getProductName() + "TEST");
 
     Assertions.assertThat(productOptional).isEmpty();
   }
+
+
 
   private Product createProduct() {
     //@formatter:off
