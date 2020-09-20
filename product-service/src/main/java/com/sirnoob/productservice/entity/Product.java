@@ -65,9 +65,9 @@ public class Product {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @JoinColumn(name = "category_id")
   @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
   @ManyToOne(fetch =FetchType.LAZY)
+  @JoinColumn(name = "category_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private MainCategory mainCategory;
 

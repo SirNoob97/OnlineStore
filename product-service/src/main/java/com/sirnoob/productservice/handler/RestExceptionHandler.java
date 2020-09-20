@@ -4,6 +4,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.sirnoob.productservice.exception.ExceptionDetails;
+import com.sirnoob.productservice.exception.ResourceNotFoundException;
+import com.sirnoob.productservice.exception.ValidationExceptionDetails;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,10 +19,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import com.sirnoob.productservice.exception.ExceptionDetails;
-import com.sirnoob.productservice.exception.ResourceNotFoundException;
-import com.sirnoob.productservice.exception.ValidationExceptionDetails;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler{
