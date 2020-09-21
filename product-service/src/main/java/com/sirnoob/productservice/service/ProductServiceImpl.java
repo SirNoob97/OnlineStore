@@ -115,7 +115,7 @@ public class ProductServiceImpl implements IProductService {
 
   @Override
   public Page<ProductListView> getProductListViewByName(String productName, Pageable pageable) {
-    Page<ProductListView> products = iProductRepository.listByName(productName, pageable);
+    Page<ProductListView> products = iProductRepository.listByNameMatches(productName, pageable);
     return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
