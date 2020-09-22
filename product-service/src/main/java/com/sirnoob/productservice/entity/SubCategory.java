@@ -15,11 +15,13 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @NoArgsConstructor
@@ -32,7 +34,8 @@ public class SubCategory{
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "sub_category_id")
+  @Column(name = "sub_category_id", updatable = false)
+  @Setter(AccessLevel.NONE)
   private Long subCategoryId;
 
   @Column(name = "sub_category_name", nullable = false, unique = true, length = 50)
