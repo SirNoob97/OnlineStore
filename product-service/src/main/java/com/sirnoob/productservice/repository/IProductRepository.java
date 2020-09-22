@@ -1,6 +1,8 @@
 package com.sirnoob.productservice.repository;
 
+import java.util.List;
 import java.util.Optional;
+
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.entity.MainCategory;
@@ -14,8 +16,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface IProductRepository extends JpaRepository<Product, Long>{
@@ -40,7 +40,7 @@ public interface IProductRepository extends JpaRepository<Product, Long>{
   @Query("SELECT new com.sirnoob.productservice.dto.ProductListView(p.productName, p.productDescription, p.productPrice) FROM Product p WHERE :subCategory MEMBER p.subCategories")
   public List<ProductListView> findBySubCategory(@Param("subCategory") SubCategory subCategory);
 
-  @Modifying
-  @Query(value = "UPDATE products SET product_stock = :stock WHERE product_bar_code = :productBarCode", nativeQuery = true)
+  @Modifying(clearAutomatically = true)
+  @Query("UPDATE Product AS p SET p.productStock = :stock WHERE p.productBarCode = :productBarCode")
   public int updateProductStockByProductBarCode(@Param("stock") Integer stock, @Param("productBarCode") Long productBarCode);
 }
