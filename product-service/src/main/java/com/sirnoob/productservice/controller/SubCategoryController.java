@@ -4,8 +4,8 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
+import com.sirnoob.productservice.dto.SubCategoryRequest;
 import com.sirnoob.productservice.dto.SubCategoryResponse;
-import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.service.ISubCategoryService;
 
 import org.springframework.http.HttpStatus;
@@ -30,12 +30,13 @@ public class SubCategoryController {
   private final ISubCategoryService iSubCategoryService;
 
   @PostMapping
-  public ResponseEntity<String> createSubCategory(@Valid @RequestBody SubCategory subCategory) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(iSubCategoryService.createSubCategory(subCategory));
+  public ResponseEntity<String> createSubCategory(@Valid @RequestBody SubCategoryRequest subCategoryRequest) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(iSubCategoryService.createSubCategory(subCategoryRequest));
   }
 
   @PutMapping("/{subCategoryId}")
-  public ResponseEntity<Void> updateSubCategoryName(@PathVariable Long subCategoryId, @RequestParam(required = true) String subCategoryName) {
+  public ResponseEntity<Void> updateSubCategoryName(@PathVariable Long subCategoryId,
+                                                    @RequestParam(required = true) String subCategoryName) {
     iSubCategoryService.updateSubCategoryName(subCategoryId, subCategoryName);
     return ResponseEntity.noContent().build();
   }
