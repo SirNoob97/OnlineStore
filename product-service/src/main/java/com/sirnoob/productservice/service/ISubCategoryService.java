@@ -2,13 +2,14 @@ package com.sirnoob.productservice.service;
 
 import java.util.Set;
 
+import com.sirnoob.productservice.dto.SubCategoryRequest;
 import com.sirnoob.productservice.dto.SubCategoryResponse;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.SubCategory;
 
 public interface ISubCategoryService {
 
-  public String createSubCategory(SubCategory subCategory);
+  public String createSubCategory(SubCategoryRequest subCategoryRequest);
 
   public SubCategoryResponse getSubCategoryResponseByName(String subCategoryName);
 

@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.sirnoob.productservice.dto.SubCategoryRequest;
 import com.sirnoob.productservice.dto.SubCategoryResponse;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
@@ -26,14 +27,16 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
   private final ISubCategoryMapper iSubCategoryMapper;
   private final ISubCategoryRepository iSubCategoryRepository;
+  private final IMainCategoryService iMainCategoryService;
 
   private static final String SUB_CATEGORY_NOT_FOUND = "Sub Category Not Found";
   private static final String NO_SUB_CATEGORIES_FOUND = "No Sub Categories Found";
 
   @Transactional
   @Override
-  public String createSubCategory(SubCategory subCategory) {
-    return iSubCategoryRepository.save(subCategory).getSubCategoryName();
+  public String createSubCategory(SubCategoryRequest subCategoryRequest) {
+    MainCategory mainCategory = iMainCategoryService.getMainCategoryByName(subCategoryRequest.getMainCategoryName());
+    return iSubCategoryRepository.save(iSubCategoryMapper.mapSubCategoryRequestToSubCategory(subCategoryRequest, mainCategory)).getSubCategoryName();
   }
 
   @Transactional
