@@ -70,6 +70,21 @@ class ProductRepositoryTest {
   }
 
   @Test
+  @DisplayName("Save throw UnsupportedOperationException when subcategory is added to a product after it has been persisted")
+  public void save_ThrowUnsupportedOperationException_WhenSubCategoryIsAddedToAProductAfterItHasBeenPersisted() {
+    Product productSaved = iProductRepository.save(createProduct());
+
+    SubCategory subCategory = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategory());
+
+    productSaved.setSubCategories(Set.of(subCategory, subCategory2, subCategory3));
+
+    Assertions.assertThatExceptionOfType(UnsupportedOperationException.class)
+        .isThrownBy(() -> iProductRepository.save(productSaved));
+  }
+
+  @Test
   @DisplayName("Save Updates product when successful")
   public void save_UpdateProduct_WhenSuccessful() {
     Product productToUpdate = iProductRepository.save(createProduct());
@@ -189,7 +204,7 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Main Category return a list of product when main category isnt saved")
+  @DisplayName("Find By Main Category return empty list of product when main category isnt saved")
   public void findByMainCategory_ReturnEmptyProductList_WhenMainCategoryIsNotSaved() {
     List<Product> productsFetchedByMainCategory = iProductRepository.findByMainCategory(createMainCategory());
 
@@ -303,7 +318,7 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Main Category return a page of product when main category isnt saved")
+  @DisplayName("Find By Main Category return empty page of product when main category isnt saved")
   public void findByMainCategory_ReturnEmptyProductListView_WhenMainCategoryIsNotSaved() {
     iProductRepository.save(createProduct());
     iProductRepository.save(createProduct());
@@ -315,7 +330,7 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Main Category return a list of product when main category is saved but doenst contains product")
+  @DisplayName("Find By Main Category return empty list of product when main category is saved but doenst contains product")
   public void findByMainCategory_ReturnEmptyProductListView_WhenMainCategoryIsSavedButDoesNotContainsProduct() {
     MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
 
@@ -324,38 +339,119 @@ class ProductRepositoryTest {
     Assertions.assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
   }
 
-  //@Test
-  //@DisplayName("Find By Sub Category return a list of productListView when successful")
-  //public void findBySubCategory_ReturnListOfProductListView_WhenSuccessful() {
-    //Product product1 = iProductRepository.save(createProduct());
-    //Product product2 = iProductRepository.save(createProduct());
-    //Product product3 = iProductRepository.save(createProduct());
-    //Product product4 = iProductRepository.save(createProduct());
-    //Product product5 = iProductRepository.save(createProduct());
+  @Test
+  @DisplayName("Find By Sub Category return a list of productListView when successful")
+  public void findBySubCategory_ReturnListOfProductListView_WhenSuccessful() {
+    Product product1 = createProduct();
+    Product product2 = createProduct();
+    Product product3 = createProduct();
+    Product product4 = createProduct();
+    Product product5 = createProduct();
 
-    //SubCategory subCategory = iSubCategoryRepository.save(createSubCategory());
-    //SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategory());
-    //SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategory());
-    //SubCategory subCategory4 = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory4 = iSubCategoryRepository.save(createSubCategory());
 
-    //product1.setSubCategories(Set.of(subCategory, subCategory2));
-    //product2.setSubCategories(Set.of(subCategory, subCategory3));
-    //product3.setSubCategories(Set.of(subCategory, subCategory4));
+    product1.setSubCategories(Set.of(subCategory, subCategory2));
+    product2.setSubCategories(Set.of(subCategory, subCategory3));
+    product3.setSubCategories(Set.of(subCategory, subCategory4));
 
-    //product4.setSubCategories(Set.of(subCategory2, subCategory4));
-    //product5.setSubCategories(Set.of(subCategory3, subCategory4));
+    product4.setSubCategories(Set.of(subCategory2, subCategory4));
+    product5.setSubCategories(Set.of(subCategory3, subCategory4));
 
-    //iProductRepository.save(product1);
-    //iProductRepository.save(product2);
-    //iProductRepository.save(product3);
-    //iProductRepository.save(product4);
-    //iProductRepository.save(product5);
+    iProductRepository.save(product1);
+    iProductRepository.save(product2);
+    iProductRepository.save(product3);
+    iProductRepository.save(product4);
+    iProductRepository.save(product5);
 
-    //List<ProductListView> productsFetchedBySubCategory = iProductRepository.findBySubCategory(subCategory);
+    List<ProductListView> productsFetchedBySubCategory = iProductRepository.findBySubCategory(subCategory);
 
-    //Assertions.assertThat(productsFetchedBySubCategory.isEmpty()).isFalse();
-    //Assertions.assertThat(productsFetchedBySubCategory.size()).isEqualTo(3);
-  //}
+    Assertions.assertThat(productsFetchedBySubCategory.isEmpty()).isFalse();
+    Assertions.assertThat(productsFetchedBySubCategory.size()).isEqualTo(3);
+  }
+
+  @Test
+  @DisplayName("Find By Sub Category return empty list of productListView when no product contains that sub category")
+  public void findBySubCategory_ReturnEmptyListOfProductListView_WhenNoProductContainsThatSubCategory() {
+    Product product1 = createProduct();
+    Product product2 = createProduct();
+    Product product3 = createProduct();
+
+    SubCategory subCategory = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory4 = iSubCategoryRepository.save(createSubCategory());
+
+    product1.setSubCategories(Set.of(subCategory, subCategory2));
+    product2.setSubCategories(Set.of(subCategory, subCategory3));
+    product3.setSubCategories(Set.of(subCategory3, subCategory2));
+
+    iProductRepository.save(product1);
+    iProductRepository.save(product2);
+    iProductRepository.save(product3);
+
+    List<ProductListView> productsFetchedBySubCategory = iProductRepository.findBySubCategory(subCategory4);
+
+    Assertions.assertThat(productsFetchedBySubCategory.isEmpty()).isTrue();
+  }
+
+  @Test
+  @DisplayName("Find By Sub Category return empty list of productListView when that sub category is not saved")
+  public void findBySubCategory_ReturnEmptyListOfProductListView_WhenThatSubCategoryIsNotSaved() {
+    Product product1 = createProduct();
+    Product product2 = createProduct();
+    Product product3 = createProduct();
+
+    SubCategory subCategory = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategory());
+
+    product1.setSubCategories(Set.of(subCategory, subCategory2));
+    product2.setSubCategories(Set.of(subCategory, subCategory3));
+    product3.setSubCategories(Set.of(subCategory3, subCategory2));
+
+    iProductRepository.save(product1);
+    iProductRepository.save(product2);
+    iProductRepository.save(product3);
+
+    List<ProductListView> productsFetchedBySubCategory = iProductRepository.findBySubCategory(createSubCategory());
+
+    Assertions.assertThat(productsFetchedBySubCategory.isEmpty()).isTrue();
+  }
+
+  @Test
+  @DisplayName("Update product stock by product barcode return an integer greater than zero when successful")
+  public void updateProductStockByProductBarCode_ReturnAnIntegerGreaterThanZero_WhenSuccessful(){
+    Product productSaved = iProductRepository.save(createProduct());
+
+    Integer returnFromUpdateOperation = iProductRepository.updateProductStockByProductBarCode(100, productSaved.getProductBarCode());
+
+    Product productWithUpdatedStock = iProductRepository.findById(productSaved.getProductId()).get();
+
+    Assertions.assertThat(returnFromUpdateOperation).isNotNull();
+    Assertions.assertThat(returnFromUpdateOperation).isGreaterThan(0);
+    Assertions.assertThat(productWithUpdatedStock.getProductStock()).isNotEqualTo(productSaved.getProductStock());
+  }
+
+  @Test
+  @DisplayName("Update product stock by product barcode return zero when no product has that barcode")
+  public void updateProductStockByProductBarCode_ReturnZero_WhenNoProductHasThatBarCode(){
+    Integer returnFromUpdateOperation = iProductRepository.updateProductStockByProductBarCode(100, -1L);
+
+    Assertions.assertThat(returnFromUpdateOperation).isNotNull();
+    Assertions.assertThat(returnFromUpdateOperation).isEqualTo(0);
+  }
+
+  @Test
+  @DisplayName("Update product stock by product barcode return zero when no product has that barcode")
+  public void updateProductStockByProductBarCode_ReturnZero_WhenProductBarCodeIsNull(){
+    Integer returnFromUpdateOperation = iProductRepository.updateProductStockByProductBarCode(100, null);
+
+    Assertions.assertThat(returnFromUpdateOperation).isNotNull();
+    Assertions.assertThat(returnFromUpdateOperation).isEqualTo(0);
+  }
 
   private Product createProduct() {
     //@formatter:off
