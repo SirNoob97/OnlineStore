@@ -12,14 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,18 +35,15 @@ public class SubCategory{
   @Column(name = "sub_category_id")
   private Long subCategoryId;
 
-  @NotEmpty(message = "The Sub Category Name is required")
-  @Size(max = 30, message = "The Sub Category must be a maximum of 30 characters")
-  @Column(name = "sub_category_name", nullable = false, unique = true, length = 30)
+  @Column(name = "sub_category_name", nullable = false, unique = true, length = 50)
   private String subCategoryName;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @NotNull(message = "The Sub Category must belong to a Main Category")
   @JoinColumn(name = "category_id")
   @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
   @ManyToOne(fetch = FetchType.LAZY)
-  @OnDelete(action = OnDeleteAction.CASCADE)
+  //@OnDelete(action = OnDeleteAction.CASCADE)
   private MainCategory mainCategory;
 
   @ToString.Exclude
