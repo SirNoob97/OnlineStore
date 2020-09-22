@@ -5,14 +5,14 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
 import com.sirnoob.productservice.repository.IMainCategoryRepository;
-import com.sirnoob.productservice.validator.CollectionValidator;
+import com.sirnoob.productservice.util.CollectionValidator;
+
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MainCategoryServiceImpl implements IMainCategoryService {

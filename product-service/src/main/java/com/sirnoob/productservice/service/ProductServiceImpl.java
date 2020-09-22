@@ -7,10 +7,6 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.dto.ProductRequest;
@@ -22,7 +18,11 @@ import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
 import com.sirnoob.productservice.mapper.IProductMapper;
 import com.sirnoob.productservice.repository.IProductRepository;
-import com.sirnoob.productservice.validator.CollectionValidator;
+import com.sirnoob.productservice.util.CollectionValidator;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 

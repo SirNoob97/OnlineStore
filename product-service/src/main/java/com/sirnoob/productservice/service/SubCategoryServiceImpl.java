@@ -6,9 +6,6 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-
 import com.sirnoob.productservice.dto.SubCategoryRequest;
 import com.sirnoob.productservice.dto.SubCategoryResponse;
 import com.sirnoob.productservice.entity.MainCategory;
@@ -17,7 +14,10 @@ import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
 import com.sirnoob.productservice.mapper.ISubCategoryMapper;
 import com.sirnoob.productservice.repository.ISubCategoryRepository;
-import com.sirnoob.productservice.validator.CollectionValidator;
+import com.sirnoob.productservice.util.CollectionValidator;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
