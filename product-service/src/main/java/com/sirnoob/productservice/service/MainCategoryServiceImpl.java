@@ -24,7 +24,7 @@ public class MainCategoryServiceImpl implements IMainCategoryService {
 	private static final String MAIN_CATEGORY_NOT_FOUND = "Main Category Not Found";
 	private static final String NO_MAIN_CATEGORIES_FOUND = "No Main Categories Found";
 
-	public MainCategoryServiceImpl(@Lazy IProductService iProductService, ISubCategoryService iSubCategoryService,
+	public MainCategoryServiceImpl(@Lazy IProductService iProductService, @Lazy ISubCategoryService iSubCategoryService,
 			IMainCategoryRepository iMainCategoryRepository) {
 		this.iProductService = iProductService;
 		this.iSubCategoryService = iSubCategoryService;
