@@ -15,7 +15,7 @@ public interface IMainCategoryRepository extends JpaRepository<MainCategory, Lon
 
   public Optional<MainCategory> findByMainCategoryName(String categoryName);
 
-  @Modifying
+  @Modifying(clearAutomatically = true)
   @Query(value = "UPDATE main_categories SET category_name = :categoryName WHERE category_id = :categoryId", nativeQuery = true)
   public int updateMainCategoryName(@Param("categoryName") String categoryName, @Param("categoryId") Long categoryId);
 }
