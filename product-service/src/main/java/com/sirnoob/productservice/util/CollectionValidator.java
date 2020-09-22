@@ -1,4 +1,4 @@
-package com.sirnoob.productservice.validator;
+package com.sirnoob.productservice.util;
 
 import java.util.Set;
 
