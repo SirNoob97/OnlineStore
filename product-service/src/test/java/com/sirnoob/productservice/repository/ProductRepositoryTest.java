@@ -84,9 +84,9 @@ class ProductRepositoryTest {
   public void save_ThrowUnsupportedOperationException_WhenSubCategoryIsAddedToAProductAfterItHasBeenPersisted() {
     Product productSaved = iProductRepository.save(createProduct());
 
-    SubCategory subCategory = iSubCategoryRepository.save(createSubCategory());
-    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategory());
-    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
     productSaved.setSubCategories(Set.of(subCategory, subCategory2, subCategory3));
 
@@ -371,10 +371,10 @@ class ProductRepositoryTest {
     Product product4 = createProduct();
     Product product5 = createProduct();
 
-    SubCategory subCategory = iSubCategoryRepository.save(createSubCategory());
-    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategory());
-    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategory());
-    SubCategory subCategory4 = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory4 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
     product1.setSubCategories(Set.of(subCategory, subCategory2));
     product2.setSubCategories(Set.of(subCategory, subCategory3));
@@ -402,10 +402,10 @@ class ProductRepositoryTest {
     Product product2 = createProduct();
     Product product3 = createProduct();
 
-    SubCategory subCategory = iSubCategoryRepository.save(createSubCategory());
-    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategory());
-    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategory());
-    SubCategory subCategory4 = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory4 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
     product1.setSubCategories(Set.of(subCategory, subCategory2));
     product2.setSubCategories(Set.of(subCategory, subCategory3));
@@ -427,9 +427,9 @@ class ProductRepositoryTest {
     Product product2 = createProduct();
     Product product3 = createProduct();
 
-    SubCategory subCategory = iSubCategoryRepository.save(createSubCategory());
-    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategory());
-    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategory());
+    SubCategory subCategory = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
     product1.setSubCategories(Set.of(subCategory, subCategory2));
     product2.setSubCategories(Set.of(subCategory, subCategory3));
@@ -475,5 +475,15 @@ class ProductRepositoryTest {
 
     assertThat(returnFromUpdateOperation).isNotNull();
     assertThat(returnFromUpdateOperation).isEqualTo(0);
+  }
+
+  private SubCategory createSubCategoryWithPersistedMainCategory(){
+    SubCategory subCategory = createSubCategory();
+
+    MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
+
+    subCategory.setMainCategory(mainCategory);
+
+    return subCategory;
   }
 }
