@@ -19,7 +19,7 @@ public interface ISubCategoryRepository extends JpaRepository<SubCategory, Long>
 
   public List<SubCategory> findByMainCategory(MainCategory subCategory);
 
-  @Modifying
-  @Query(value = "UPDATE sub_categories SET sub_category_name = :subCategoryName WHERE sub_category_id = :subCategoryId", nativeQuery = true)
+  @Modifying(clearAutomatically = true)
+  @Query("UPDATE SubCategory AS s SET s.subCategoryName = :subCategoryName WHERE s.subCategoryId = :subCategoryId")
   public int updateSubCategoryName(@Param("subCategoryName") String subCategoryName, @Param("subCategoryId") Long subCategoryId);
 }
