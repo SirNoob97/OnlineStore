@@ -45,7 +45,7 @@ public class SubCategory{
   @EqualsAndHashCode.Exclude
   @JoinColumn(name = "category_id")
   @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   //@OnDelete(action = OnDeleteAction.CASCADE)
   private MainCategory mainCategory;
 
