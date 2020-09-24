@@ -10,9 +10,11 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class ProductRequest{
 
   @PositiveOrZero(message = "The Bar Code must be positive")
