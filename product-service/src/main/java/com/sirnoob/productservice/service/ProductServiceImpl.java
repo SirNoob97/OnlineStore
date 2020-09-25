@@ -24,16 +24,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Service
 public class ProductServiceImpl implements IProductService {
 
-  private final IMainCategoryService iMainCategoryService;
-  private final ISubCategoryService iSubCategoryService;
-  private final IProductRepository iProductRepository;
-  private final IProductMapper iProductMapper;
+  private IMainCategoryService iMainCategoryService;
+  private ISubCategoryService iSubCategoryService;
+  private IProductRepository iProductRepository;
+  private IProductMapper iProductMapper;
 
   private static final String PRODUCT_NOT_FOUND = "Product Not Found";
   private static final String NO_PRODUCTS_FOUND = "No Products Found";
