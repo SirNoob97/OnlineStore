@@ -16,7 +16,7 @@ import com.sirnoob.productservice.mapper.ISubCategoryMapper;
 import com.sirnoob.productservice.repository.ISubCategoryRepository;
 import com.sirnoob.productservice.util.CollectionValidator;
 
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -34,9 +34,9 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
   @Transactional
   @Override
-  public String createSubCategory(SubCategoryRequest subCategoryRequest) {
+  public SubCategory createSubCategory(SubCategoryRequest subCategoryRequest) {
     MainCategory mainCategory = iMainCategoryService.getMainCategoryByName(subCategoryRequest.getMainCategoryName());
-    return iSubCategoryRepository.save(iSubCategoryMapper.mapSubCategoryRequestToSubCategory(subCategoryRequest, mainCategory)).getSubCategoryName();
+    return iSubCategoryRepository.save(iSubCategoryMapper.mapSubCategoryRequestToSubCategory(subCategoryRequest, mainCategory));
   }
 
   @Transactional
@@ -76,8 +76,8 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
   }
 
   @Override
-  public Set<String> getAllSubCategories(int page) {
-    Set<String> subCategories = iSubCategoryRepository.findAll(PageRequest.of(page, 10)).map(SubCategory::getSubCategoryName)
+  public Set<String> getAllSubCategories(Pageable pageable) {
+    Set<String> subCategories = iSubCategoryRepository.findAll(pageable).map(SubCategory::getSubCategoryName)
       .toSet();
     return CollectionValidator.throwExceptionIfSetIsEmpty(subCategories, NO_SUB_CATEGORIES_FOUND);
   }

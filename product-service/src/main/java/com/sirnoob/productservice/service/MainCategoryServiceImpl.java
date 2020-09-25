@@ -11,7 +11,7 @@ import com.sirnoob.productservice.repository.IMainCategoryRepository;
 import com.sirnoob.productservice.util.CollectionValidator;
 
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,8 +33,8 @@ public class MainCategoryServiceImpl implements IMainCategoryService {
 
 	@Transactional
 	@Override
-	public String createMainCategory(MainCategory mainCategory) {
-		return iMainCategoryRepository.save(mainCategory).getMainCategoryName();
+	public MainCategory createMainCategory(MainCategory mainCategory) {
+		return iMainCategoryRepository.save(mainCategory);
 	}
 
 	@Transactional
@@ -66,8 +66,8 @@ public class MainCategoryServiceImpl implements IMainCategoryService {
 	}
 
 	@Override
-	public Set<String> getAllMainCategory(int page) {
-		Set<String> mainCategories = iMainCategoryRepository.findAll(PageRequest.of(page, 10)).stream().map(MainCategory::getMainCategoryName)
+	public Set<String> getAllMainCategory(Pageable pageable) {
+		Set<String> mainCategories = iMainCategoryRepository.findAll(pageable).stream().map(MainCategory::getMainCategoryName)
 				.collect(Collectors.toSet());
 		return CollectionValidator.throwExceptionIfSetIsEmpty(mainCategories, NO_MAIN_CATEGORIES_FOUND);
 	}

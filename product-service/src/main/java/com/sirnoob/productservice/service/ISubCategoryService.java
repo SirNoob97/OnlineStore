@@ -7,9 +7,11 @@ import com.sirnoob.productservice.dto.SubCategoryResponse;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.SubCategory;
 
+import org.springframework.data.domain.Pageable;
+
 public interface ISubCategoryService {
 
-  public String createSubCategory(SubCategoryRequest subCategoryRequest);
+  public SubCategory createSubCategory(SubCategoryRequest subCategoryRequest);
 
   public SubCategoryResponse getSubCategoryResponseByName(String subCategoryName);
 
@@ -17,7 +19,7 @@ public interface ISubCategoryService {
 
   public SubCategory getSubCategoryById(Long subCategoryId);
 
-  public Set<String> getAllSubCategories(int page);
+  public Set<String> getAllSubCategories(Pageable pageable);
 
   public Set<SubCategory> getSubcategoriesByName(String[] subCategoriesNames);
 
