@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.dto.ProductRequest;
@@ -24,18 +23,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class ProductServiceImpl implements IProductService {
 
-  private IMainCategoryService iMainCategoryService;
-  private ISubCategoryService iSubCategoryService;
-  private IProductRepository iProductRepository;
-  private IProductMapper iProductMapper;
+  private final IMainCategoryService iMainCategoryService;
+  private final ISubCategoryService iSubCategoryService;
+  private final IProductRepository iProductRepository;
+  private final IProductMapper iProductMapper;
 
   private static final String PRODUCT_NOT_FOUND = "Product Not Found";
   private static final String NO_PRODUCTS_FOUND = "No Products Found";
