@@ -18,6 +18,8 @@ The project will consists of three microservices connected from the consumer tha
   * Invoices(Consumer)
 
 
+### Product-Service [Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
+
 
 These will obtain their configuration from this repository through a centralized configuration service that will use the Spring Cloud Config Server dependency.
 
