@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.service.IMainCategoryService;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +30,7 @@ public class MainCategoryController {
   private final IMainCategoryService iMainCategoryService;
 
   @PostMapping
-  public ResponseEntity<String> createMainCategory(@Valid @RequestBody MainCategory mainCategory){
+  public ResponseEntity<MainCategory> createMainCategory(@Valid @RequestBody MainCategory mainCategory){
     return ResponseEntity.status(HttpStatus.CREATED).body(iMainCategoryService.createMainCategory(mainCategory));
   }
 
@@ -51,7 +52,7 @@ public class MainCategoryController {
   }
 
   @GetMapping
-  public ResponseEntity<Set<String>> getAllMainCategory(@RequestParam(defaultValue = "0") int page){
-    return ResponseEntity.ok().body(iMainCategoryService.getAllMainCategory(page));
+  public ResponseEntity<Set<String>> getAllMainCategory(Pageable pageable){
+    return ResponseEntity.ok().body(iMainCategoryService.getAllMainCategory(pageable));
   }
 }

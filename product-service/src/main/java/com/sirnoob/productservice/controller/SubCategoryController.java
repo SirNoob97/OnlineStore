@@ -6,8 +6,10 @@ import javax.validation.Valid;
 
 import com.sirnoob.productservice.dto.SubCategoryRequest;
 import com.sirnoob.productservice.dto.SubCategoryResponse;
+import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.service.ISubCategoryService;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +32,7 @@ public class SubCategoryController {
   private final ISubCategoryService iSubCategoryService;
 
   @PostMapping
-  public ResponseEntity<String> createSubCategory(@Valid @RequestBody SubCategoryRequest subCategoryRequest) {
+  public ResponseEntity<SubCategory> createSubCategory(@Valid @RequestBody SubCategoryRequest subCategoryRequest) {
     return ResponseEntity.status(HttpStatus.CREATED).body(iSubCategoryService.createSubCategory(subCategoryRequest));
   }
 
@@ -48,8 +50,8 @@ public class SubCategoryController {
   }
 
   @GetMapping
-  public ResponseEntity<Set<String>> getAllSubCategories(@RequestParam(defaultValue = "0") int page) {
-    return ResponseEntity.ok().body(iSubCategoryService.getAllSubCategories(page));
+  public ResponseEntity<Set<String>> getAllSubCategories(Pageable pageable) {
+    return ResponseEntity.ok().body(iSubCategoryService.getAllSubCategories(pageable));
   }
 
   @GetMapping("/{subCategoryName}")
