@@ -102,8 +102,8 @@ public class ProductServiceImpl implements IProductService {
   }
 
   @Override
-  public List<Product> getProductByMainCategory(MainCategory mainCategory) {
-    return iProductRepository.findByMainCategory(mainCategory);
+  public List<Product> getProductByMainCategory(Long mainCategoryId) {
+    return iProductRepository.findByMainCategoryMainCategoryId(mainCategoryId);
   }
 
   @Override
@@ -114,7 +114,7 @@ public class ProductServiceImpl implements IProductService {
 
   @Override
   public Page<ProductListView> getProductListViewByName(String productName, Pageable pageable) {
-    Page<ProductListView> products = iProductRepository.listByNameMatches(productName, pageable);
+    Page<ProductListView> products = iProductRepository.findByProductNameContainingIgnoreCase(productName, pageable);
     return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
@@ -125,9 +125,8 @@ public class ProductServiceImpl implements IProductService {
   }
 
   @Override
-  public Page<ProductListView> getProductListViewByMainCategory(String mainCategoryName, Pageable pageable) {
-    Page<ProductListView> products = iProductRepository
-        .findByMainCategory(iMainCategoryService.getMainCategoryByName(mainCategoryName), pageable);
+  public Page<ProductListView> getProductListViewByMainCategory(Long mainCategoryId, Pageable pageable) {
+    Page<ProductListView> products = iProductRepository.findByMainCategoryMainCategoryId(mainCategoryId, pageable);
     return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 

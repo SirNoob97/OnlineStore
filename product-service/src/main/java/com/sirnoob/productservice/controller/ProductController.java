@@ -72,9 +72,9 @@ public class ProductController {
     return ResponseEntity.ok().body(iProductService.getPageOfProductListView(pageable));
   }
 
-  @GetMapping("/main-categories")
-  public ResponseEntity<Page<ProductListView>> listProductsByMainCategoryId(@RequestParam(required = true) String mainCategoryName, Pageable pageable){
-    return ResponseEntity.ok().body(iProductService.getProductListViewByMainCategory(mainCategoryName, pageable));
+  @GetMapping("/main-categories/{mainCategoryId}")
+  public ResponseEntity<Page<ProductListView>> listProductsByMainCategoryId(@PathVariable Long mainCategoryId, Pageable pageable){
+    return ResponseEntity.ok().body(iProductService.getProductListViewByMainCategory(mainCategoryId, pageable));
   }
 
   @GetMapping("/sub-categories")
