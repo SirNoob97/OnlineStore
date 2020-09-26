@@ -1,8 +1,8 @@
 package com.sirnoob.productservice.service;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.transaction.Transactional;
 
@@ -84,13 +84,7 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
   @Override
   public Set<SubCategory> getSubcategoriesByName(String[] subCategoriesNames) {
-
-    Set<SubCategory> subCategories = new HashSet<>();
-
-    for (String sc : subCategoriesNames) {
-      subCategories.add(getSubCategoryByName(sc));
-    }
-
+    Set<SubCategory> subCategories = Stream.of(subCategoriesNames).map(this::getSubCategoryByName).collect(Collectors.toSet());
     return CollectionValidator.throwExceptionIfSetIsEmpty(subCategories, NO_SUB_CATEGORIES_FOUND);
   }
 
