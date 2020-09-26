@@ -28,6 +28,29 @@ public class RandomEntityGenerator {
     //@formatter:on
   }
 
+  public static MainCategory createMainCategory() {
+    //@formatter:off
+    return MainCategory.builder()
+                       .mainCategoryId(getRandomLongNumber())
+                       .mainCategoryName(getRandomString())
+                       .build();
+    //formatter:on
+  }
+
+  public static SubCategory createSubCategory(){
+    //@formatter:off
+    return SubCategory.builder()
+                      .subCategoryId(getRandomLongNumber())
+                      .subCategoryName(getRandomString())
+                      .build();
+    //@formatter:on
+  }
+
+
+
+
+  /** static values **/
+
   public static Product createProductWithMainCategoryAndSubCategory() {
     //@formatter:off
     return Product.builder()
@@ -39,14 +62,8 @@ public class RandomEntityGenerator {
                   .productPrice(199.99)
                   .productStatus("CREATED")
                   .createAt(LocalDate.now())
-                  .mainCategory(
-                      MainCategory.builder()
-                                  .mainCategoryId(1L)
-                                  .mainCategoryName("Main Category")
-                                  .build()
-                  ).subCategories(
-                      Set.of(SubCategory.builder().subCategoryId(1L).subCategoryName("Sub Category 1").build(), SubCategory.builder().subCategoryId(2L).subCategoryName("Sub Category 2").build())
-                    )
+                  .mainCategory(createMainCategoryStaticValues())
+                  .subCategories(createSubSetCategoryStaticValues())
                   .build();
     //@formatter:on
   }
@@ -70,24 +87,14 @@ public class RandomEntityGenerator {
     return new ProductListView("Samsung Galaxy J7 (2016)","Color: Black, Camera: 13MP, Resolution: 720 x 1280" ,199.99);
   }
 
-  public static MainCategory createMainCategory() {
-    //@formatter:off
-    return MainCategory.builder()
-                       .mainCategoryId(getRandomLongNumber())
-                       .mainCategoryName(getRandomString())
-                       .build();
-    //formatter:on
+  public static MainCategory createMainCategoryStaticValues() {
+    return MainCategory.builder().mainCategoryId(1L).mainCategoryName("Main Category").build();
   }
 
-  public static SubCategory createSubCategory(){
-    //@formatter:off
-    return SubCategory.builder()
-                      .subCategoryId(getRandomLongNumber())
-                      .subCategoryName(getRandomString())
-                      .build();
-    //@formatter:on
+  public static Set<SubCategory> createSubSetCategoryStaticValues() {
+    return Set.of(SubCategory.builder().subCategoryId(1L).subCategoryName("Sub Category 1").mainCategory(createMainCategoryStaticValues()).build(),
+                  SubCategory.builder().subCategoryId(2L).subCategoryName("Sub Category 2").mainCategory(createMainCategoryStaticValues()).build());
   }
-
   public static Long getRandomLongNumber() {
     Long rn = new Random().nextLong();
     return rn > 0 ? rn : rn * -1;
