@@ -199,7 +199,7 @@ class ProductRepositoryTest {
     iProductRepository.save(product2);
     iProductRepository.save(product3);
 
-    List<Product> productsFetchedByMainCategory = iProductRepository.findByMainCategory(mainCategory);
+    List<Product> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId());
 
     int productCount = productsFetchedByMainCategory.size();
 
@@ -216,7 +216,7 @@ class ProductRepositoryTest {
 
     MainCategory mainCategorySaved = iMainCategoryRepository.save(createMainCategory());
 
-    List<Product> productsFetchedByMainCategory = iProductRepository.findByMainCategory(mainCategorySaved);
+    List<Product> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(mainCategorySaved.getMainCategoryId());
 
     assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
   }
@@ -224,7 +224,7 @@ class ProductRepositoryTest {
   @Test
   @DisplayName("Find By Main Category return empty list of product when main category isnt saved")
   public void findByMainCategory_ReturnEmptyProductList_WhenMainCategoryIsNotSaved() {
-    List<Product> productsFetchedByMainCategory = iProductRepository.findByMainCategory(createMainCategory());
+    List<Product> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(createMainCategory().getMainCategoryId());
 
     assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
   }
@@ -296,19 +296,19 @@ class ProductRepositoryTest {
 
     int size = 5;
 
-    Page<ProductListView> pageOfProducts = iProductRepository.listByNameMatches("mo", PageRequest.of(0, size));
+    Page<ProductListView> products = iProductRepository.findByProductNameContainingIgnoreCase("mo", PageRequest.of(0, 5));
 
-    assertThat(pageOfProducts.isEmpty()).isFalse();
-    assertThat(pageOfProducts.getSize()).isEqualTo(size);
-    assertThat(pageOfProducts.getPageable().getPageNumber()).isEqualTo(0);
+    assertThat(products.isEmpty()).isFalse();
+    assertThat(products.getSize()).isEqualTo(size);
+    assertThat(products.getPageable().getPageNumber()).isEqualTo(0);
   }
 
   @Test
   @DisplayName("List by name return empty page of ProductListView when the product name not matches the search parameter")
   public void listByName_ReturnEmptyPageOfProductListView_WhenTheProductNameNotMatchesTheSearchParameter() {
-    Page<ProductListView> pageOfProducts = iProductRepository.listByNameMatches("asdf", PageRequest.of(0, 10));
+    Page<ProductListView> products = iProductRepository.findByProductNameContainingIgnoreCase("asdf", PageRequest.of(0, 5));
 
-    assertThat(pageOfProducts.isEmpty()).isTrue();
+    assertThat(products.isEmpty()).isTrue();
   }
 
   @Test
@@ -328,7 +328,7 @@ class ProductRepositoryTest {
     iProductRepository.save(product2);
     iProductRepository.save(product3);
 
-    Page<ProductListView> productsFetchedByMainCategory = iProductRepository.findByMainCategory(mainCategory,
+    Page<ProductListView> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId(),
         PageRequest.of(0, 10));
 
     int productCount = productsFetchedByMainCategory.getSize();
@@ -345,7 +345,7 @@ class ProductRepositoryTest {
     iProductRepository.save(createProduct());
     iProductRepository.save(createProduct());
 
-    Page<ProductListView> productsFetchedByMainCategory = iProductRepository.findByMainCategory(createMainCategory(),
+    Page<ProductListView> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(createMainCategory().getMainCategoryId(),
         PageRequest.of(0, 10));
 
     assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
@@ -356,7 +356,7 @@ class ProductRepositoryTest {
   public void findByMainCategory_ReturnEmptyProductListView_WhenMainCategoryIsSavedButDoesNotContainsProduct() {
     MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
 
-    Page<ProductListView> productsFetchedByMainCategory = iProductRepository.findByMainCategory(mainCategory,
+    Page<ProductListView> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId(),
         PageRequest.of(0, 10));
 
     assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
