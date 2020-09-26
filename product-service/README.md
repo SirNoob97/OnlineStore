@@ -8,7 +8,7 @@ GET a page with 10 elements of the ProductListView type, discount to avoid sendi
 
 GET, like the previous command but only of products that belong to foo main category
 
-    curl -v -X GET http://localhost:8091/products/main-categories\?mainCategoryName\=Computers+%26+Accessories\&page\=0\&size\=10 -H 'Accept: application/json' | jq
+    curl -v -X GET http://localhost:8091/products/main-categories/1?page\=0\&size\=10 -H 'Accept: application/json' | jq
 
 GET products by name matches for users
 
@@ -21,6 +21,16 @@ GET product info for generate invoices
 GET get a ProductResponse DTO through barcode or name for employees, categories will only show the name to avoid unnecessary information
 
      curl -v -X GET http://localhost:8091/products/responses\?productBarCode\=5812329632587&productName=Adobe+Photoshop+Elements+2020 -H 'Accept: application/json' | jq
+
+GET ProductListView that have at least one of the specified subcategories
+
+     curl -v -X GET http://localhost:8091/products/sub-categories \
+       -H 'Content-Type: application/json' \
+       --data-raw '[
+             "Web Cameras",
+             "Monitors",
+             "Mice"
+       ]' | jq
 
 POST, create a new product record, the main category and the sub categories must already be registered
 
