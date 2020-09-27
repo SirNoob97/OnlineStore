@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ISubCategoryService {
 
-  public SubCategory createSubCategory(SubCategoryRequest subCategoryRequest);
+  public SubCategoryResponse createSubCategory(SubCategoryRequest subCategoryRequest, MainCategory mainCategory);
 
   public SubCategoryResponse getSubCategoryResponseByName(String subCategoryName);
 

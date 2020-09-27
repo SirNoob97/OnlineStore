@@ -6,7 +6,7 @@ import javax.validation.Valid;
 
 import com.sirnoob.productservice.dto.SubCategoryRequest;
 import com.sirnoob.productservice.dto.SubCategoryResponse;
-import com.sirnoob.productservice.entity.SubCategory;
+import com.sirnoob.productservice.service.IMainCategoryService;
 import com.sirnoob.productservice.service.ISubCategoryService;
 
 import org.springframework.data.domain.Pageable;
@@ -29,11 +29,13 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/sub-categories")
 public class SubCategoryController {
 
+  private final IMainCategoryService iMainCategoryService;
   private final ISubCategoryService iSubCategoryService;
 
   @PostMapping
-  public ResponseEntity<SubCategory> createSubCategory(@Valid @RequestBody SubCategoryRequest subCategoryRequest) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(iSubCategoryService.createSubCategory(subCategoryRequest));
+  public ResponseEntity<SubCategoryResponse> createSubCategory(@Valid @RequestBody SubCategoryRequest subCategoryRequest) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+      .body(iSubCategoryService.createSubCategory(subCategoryRequest, iMainCategoryService.getMainCategoryByName(subCategoryRequest.getMainCategoryName())));
   }
 
   @PutMapping("/{subCategoryId}")

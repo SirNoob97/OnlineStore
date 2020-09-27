@@ -16,6 +16,8 @@ import com.sirnoob.productservice.mapper.ISubCategoryMapper;
 import com.sirnoob.productservice.repository.ISubCategoryRepository;
 import com.sirnoob.productservice.util.CollectionValidator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -27,16 +29,15 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
   private final ISubCategoryMapper iSubCategoryMapper;
   private final ISubCategoryRepository iSubCategoryRepository;
-  private final IMainCategoryService iMainCategoryService;
 
   private static final String SUB_CATEGORY_NOT_FOUND = "Sub Category Not Found";
   private static final String NO_SUB_CATEGORIES_FOUND = "No Sub Categories Found";
 
   @Transactional
   @Override
-  public SubCategory createSubCategory(SubCategoryRequest subCategoryRequest) {
-    MainCategory mainCategory = iMainCategoryService.getMainCategoryByName(subCategoryRequest.getMainCategoryName());
-    return iSubCategoryRepository.save(iSubCategoryMapper.mapSubCategoryRequestToSubCategory(subCategoryRequest, mainCategory));
+  public SubCategoryResponse createSubCategory(SubCategoryRequest subCategoryRequest, MainCategory mainCategory) {
+    SubCategory subCategory = iSubCategoryRepository.save(iSubCategoryMapper.mapSubCategoryRequestToSubCategory(subCategoryRequest, mainCategory));
+    return iSubCategoryMapper.mapSubCategoryToSubCategoryResponse(subCategory);
   }
 
   @Transactional
