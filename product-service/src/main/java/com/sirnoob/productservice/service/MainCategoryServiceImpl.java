@@ -10,10 +10,12 @@ import com.sirnoob.productservice.exception.ResourceNotFoundException;
 import com.sirnoob.productservice.repository.IMainCategoryRepository;
 import com.sirnoob.productservice.util.CollectionValidator;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 public class MainCategoryServiceImpl implements IMainCategoryService {
 
@@ -23,13 +25,6 @@ public class MainCategoryServiceImpl implements IMainCategoryService {
 
 	private static final String MAIN_CATEGORY_NOT_FOUND = "Main Category Not Found";
 	private static final String NO_MAIN_CATEGORIES_FOUND = "No Main Categories Found";
-
-	public MainCategoryServiceImpl(@Lazy IProductService iProductService, @Lazy ISubCategoryService iSubCategoryService,
-			IMainCategoryRepository iMainCategoryRepository) {
-		this.iProductService = iProductService;
-		this.iSubCategoryService = iSubCategoryService;
-		this.iMainCategoryRepository = iMainCategoryRepository;
-	}
 
 	@Transactional
 	@Override
