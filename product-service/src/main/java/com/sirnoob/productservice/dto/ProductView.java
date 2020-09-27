@@ -17,6 +17,6 @@ public class ProductView {
   private String productName;
   private String productDescription;
   private Double productPrice;
-  private String mainCategory;
+  private String mainCategoryName;
   private Set<String> subcategories;
 }

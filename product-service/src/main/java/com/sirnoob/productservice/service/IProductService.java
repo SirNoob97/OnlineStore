@@ -30,13 +30,13 @@ public interface IProductService {
 
   public ProductView findProductViewByName(String productName);
 
-  public Page<ProductListView> getProductListViewByName(String productName, Pageable pageable);
+  public Page<ProductListView> getPageOfProductListViewByName(String productName, Pageable pageable);
 
   public Page<ProductListView> getPageOfProductListView(Pageable pageable);
 
-  public Page<ProductListView> getProductListViewByMainCategory(Long mainCategoryId, Pageable pageable);
+  public Page<ProductListView> getPageOfProductListViewByMainCategory(Long mainCategoryId, Pageable pageable);
 
-  public Set<ProductListView> getProductListViewBySubCategory(String[] subCategoryName);
+  public Set<ProductListView> getSetOfProductListViewBySubCategory(String[] subCategoryName);
 
   public void updateProductStock(Long productBarCode, Integer quantity);
 

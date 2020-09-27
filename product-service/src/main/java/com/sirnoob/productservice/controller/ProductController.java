@@ -78,12 +78,12 @@ public class ProductController {
 
   @GetMapping("/main-categories/{mainCategoryId}")
   public ResponseEntity<Page<ProductListView>> listProductsByMainCategoryId(@PathVariable Long mainCategoryId, Pageable pageable){
-    return ResponseEntity.ok().body(iProductService.getProductListViewByMainCategory(mainCategoryId, pageable));
+    return ResponseEntity.ok().body(iProductService.getPageOfProductListViewByMainCategory(mainCategoryId, pageable));
   }
 
   @GetMapping("/sub-categories")
   public ResponseEntity<Set<ProductListView>> listProductsBySubCategories(@RequestBody String[] subCategories){
-    return ResponseEntity.ok().body(iProductService.getProductListViewBySubCategory(subCategories));
+    return ResponseEntity.ok().body(iProductService.getSetOfProductListViewBySubCategory(subCategories));
   }
 
   @GetMapping("/names")
@@ -93,6 +93,6 @@ public class ProductController {
 
   @GetMapping("/names/search")
   public ResponseEntity<Page<ProductListView>> listByProductNameCoincidences(@RequestParam(required = true) String productName, Pageable pageable){
-    return ResponseEntity.ok().body(iProductService.getProductListViewByName(productName, pageable));
+    return ResponseEntity.ok().body(iProductService.getPageOfProductListViewByName(productName, pageable));
   }
 }

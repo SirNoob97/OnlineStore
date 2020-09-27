@@ -99,7 +99,8 @@ public class ProductServiceImpl implements IProductService {
 
   @Override
   public List<Product> getProductByMainCategory(Long mainCategoryId) {
-    return iProductRepository.findByMainCategoryMainCategoryId(mainCategoryId);
+     List<Product> products = iProductRepository.findByMainCategoryMainCategoryId(mainCategoryId);
+     return CollectionValidator.throwExceptionIfListIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
   @Override
@@ -109,7 +110,7 @@ public class ProductServiceImpl implements IProductService {
   }
 
   @Override
-  public Page<ProductListView> getProductListViewByName(String productName, Pageable pageable) {
+  public Page<ProductListView> getPageOfProductListViewByName(String productName, Pageable pageable) {
     Page<ProductListView> products = iProductRepository.findByProductNameContainingIgnoreCase(productName, pageable);
     return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
@@ -121,13 +122,13 @@ public class ProductServiceImpl implements IProductService {
   }
 
   @Override
-  public Page<ProductListView> getProductListViewByMainCategory(Long mainCategoryId, Pageable pageable) {
+  public Page<ProductListView> getPageOfProductListViewByMainCategory(Long mainCategoryId, Pageable pageable) {
     Page<ProductListView> products = iProductRepository.findByMainCategoryMainCategoryId(mainCategoryId, pageable);
     return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
   @Override
-  public Set<ProductListView> getProductListViewBySubCategory(String[] subCategoriesNames) {
+  public Set<ProductListView> getSetOfProductListViewBySubCategory(String[] subCategoriesNames) {
     Set<ProductListView> products = iSubCategoryService.getSubcategoriesByName(subCategoriesNames).stream()
         .map(sc -> iProductRepository.findBySubCategory(sc))
         .flatMap(pdv -> pdv.stream())
