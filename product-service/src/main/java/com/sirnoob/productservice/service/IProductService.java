@@ -8,6 +8,7 @@ import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.dto.ProductView;
+import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 
 import org.springframework.data.domain.Page;
@@ -19,9 +20,9 @@ public interface IProductService {
 
   public List<Product> getProductByMainCategory(Long mainCategoryId);
 
-  public ProductResponse createProduct(ProductRequest productRequest);
+  public ProductResponse createProduct(ProductRequest productRequest, MainCategory mainCategory);
 
-  public ProductResponse updateProduct(Long productId, ProductRequest productRequest);
+  public ProductResponse updateProduct(Long productId, ProductRequest productRequest, MainCategory mainCategory);
 
   public ProductResponse getProductResponseByBarCodeOrProductName(Long productBarCode, String productName);
 

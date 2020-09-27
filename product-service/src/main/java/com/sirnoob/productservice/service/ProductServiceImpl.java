@@ -29,7 +29,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ProductServiceImpl implements IProductService {
 
-  private final IMainCategoryService iMainCategoryService;
   private final ISubCategoryService iSubCategoryService;
   private final IProductRepository iProductRepository;
   private final IProductMapper iProductMapper;
@@ -39,10 +38,7 @@ public class ProductServiceImpl implements IProductService {
 
   @Transactional
   @Override
-  public ProductResponse createProduct(ProductRequest productRequest) {
-
-    MainCategory mainCategory = iMainCategoryService.getMainCategoryByName(productRequest.getMainCategoryName());
-
+  public ProductResponse createProduct(ProductRequest productRequest, MainCategory mainCategory) {
     Set<SubCategory> subCategories = iSubCategoryService.getSubcategoriesByName(productRequest.getSubCategoriesNames());
 
     Product product = iProductMapper.mapProductRequestToProduct(productRequest, mainCategory, subCategories);
@@ -55,7 +51,7 @@ public class ProductServiceImpl implements IProductService {
 
   @Transactional
   @Override
-  public ProductResponse updateProduct(Long productId, ProductRequest productRequest) {
+  public ProductResponse updateProduct(Long productId, ProductRequest productRequest, MainCategory mainCategory) {
 
     Product product = getProductById(productId);
 
@@ -64,7 +60,7 @@ public class ProductServiceImpl implements IProductService {
     product.setProductDescription(productRequest.getProductDescription());
     product.setProductStock(productRequest.getProductStock());
     product.setProductPrice(productRequest.getProductPrice());
-    product.setMainCategory(iMainCategoryService.getMainCategoryByName(productRequest.getMainCategoryName()));
+    product.setMainCategory(mainCategory);
     product.setSubCategories(iSubCategoryService.getSubcategoriesByName(productRequest.getSubCategoriesNames()));
 
     return iProductMapper.mapProductToProductResponse(iProductRepository.save(product));

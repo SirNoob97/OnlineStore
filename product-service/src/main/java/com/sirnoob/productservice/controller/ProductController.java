@@ -9,6 +9,7 @@ import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.dto.ProductView;
+import com.sirnoob.productservice.service.IMainCategoryService;
 import com.sirnoob.productservice.service.IProductService;
 
 import org.springframework.data.domain.Page;
@@ -32,16 +33,19 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/products")
 public class ProductController {
 
+  private final IMainCategoryService iMainCategoryService;
   private final IProductService iProductService;
 
   @PostMapping
   public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest productRequest){
-    return ResponseEntity.status(HttpStatus.CREATED).body(iProductService.createProduct(productRequest));
+    return ResponseEntity.status(HttpStatus.CREATED).body(iProductService.createProduct(productRequest,
+        iMainCategoryService.getMainCategoryByName(productRequest.getMainCategoryName())));
   }
 
   @PutMapping("/{productId}")
   public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId, @Valid @RequestBody ProductRequest productRequest){
-    return ResponseEntity.ok().body(iProductService.updateProduct(productId, productRequest));
+    return ResponseEntity.ok().body(iProductService.updateProduct(productId, productRequest,
+          iMainCategoryService.getMainCategoryByName(productRequest.getMainCategoryName())));
   }
 
   @PutMapping("/{productBarCode}/stock")
