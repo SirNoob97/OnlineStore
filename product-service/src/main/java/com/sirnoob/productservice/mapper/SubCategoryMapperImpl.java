@@ -1,5 +1,6 @@
 package com.sirnoob.productservice.mapper;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.sirnoob.productservice.dto.SubCategoryRequest;
@@ -23,11 +24,21 @@ public class SubCategoryMapperImpl implements ISubCategoryMapper {
 
   @Override
   public SubCategoryResponse mapSubCategoryToSubCategoryResponse(SubCategory subCategory) {
-    return SubCategoryResponse.builder()
-                              .subCategoryId(subCategory.getSubCategoryId())
-                              .subCategoryName(subCategory.getSubCategoryName())
-                              .mainCategory(subCategory.getMainCategory().getMainCategoryName())
-                              .products(subCategory.getProducts().stream().map(Product::getProductName).collect(Collectors.toSet()))
-                              .build();
+    return subCategory.getProducts() == null || subCategory.getProducts().isEmpty()
+    //@formatter:off
+                ? SubCategoryResponse.builder()
+                                          .subCategoryId(subCategory.getSubCategoryId())
+                                          .subCategoryName(subCategory.getSubCategoryName())
+                                          .mainCategory(subCategory.getMainCategory().getMainCategoryName())
+                                          .products(Set.of("This subcategory has no products"))
+                                          .build()
+
+                : SubCategoryResponse.builder()
+                                          .subCategoryId(subCategory.getSubCategoryId())
+                                          .subCategoryName(subCategory.getSubCategoryName())
+                                          .mainCategory(subCategory.getMainCategory().getMainCategoryName())
+                                          .products(subCategory.getProducts().stream().map(Product::getProductName).collect(Collectors.toSet()))
+                                          .build();
+    //@formatter:on
   }
 }
