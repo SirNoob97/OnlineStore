@@ -2,7 +2,6 @@ package com.sirnoob.productservice.util;
 
 import java.time.LocalDate;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 import com.sirnoob.productservice.dto.ProductListView;
@@ -51,22 +50,21 @@ public class RandomEntityGenerator {
 
   /** static values **/
 
-  public static Product createProductWithMainCategoryAndSubCategory() {
-    //@formatter:off
-    return Product.builder()
-                  .productId(1L)
-                  .productName("Samsung Galaxy J7 (2016)")
-                  .productBarCode(1023045090807L)
-                  .productDescription("Color: Black, Camera: 13MP, Resolution: 720 x 1280")
-                  .productStock(50)
-                  .productPrice(199.99)
-                  .productStatus("CREATED")
-                  .createAt(LocalDate.now())
-                  .mainCategory(createMainCategoryStaticValues())
-                  .subCategories(createSubSetCategoryStaticValues())
-                  .build();
-    //@formatter:on
-  }
+//  public static Product createProductWithMainCategoryAndSubCategory() {
+//    //@formatter:off
+//    return Product.builder()
+//                  .productName("Samsung Galaxy J7 (2016)")
+//                  .productBarCode(1023045090807L)
+//                  .productDescription("Color: Black, Camera: 13MP, Resolution: 720 x 1280")
+//                  .productStock(50)
+//                  .productPrice(199.99)
+//                  .productStatus("CREATED")
+//                  .createAt(LocalDate.now())
+//                  .mainCategory(createMainCategoryStaticValues())
+//                  .subCategories(createSubSetCategoryStaticValues())
+//                  .build();
+//    //@formatter:on
+//  }
 
   public static ProductRequest createProductRequest() {
     String[] subCategoriesNames = {"Sub Category 1", "Sub Category 2"};
@@ -88,12 +86,11 @@ public class RandomEntityGenerator {
   }
 
   public static MainCategory createMainCategoryStaticValues() {
-    return MainCategory.builder().mainCategoryId(1L).mainCategoryName("Main Category").build();
+    return MainCategory.builder().mainCategoryName("Main Category").build();
   }
 
-  public static Set<SubCategory> createSubSetCategoryStaticValues() {
-    return Set.of(SubCategory.builder().subCategoryId(1L).subCategoryName("Sub Category 1").mainCategory(createMainCategoryStaticValues()).build(),
-                  SubCategory.builder().subCategoryId(2L).subCategoryName("Sub Category 2").mainCategory(createMainCategoryStaticValues()).build());
+  public static SubCategory createSubSetCategoryStaticValues(int value, MainCategory mainCategory) {
+    return SubCategory.builder().subCategoryName("Sub Category " + value).mainCategory(mainCategory).build();
   }
   public static Long getRandomLongNumber() {
     Long rn = new Random().nextLong();
