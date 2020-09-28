@@ -35,7 +35,8 @@ public class SubCategoryController {
   @PostMapping
   public ResponseEntity<SubCategoryResponse> createSubCategory(@Valid @RequestBody SubCategoryRequest subCategoryRequest) {
     return ResponseEntity.status(HttpStatus.CREATED)
-      .body(iSubCategoryService.createSubCategory(subCategoryRequest, iMainCategoryService.getMainCategoryByName(subCategoryRequest.getMainCategoryName())));
+      .body(iSubCategoryService.createSubCategory(subCategoryRequest.getSubCategoryName(),
+        iMainCategoryService.getMainCategoryByName(subCategoryRequest.getMainCategoryName())));
   }
 
   @PutMapping("/{subCategoryId}")

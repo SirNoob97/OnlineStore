@@ -1,5 +1,6 @@
 package com.sirnoob.productservice.service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -9,10 +10,8 @@ import javax.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.sirnoob.productservice.dto.SubCategoryRequest;
 import com.sirnoob.productservice.dto.SubCategoryResponse;
 import com.sirnoob.productservice.entity.MainCategory;
-import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
 import com.sirnoob.productservice.mapper.ISubCategoryMapper;
@@ -33,9 +32,9 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
   @Transactional
   @Override
-  public SubCategoryResponse createSubCategory(SubCategoryRequest subCategoryRequest, MainCategory mainCategory) {
+  public SubCategoryResponse createSubCategory(String subCategoryName, MainCategory mainCategory) {
     SubCategory subCategory = iSubCategoryRepository
-      .save(iSubCategoryMapper.mapSubCategoryRequestToSubCategory(subCategoryRequest, mainCategory));
+      .save(iSubCategoryMapper.mapSubCategoryRequestToSubCategory(subCategoryName, mainCategory));
     return iSubCategoryMapper.mapSubCategoryToSubCategoryResponse(subCategory);
   }
 
@@ -52,9 +51,13 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
     SubCategory subCategory = getSubCategoryById(subCategoryId);
 
     if (subCategory.getProducts() != null && !subCategory.getProducts().isEmpty()) {
-      for (Product p : subCategory.getProducts()) {
-        p.getSubCategories().remove(subCategory);
-      }
+      subCategory.getProducts().stream()
+      .filter(p -> p.getSubCategories() != null && !p.getSubCategories().isEmpty())
+      .forEach(prd -> prd.getSubCategories().remove(subCategory));
+//      for (Product p : subCategory.getProducts()) {
+//        if (p.getSubCategories() != null && !p.getSubCategories().isEmpty())
+//          p.getSubCategories().remove(subCategory);
+//      }
     }
     iSubCategoryRepository.delete(subCategory);
   }
@@ -84,13 +87,12 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
   @Override
   public Set<SubCategory> getSubcategoriesByName(String[] subCategoriesNames) {
-    Set<SubCategory> subCategories = Stream.of(subCategoriesNames).map(this::getSubCategoryByName).collect(Collectors.toSet());
-    return CollectionValidator.throwExceptionIfSetIsEmpty(subCategories, NO_SUB_CATEGORIES_FOUND);
+    return Stream.of(subCategoriesNames).map(this::getSubCategoryByName).collect(Collectors.toSet());
   }
 
   @Override
-  public Set<SubCategory> getSubCategoryByMainCategory(MainCategory mainCategory) {
-    return iSubCategoryRepository.findByMainCategory(mainCategory).stream().collect(Collectors.toSet());
+  public List<SubCategory> getSubCategoryByMainCategory(Long mainCategoryId) {
+    return iSubCategoryRepository.findByMainCategoryMainCategoryId(mainCategoryId);
   }
 
 }

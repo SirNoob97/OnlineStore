@@ -1,17 +1,17 @@
 package com.sirnoob.productservice.service;
 
+import java.util.List;
 import java.util.Set;
 
-import com.sirnoob.productservice.dto.SubCategoryRequest;
+import org.springframework.data.domain.Pageable;
+
 import com.sirnoob.productservice.dto.SubCategoryResponse;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.SubCategory;
 
-import org.springframework.data.domain.Pageable;
-
 public interface ISubCategoryService {
 
-  public SubCategoryResponse createSubCategory(SubCategoryRequest subCategoryRequest, MainCategory mainCategory);
+  public SubCategoryResponse createSubCategory(String subCategoryName, MainCategory mainCategory);
 
   public SubCategoryResponse getSubCategoryResponseByName(String subCategoryName);
 
@@ -23,7 +23,7 @@ public interface ISubCategoryService {
 
   public Set<SubCategory> getSubcategoriesByName(String[] subCategoriesNames);
 
-  public Set<SubCategory> getSubCategoryByMainCategory (MainCategory mainCategory);
+  public List<SubCategory> getSubCategoryByMainCategory (Long mainCategoryId);
 
   public void updateSubCategoryName(Long subCategoryId, String subCategoryName);
 

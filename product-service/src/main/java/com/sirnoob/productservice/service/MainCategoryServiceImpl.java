@@ -44,7 +44,7 @@ public class MainCategoryServiceImpl implements IMainCategoryService {
   public void deleteMainCategory(Long mainCategoryId) {
     MainCategory mainCategory = getMainCategoryById(mainCategoryId);
 
-    iSubCategoryService.getSubCategoryByMainCategory(mainCategory)
+    iSubCategoryService.getSubCategoryByMainCategory(mainCategoryId)
       .forEach(sc -> iSubCategoryService.deleteSubCategory(sc.getSubCategoryId()));
 
     iProductService.getProductByMainCategory(mainCategoryId).forEach(prs -> {
