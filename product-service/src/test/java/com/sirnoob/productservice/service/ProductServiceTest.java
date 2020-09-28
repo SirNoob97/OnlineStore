@@ -4,6 +4,7 @@ import static com.sirnoob.productservice.util.RandomEntityGenerator.createMainCa
 import static com.sirnoob.productservice.util.RandomEntityGenerator.createProductRequest;
 import static com.sirnoob.productservice.util.RandomEntityGenerator.createSubSetCategoryStaticValues;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,7 @@ import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.dto.ProductView;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
+import com.sirnoob.productservice.exception.ResourceNotFoundException;
 import com.sirnoob.productservice.repository.IMainCategoryRepository;
 import com.sirnoob.productservice.repository.IProductRepository;
 import com.sirnoob.productservice.repository.ISubCategoryRepository;
@@ -39,6 +41,9 @@ import com.sirnoob.productservice.repository.ISubCategoryRepository;
 @Transactional
 @DisplayName("Produc Service Test")
 public class ProductServiceTest {
+
+  private static final String PRODUCT_NOT_FOUND = "Product Not Found";
+  private static final String NO_PRODUCTS_FOUND = "No Products Found";
 
   Logger log = LoggerFactory.getLogger(ProductServiceTest.class);
 
@@ -65,7 +70,10 @@ public class ProductServiceTest {
   @Test
   @DisplayName("createProduct create a new product log when successful")
   public void createProduct_CreateProduct_WhenSuccessful() {
-    ProductResponse productSaved = getAProductResponseFromAnAlreadyPersistedProduct();
+    Optional<MainCategory> mainCategory = iMainCategoryRepository
+      .findByMainCategoryName(createMainCategoryStaticValues().getMainCategoryName());
+
+    ProductResponse productSaved = iProductService.createProduct(createProductRequest(), mainCategory.get());
 
     assertThat(productSaved).isNotNull();
     assertThat(productSaved.getProductStatus()).isEqualTo("CREATED");
@@ -109,6 +117,13 @@ public class ProductServiceTest {
   }
 
   @Test
+  @DisplayName("getProductById throw ResourceNotFoundException when product was not found")
+  public void getProductById_ThrowResourceNotFoundException_WhenProductWasNotFound() {
+    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> iProductService.getProductById(-1L))
+      .withMessage(PRODUCT_NOT_FOUND);
+  }
+
+  @Test
   @DisplayName("updateProductStock update the stock of an existing product when successful")
   public void updateProductStock_UpdateStockOfAnExistingProduct_WhenSuccessful() {
     ProductResponse productSaved = getAProductResponseFromAnAlreadyPersistedProduct();
@@ -124,6 +139,13 @@ public class ProductServiceTest {
     assertThat(productSaved.getProductStock()).isNotEqualTo(productUpdated.getProductStock());
     assertThat(productUpdated.getProductStock()).isNotEqualTo(oldStock);
     assertThat(productUpdated.getProductStock()).isEqualTo(newStock);
+  }
+
+  @Test
+  @DisplayName("updateProductStock throw ResourceNotFoundException when the return of the query is less than one")
+  public void updateProductStock_ThrowResourceNotFoundException_WhenTheReturnOfTheQueryIsLessThanOne() {
+    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> iProductService.updateProductStock(-1L, 0))
+      .withMessage(PRODUCT_NOT_FOUND);
   }
 
   @Test
@@ -158,6 +180,13 @@ public class ProductServiceTest {
   }
 
   @Test
+  @DisplayName("getProductResponseByBarCodeOrProductName throw ResourceNotFoundException when product was not found")
+  public void getProductResponseByBarCodeOrProductName_ThrowResourceNotFoundException_WhenProductNotFound() {
+    assertThatExceptionOfType(ResourceNotFoundException.class)
+      .isThrownBy(() -> iProductService.getProductResponseByBarCodeOrProductName(-1L, "")).withMessage(PRODUCT_NOT_FOUND);
+  }
+
+  @Test
   @DisplayName("getProductForInvoiceResponse return a product invoice response when successful")
   public void getProductForInvoiceResponse_ReturnAProductInvoiceResponse_WhenSuccessful() {
     ProductResponse productSaved = getAProductResponseFromAnAlreadyPersistedProduct();
@@ -169,6 +198,13 @@ public class ProductServiceTest {
     assertThat(productForInvoiceResponse).isNotNull();
     assertThat(productForInvoiceResponse.getProductName()).isEqualTo(productSaved.getProductName());
     assertThat(productForInvoiceResponse.getProductPrice()).isEqualTo(productSaved.getProductPrice());
+  }
+
+  @Test
+  @DisplayName("getProductForInvoiceResponse throw ResourceNotFoundException when product was not found")
+  public void getProductForInvoiceResponse_ThrowResourceNotFoundException_WhenProductNotFound() {
+    assertThatExceptionOfType(ResourceNotFoundException.class)
+      .isThrownBy(() -> iProductService.getProductForInvoiceResponse(-1L, "")).withMessage(PRODUCT_NOT_FOUND);
   }
 
   @Test
@@ -186,6 +222,17 @@ public class ProductServiceTest {
   }
 
   @Test
+  @DisplayName("getProductByMainCategory throw ResourceNotFoundException when the main category has no products")
+  public void getProductByMainCategory_ThrowResourceNotFoundException_WhenTheMainCategoryHasNoProducts() {
+    Optional<MainCategory> mainCategory = iMainCategoryRepository
+      .findByMainCategoryName(createMainCategoryStaticValues().getMainCategoryName());
+
+    assertThatExceptionOfType(ResourceNotFoundException.class)
+      .isThrownBy(() -> iProductService.getProductByMainCategory(mainCategory.get().getMainCategoryId()))
+      .withMessage(NO_PRODUCTS_FOUND);
+  }
+
+  @Test
   @DisplayName("findProductViewByName return a product view when successful")
   public void findProductViewByName_ReturnAProductView_WhenSuccessful() {
     ProductResponse productSaved = getAProductResponseFromAnAlreadyPersistedProduct();
@@ -196,6 +243,13 @@ public class ProductServiceTest {
     assertThat(productView.getProductBarCode()).isEqualTo(productSaved.getProductBarCode());
     assertThat(productView.getProductName()).isEqualTo(productSaved.getProductName());
     assertThat(productView.getMainCategoryName()).isEqualTo(productSaved.getMainCategoryName());
+  }
+
+  @Test
+  @DisplayName("findProductViewByName throw ResourceNotFoundException when product was not found")
+  public void findProductViewByName_ThrowResourceNotFoundException_WhenProductNotFound() {
+    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> iProductService.findProductViewByName(""))
+      .withMessage(PRODUCT_NOT_FOUND);
   }
 
   @Test
@@ -210,6 +264,14 @@ public class ProductServiceTest {
   }
 
   @Test
+  @DisplayName("getPageOfProductListViewByName throw ResourceNotFoundException when the names dont match")
+  public void getPageOfProductListViewByName_ThrowResourceNotFoundException_WhenTheNamesDoNotMatch() {
+    assertThatExceptionOfType(ResourceNotFoundException.class)
+      .isThrownBy(() -> iProductService.getPageOfProductListViewByName("?>~!#", PageRequest.of(0, 10)))
+      .withMessage(NO_PRODUCTS_FOUND);
+  }
+
+  @Test
   @DisplayName("getPageOfProductListView return a page of product list view when successful")
   public void getPageOfProductListView_ReturnAPageProductListView_WhenSuccessful() {
     getAProductResponseFromAnAlreadyPersistedProduct();
@@ -218,6 +280,15 @@ public class ProductServiceTest {
 
     assertThat(products.isEmpty()).isFalse();
     assertThat(products.getSize()).isGreaterThan(1);
+  }
+
+  @Test
+  @DisplayName("getPageOfProductListView throw ResourceNotFoundException when there are no products in the registry")
+  public void getPageOfProductListView_ThrowResourceNotFoundException_WhenThereAreNoProductsInTheRegistry() {
+    iProductRepository.deleteAllInBatch();
+
+    assertThatExceptionOfType(ResourceNotFoundException.class)
+      .isThrownBy(() -> iProductService.getPageOfProductListView(PageRequest.of(0, 10))).withMessage(NO_PRODUCTS_FOUND);
   }
 
   @Test
@@ -235,10 +306,21 @@ public class ProductServiceTest {
   }
 
   @Test
+  @DisplayName("getPageOfProductListViewByMainCategory throw ResourceNotFoundException when the main category has no products")
+  public void getPageOfProductListViewByMainCategory_ThrowResourceNotFoundException_WhenTheMainCategoryHasNoProducts() {
+    Optional<MainCategory> mainCategory = iMainCategoryRepository
+      .findByMainCategoryName(createMainCategoryStaticValues().getMainCategoryName());
+
+    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(
+      () -> iProductService.getPageOfProductListViewByMainCategory(mainCategory.get().getMainCategoryId(), PageRequest.of(0, 10)))
+      .withMessage(NO_PRODUCTS_FOUND);
+  }
+
+  @Test
   @DisplayName("getSetOfProductListViewBySubCategory return a set of product list view when successful")
   public void getSetOfProductListViewBySubCategory_ReturnASetProductListView_WhenSuccessful() {
     getAProductResponseFromAnAlreadyPersistedProduct();
-    
+
     String[] subcategories = { "Sub Category 1" };
 
     Set<ProductListView> products = iProductService.getSetOfProductListViewBySubCategory(subcategories);
@@ -247,7 +329,14 @@ public class ProductServiceTest {
     assertThat(products.size()).isEqualTo(1);
   }
 
+  @Test
+  @DisplayName("getSetOfProductListViewBySubCategory throw ResourceNotFoundException when the sub category or sub categories has no products")
+  public void getSetOfProductListViewBySubCategory_ThrowResourceNotFoundException_WhenTheSubCategoryOrSubCategoriesHasNoProducts() {
+    String[] subcategories = { "Sub Category 1", "Sub Category 2" };
 
+    assertThatExceptionOfType(ResourceNotFoundException.class)
+      .isThrownBy(() -> iProductService.getSetOfProductListViewBySubCategory(subcategories)).withMessage(NO_PRODUCTS_FOUND);
+  }
 
   private ProductResponse getAProductResponseFromAnAlreadyPersistedProduct() {
     Optional<MainCategory> mainCategory = iMainCategoryRepository
