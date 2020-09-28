@@ -15,8 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -44,8 +42,6 @@ public class ProductServiceTest {
 
   private static final String PRODUCT_NOT_FOUND = "Product Not Found";
   private static final String NO_PRODUCTS_FOUND = "No Products Found";
-
-  Logger log = LoggerFactory.getLogger(ProductServiceTest.class);
 
   @Autowired
   ISubCategoryRepository iSubCategoryRepository;
@@ -222,14 +218,14 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getProductByMainCategory throw ResourceNotFoundException when the main category has no products")
-  public void getProductByMainCategory_ThrowResourceNotFoundException_WhenTheMainCategoryHasNoProducts() {
+  @DisplayName("getProductByMainCategory return an empty product list when the main category has no products")
+  public void getProductByMainCategory_ReturnAnEmptyProductList_WhenTheMainCategoryHasNoProducts() {
     Optional<MainCategory> mainCategory = iMainCategoryRepository
       .findByMainCategoryName(createMainCategoryStaticValues().getMainCategoryName());
 
-    assertThatExceptionOfType(ResourceNotFoundException.class)
-      .isThrownBy(() -> iProductService.getProductByMainCategory(mainCategory.get().getMainCategoryId()))
-      .withMessage(NO_PRODUCTS_FOUND);
+      List<Product> products = iProductService.getProductByMainCategory(mainCategory.get().getMainCategoryId());
+      
+      assertThat(products.isEmpty()).isTrue();
   }
 
   @Test
