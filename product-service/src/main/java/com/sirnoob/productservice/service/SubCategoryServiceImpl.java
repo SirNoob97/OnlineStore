@@ -34,7 +34,8 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
   @Transactional
   @Override
   public SubCategoryResponse createSubCategory(SubCategoryRequest subCategoryRequest, MainCategory mainCategory) {
-    SubCategory subCategory = iSubCategoryRepository.save(iSubCategoryMapper.mapSubCategoryRequestToSubCategory(subCategoryRequest, mainCategory));
+    SubCategory subCategory = iSubCategoryRepository
+      .save(iSubCategoryMapper.mapSubCategoryRequestToSubCategory(subCategoryRequest, mainCategory));
     return iSubCategoryMapper.mapSubCategoryToSubCategoryResponse(subCategory);
   }
 
@@ -50,7 +51,7 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
   public void deleteSubCategory(Long subCategoryId) {
     SubCategory subCategory = getSubCategoryById(subCategoryId);
 
-    if(!subCategory.getProducts().isEmpty()){
+    if (subCategory.getProducts() != null && !subCategory.getProducts().isEmpty()) {
       for (Product p : subCategory.getProducts()) {
         p.getSubCategories().remove(subCategory);
       }
@@ -60,7 +61,8 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
   @Override
   public SubCategory getSubCategoryById(Long subCategoryId) {
-    return iSubCategoryRepository.findById(subCategoryId).orElseThrow(() -> new ResourceNotFoundException(SUB_CATEGORY_NOT_FOUND));
+    return iSubCategoryRepository.findById(subCategoryId)
+      .orElseThrow(() -> new ResourceNotFoundException(SUB_CATEGORY_NOT_FOUND));
   }
 
   @Override
@@ -76,8 +78,7 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
   @Override
   public Set<String> getAllSubCategories(Pageable pageable) {
-    Set<String> subCategories = iSubCategoryRepository.findAll(pageable).map(SubCategory::getSubCategoryName)
-      .toSet();
+    Set<String> subCategories = iSubCategoryRepository.findAll(pageable).map(SubCategory::getSubCategoryName).toSet();
     return CollectionValidator.throwExceptionIfSetIsEmpty(subCategories, NO_SUB_CATEGORIES_FOUND);
   }
 
@@ -89,8 +90,7 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
   @Override
   public Set<SubCategory> getSubCategoryByMainCategory(MainCategory mainCategory) {
-    Set<SubCategory> subCategories = iSubCategoryRepository.findByMainCategory(mainCategory).stream().collect(Collectors.toSet());
-    return CollectionValidator.throwExceptionIfSetIsEmpty(subCategories, NO_SUB_CATEGORIES_FOUND);
+    return iSubCategoryRepository.findByMainCategory(mainCategory).stream().collect(Collectors.toSet());
   }
 
 }
