@@ -1,7 +1,9 @@
 package com.sirnoob.productservice.util;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import com.sirnoob.productservice.dto.ProductListView;
@@ -50,21 +52,23 @@ public class RandomEntityGenerator {
 
   /** static values **/
 
-//  public static Product createProductWithMainCategoryAndSubCategory() {
-//    //@formatter:off
-//    return Product.builder()
-//                  .productName("Samsung Galaxy J7 (2016)")
-//                  .productBarCode(1023045090807L)
-//                  .productDescription("Color: Black, Camera: 13MP, Resolution: 720 x 1280")
-//                  .productStock(50)
-//                  .productPrice(199.99)
-//                  .productStatus("CREATED")
-//                  .createAt(LocalDate.now())
-//                  .mainCategory(createMainCategoryStaticValues())
-//                  .subCategories(createSubSetCategoryStaticValues())
-//                  .build();
-//    //@formatter:on
-//  }
+  public static Product createProductWithMainCategoryAndSubCategory(MainCategory mainCategory, SubCategory subCategory) {
+    Set<SubCategory> subCategories = new HashSet<>();
+    subCategories.add(subCategory);
+    //@formatter:off
+    return Product.builder()
+                  .productName("Samsung Galaxy J7 (2016)")
+                  .productBarCode(1023045090807L)
+                  .productDescription("Color: Black, Camera: 13MP, Resolution: 720 x 1280")
+                  .productStock(50)
+                  .productPrice(199.99)
+                  .productStatus("CREATED")
+                  .createAt(LocalDate.now())
+                  .mainCategory(mainCategory)
+                  .subCategories(subCategories)
+                  .build();
+    //@formatter:on
+  }
 
   public static ProductRequest createProductRequest() {
     String[] subCategoriesNames = {"Sub Category 1", "Sub Category 2"};
