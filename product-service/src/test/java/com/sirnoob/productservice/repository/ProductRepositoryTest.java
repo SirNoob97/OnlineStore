@@ -10,16 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.sirnoob.productservice.dto.ProductInvoiceResponse;
-import com.sirnoob.productservice.dto.ProductListView;
-import com.sirnoob.productservice.entity.MainCategory;
-import com.sirnoob.productservice.entity.Product;
-import com.sirnoob.productservice.entity.SubCategory;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,11 +19,15 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import com.sirnoob.productservice.dto.ProductInvoiceResponse;
+import com.sirnoob.productservice.dto.ProductListView;
+import com.sirnoob.productservice.entity.MainCategory;
+import com.sirnoob.productservice.entity.Product;
+import com.sirnoob.productservice.entity.SubCategory;
+
 @DataJpaTest
 @DisplayName("Product Repository Test")
 class ProductRepositoryTest {
-
-  Logger log = LoggerFactory.getLogger(ProductRepositoryTest.class);
 
   @Autowired
   private IProductRepository iProductRepository;
