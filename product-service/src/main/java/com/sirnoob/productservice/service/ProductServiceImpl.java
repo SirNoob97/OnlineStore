@@ -99,8 +99,7 @@ public class ProductServiceImpl implements IProductService {
 
   @Override
   public List<Product> getProductByMainCategory(Long mainCategoryId) {
-     List<Product> products = iProductRepository.findByMainCategoryMainCategoryId(mainCategoryId);
-     return CollectionValidator.throwExceptionIfListIsEmpty(products, NO_PRODUCTS_FOUND);
+     return iProductRepository.findByMainCategoryMainCategoryId(mainCategoryId);
   }
 
   @Override
