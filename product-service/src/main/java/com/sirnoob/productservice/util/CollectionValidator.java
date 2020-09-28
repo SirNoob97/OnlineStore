@@ -1,6 +1,5 @@
 package com.sirnoob.productservice.util;
 
-import java.util.List;
 import java.util.Set;
 
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
@@ -17,10 +16,5 @@ public class CollectionValidator {
 	public static <T> Page<T> throwExceptionIfPageIsEmpty(Page<T> page, String message){
 		if(!page.isEmpty()) return page;
 		throw new ResourceNotFoundException(message);
-	}
-	
-	public static <T> List<T> throwExceptionIfListIsEmpty(List<T> list, String message){
-    if(!list.isEmpty()) return list;
-    throw new ResourceNotFoundException(message);
-  }
+	}	
 }
