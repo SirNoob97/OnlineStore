@@ -36,7 +36,7 @@ public class MainCategoryServiceTest {
 
   private static final String MAIN_CATEGORY_NOT_FOUND = "Main Category Not Found";
   private static final String NO_MAIN_CATEGORIES_FOUND = "No Main Categories Found";
-  private static final String MAIN_CATEGORY_FOR_DELETE_METHOD_TEST = "Main Category for delete method test";
+  private static final String MAIN_CATEGORY_NAME = "Main Category for delete method test";
 
   @Autowired
   IProductRepository iProductRepository;
@@ -59,7 +59,7 @@ public class MainCategoryServiceTest {
   @BeforeEach
   public void setUp() {
     MainCategory mainCategory = iMainCategoryRepository
-      .save(MainCategory.builder().mainCategoryName(MAIN_CATEGORY_FOR_DELETE_METHOD_TEST).build());
+      .save(MainCategory.builder().mainCategoryName(MAIN_CATEGORY_NAME).build());
 
     SubCategory subCategory = iSubCategoryRepository
       .save(SubCategory.builder().mainCategory(mainCategory).subCategoryName("Sub Category for main category test").build());
@@ -130,9 +130,9 @@ public class MainCategoryServiceTest {
   @Test
   @DisplayName("deleteMainCategory delete main category even if it is related to products and sub categories when successful")
   public void deleteMainCategory_DeleteMainCategoryEvenIfItIsRelatedToProductsAndSubCategories_WhenSuccessful() {
-    Optional<MainCategory> mainCategory = iMainCategoryRepository.findByMainCategoryName(MAIN_CATEGORY_FOR_DELETE_METHOD_TEST);
+    Optional<MainCategory> mainCategory = iMainCategoryRepository.findByMainCategoryName(MAIN_CATEGORY_NAME);
 
-    Set<SubCategory> subCategories = iSubCategoryService.getSubCategoryByMainCategory(mainCategory.get());
+    List<SubCategory> subCategories = iSubCategoryService.getSubCategoryByMainCategory(mainCategory.get().getMainCategoryId());
 
     List<Product> products = iProductService.getProductByMainCategory(mainCategory.get().getMainCategoryId());
 
@@ -147,9 +147,9 @@ public class MainCategoryServiceTest {
   @Test
   @DisplayName("deleteMainCategory delete main category even if the sub categories belonging to this have a null set of products when successful")
   public void deleteMainCategory_DeleteMainCategoryEvenIfTheSubCategoriesBelongingToThisHaveANullSetOfProducts_WhenSuccessful() {
-    Optional<MainCategory> mainCategory = iMainCategoryRepository.findByMainCategoryName(MAIN_CATEGORY_FOR_DELETE_METHOD_TEST);
+    Optional<MainCategory> mainCategory = iMainCategoryRepository.findByMainCategoryName(MAIN_CATEGORY_NAME);
 
-    Set<SubCategory> subCategories = iSubCategoryService.getSubCategoryByMainCategory(mainCategory.get());
+    List<SubCategory> subCategories = iSubCategoryService.getSubCategoryByMainCategory(mainCategory.get().getMainCategoryId());
 
     subCategories.forEach(sc -> sc.setProducts(null));
 
@@ -166,9 +166,9 @@ public class MainCategoryServiceTest {
   @Test
   @DisplayName("deleteMainCategory delete main category even if the products belonging to it have a null set of sub categories when successful")
   public void deleteMainCategory_RemoveMainCategoryEvenIfTheProductsBelongingToItHaveANullSetOfSubCategories_WhenSuccessful() {
-    Optional<MainCategory> mainCategory = iMainCategoryRepository.findByMainCategoryName(MAIN_CATEGORY_FOR_DELETE_METHOD_TEST);
+    Optional<MainCategory> mainCategory = iMainCategoryRepository.findByMainCategoryName(MAIN_CATEGORY_NAME);
 
-    Set<SubCategory> subCategories = iSubCategoryService.getSubCategoryByMainCategory(mainCategory.get());
+    List<SubCategory> subCategories = iSubCategoryService.getSubCategoryByMainCategory(mainCategory.get().getMainCategoryId());
 
     List<Product> products = iProductService.getProductByMainCategory(mainCategory.get().getMainCategoryId());
 
