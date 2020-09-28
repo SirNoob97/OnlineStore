@@ -181,7 +181,7 @@ class SubCategoryRepositoryTest {
     iSubCategoryRepository.save(subCategory2);
     iSubCategoryRepository.save(subCategory3);
 
-    List<SubCategory> subCategories = iSubCategoryRepository.findByMainCategory(mainCategory);
+    List<SubCategory> subCategories = iSubCategoryRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId());
 
     assertThat(subCategories).isNotNull();
     assertThat(subCategories.isEmpty()).isFalse();
@@ -206,7 +206,7 @@ class SubCategoryRepositoryTest {
     iSubCategoryRepository.save(subCategory2);
     iSubCategoryRepository.save(subCategory3);
 
-    List<SubCategory> subCategories = iSubCategoryRepository.findByMainCategory(mainCategory2);
+    List<SubCategory> subCategories = iSubCategoryRepository.findByMainCategoryMainCategoryId(mainCategory2.getMainCategoryId());
 
     assertThat(subCategories).isNotNull();
     assertThat(subCategories.isEmpty()).isTrue();
@@ -215,7 +215,7 @@ class SubCategoryRepositoryTest {
   @Test
   @DisplayName("Find By Main Category return a empty list of sub categories when main category is null")
   public void findByMainCategory_ReturnEmptyListOfSubCategories_WhenMainCategoryIsNull(){
-    List<SubCategory> subCategories = iSubCategoryRepository.findByMainCategory(null);
+    List<SubCategory> subCategories = iSubCategoryRepository.findByMainCategoryMainCategoryId(null);
 
     assertThat(subCategories).isNotNull();
     assertThat(subCategories.isEmpty()).isTrue();
