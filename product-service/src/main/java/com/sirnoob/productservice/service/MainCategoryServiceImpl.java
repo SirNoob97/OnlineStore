@@ -19,51 +19,58 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class MainCategoryServiceImpl implements IMainCategoryService {
 
-	private final IProductService iProductService;
-	private final ISubCategoryService iSubCategoryService;
-	private final IMainCategoryRepository iMainCategoryRepository;
+  private final IProductService iProductService;
+  private final ISubCategoryService iSubCategoryService;
+  private final IMainCategoryRepository iMainCategoryRepository;
 
-	private static final String MAIN_CATEGORY_NOT_FOUND = "Main Category Not Found";
-	private static final String NO_MAIN_CATEGORIES_FOUND = "No Main Categories Found";
+  private static final String MAIN_CATEGORY_NOT_FOUND = "Main Category Not Found";
+  private static final String NO_MAIN_CATEGORIES_FOUND = "No Main Categories Found";
 
-	@Transactional
-	@Override
-	public MainCategory createMainCategory(MainCategory mainCategory) {
-		return iMainCategoryRepository.save(mainCategory);
-	}
+  @Transactional
+  @Override
+  public MainCategory createMainCategory(MainCategory mainCategory) {
+    return iMainCategoryRepository.save(mainCategory);
+  }
 
-	@Transactional
-	@Override
-	public void updateMainCategoryName(Long mainCategoryId, String mainCategoryName) {
-		if(iMainCategoryRepository.updateMainCategoryName(mainCategoryName, mainCategoryId) < 1)
-			throw new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND);
-	}
+  @Transactional
+  @Override
+  public void updateMainCategoryName(Long mainCategoryId, String mainCategoryName) {
+    if (iMainCategoryRepository.updateMainCategoryName(mainCategoryName, mainCategoryId) < 1)
+      throw new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND);
+  }
 
-	@Transactional
-	@Override
-	public void deleteMainCategory(Long mainCategoryId) {
-		MainCategory mainCategory = getMainCategoryById(mainCategoryId);
-		iSubCategoryService.getSubCategoryByMainCategory(mainCategory).forEach(sc -> iSubCategoryService.deleteSubCategory(sc.getSubCategoryId()));
-		iProductService.getProductByMainCategory(mainCategoryId).forEach(prs -> prs.getSubCategories().clear());
-		iMainCategoryRepository.delete(mainCategory);
-	}
+  @Transactional
+  @Override
+  public void deleteMainCategory(Long mainCategoryId) {
+    MainCategory mainCategory = getMainCategoryById(mainCategoryId);
 
-	@Override
-	public MainCategory getMainCategoryById(Long mainCategoryId) {
-		return iMainCategoryRepository.findById(mainCategoryId)
-				.orElseThrow(() -> new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
-	}
+    iSubCategoryService.getSubCategoryByMainCategory(mainCategory)
+      .forEach(sc -> iSubCategoryService.deleteSubCategory(sc.getSubCategoryId()));
 
-	@Override
-	public MainCategory getMainCategoryByName(String mainCategoryName) {
-		return iMainCategoryRepository.findByMainCategoryName(mainCategoryName)
-				.orElseThrow(() -> new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
-	}
+    iProductService.getProductByMainCategory(mainCategoryId).forEach(prs -> {
+      if (prs.getSubCategories() != null && !prs.getSubCategories().isEmpty())
+        prs.getSubCategories().clear();
+    });
 
-	@Override
-	public Set<String> getAllMainCategory(Pageable pageable) {
-		Set<String> mainCategories = iMainCategoryRepository.findAll(pageable).stream().map(MainCategory::getMainCategoryName)
-				.collect(Collectors.toSet());
-		return CollectionValidator.throwExceptionIfSetIsEmpty(mainCategories, NO_MAIN_CATEGORIES_FOUND);
-	}
+    iMainCategoryRepository.delete(mainCategory);
+  }
+
+  @Override
+  public MainCategory getMainCategoryById(Long mainCategoryId) {
+    return iMainCategoryRepository.findById(mainCategoryId)
+      .orElseThrow(() -> new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
+  }
+
+  @Override
+  public MainCategory getMainCategoryByName(String mainCategoryName) {
+    return iMainCategoryRepository.findByMainCategoryName(mainCategoryName)
+      .orElseThrow(() -> new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
+  }
+
+  @Override
+  public Set<String> getAllMainCategory(Pageable pageable) {
+    Set<String> mainCategories = iMainCategoryRepository.findAll(pageable).stream().map(MainCategory::getMainCategoryName)
+      .collect(Collectors.toSet());
+    return CollectionValidator.throwExceptionIfSetIsEmpty(mainCategories, NO_MAIN_CATEGORIES_FOUND);
+  }
 }
