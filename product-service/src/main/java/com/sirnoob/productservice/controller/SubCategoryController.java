@@ -47,7 +47,7 @@ public class SubCategoryController {
   }
 
   @DeleteMapping("/{subCategoryId}")
-  public ResponseEntity<Void> deleteMainCategry(@PathVariable Long subCategoryId) {
+  public ResponseEntity<Void> deleteSubCategory(@PathVariable Long subCategoryId) {
     iSubCategoryService.deleteSubCategory(subCategoryId);
     return ResponseEntity.noContent().build();
   }
