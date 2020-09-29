@@ -88,7 +88,7 @@ public class ProductController {
 
   @GetMapping("/names")
   public ResponseEntity<ProductView> getProductByProductName(@RequestParam(required = true) String productName){
-    return ResponseEntity.ok().body(iProductService.findProductViewByName(productName));
+    return ResponseEntity.ok().body(iProductService.getProductViewByName(productName));
   }
 
   @GetMapping("/names/search")

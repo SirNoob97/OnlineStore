@@ -103,7 +103,7 @@ public class ProductServiceImpl implements IProductService {
   }
 
   @Override
-  public ProductView findProductViewByName(String productName) {
+  public ProductView getProductViewByName(String productName) {
     return iProductMapper.mapProductToProductView(iProductRepository.findByProductName(productName)
         .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND)));
   }

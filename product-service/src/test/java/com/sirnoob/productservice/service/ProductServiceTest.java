@@ -233,7 +233,7 @@ public class ProductServiceTest {
   public void findProductViewByName_ReturnAProductView_WhenSuccessful() {
     ProductResponse productSaved = getAProductResponseFromAnAlreadyPersistedProduct();
 
-    ProductView productView = iProductService.findProductViewByName(productSaved.getProductName());
+    ProductView productView = iProductService.getProductViewByName(productSaved.getProductName());
 
     assertThat(productView).isNotNull();
     assertThat(productView.getProductBarCode()).isEqualTo(productSaved.getProductBarCode());
@@ -244,7 +244,7 @@ public class ProductServiceTest {
   @Test
   @DisplayName("findProductViewByName throw ResourceNotFoundException when product was not found")
   public void findProductViewByName_ThrowResourceNotFoundException_WhenProductNotFound() {
-    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> iProductService.findProductViewByName(""))
+    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> iProductService.getProductViewByName(""))
       .withMessage(PRODUCT_NOT_FOUND);
   }
 

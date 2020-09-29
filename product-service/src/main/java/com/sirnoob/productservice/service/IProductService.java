@@ -28,7 +28,7 @@ public interface IProductService {
 
   public ProductInvoiceResponse getProductForInvoiceResponse(Long productBarCode, String productName);
 
-  public ProductView findProductViewByName(String productName);
+  public ProductView getProductViewByName(String productName);
 
   public Page<ProductListView> getPageOfProductListViewByName(String productName, Pageable pageable);
 
