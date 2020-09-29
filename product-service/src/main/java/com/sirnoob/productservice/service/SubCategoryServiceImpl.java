@@ -52,12 +52,8 @@ public class SubCategoryServiceImpl implements ISubCategoryService {
 
     if (subCategory.getProducts() != null && !subCategory.getProducts().isEmpty()) {
       subCategory.getProducts().stream()
-      .filter(p -> p.getSubCategories() != null && !p.getSubCategories().isEmpty())
-      .forEach(prd -> prd.getSubCategories().remove(subCategory));
-//      for (Product p : subCategory.getProducts()) {
-//        if (p.getSubCategories() != null && !p.getSubCategories().isEmpty())
-//          p.getSubCategories().remove(subCategory);
-//      }
+                               .filter(p -> p.getSubCategories() != null && !p.getSubCategories().isEmpty())
+                               .forEach(prd -> prd.getSubCategories().remove(subCategory));
     }
     iSubCategoryRepository.delete(subCategory);
   }
