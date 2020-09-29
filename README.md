@@ -18,10 +18,6 @@ The project will consists of three microservices connected from the consumer tha
   * Invoices(Consumer)
 
 
-#### Product-Service [Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
-
-
-
 These will obtain their configuration from this repository through a centralized configuration service that will use the Spring Cloud Config Server dependency.
 
 Eureka dependencies will be used for the discovery of all services.
@@ -34,6 +30,7 @@ Spring Security for the authentication and authorization of the app.
 
 These will be the initial dependencies for the app, I'll leave the microservices security for the end, to which I'll add JWT dependencies, for the official database I'll use Postgres when I make sure that the crud operations of the microservices work correctly.
 
+#### Product-Service [Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
 ---
 This project will only be to demonstrate the knowledge that I have acquired so far this year.
 
