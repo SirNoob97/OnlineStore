@@ -40,7 +40,7 @@ class MainCategoryControllerTest {
   public void setUp() {
     MainCategory mainCategory = createMainCategory();
 
-    Set<String> mainCategoryPage = Set.of(mainCategory.getMainCategoryName());
+    Set<String> mainCategories = Set.of(mainCategory.getMainCategoryName());
 
     BDDMockito.when(iMainCategoryService.createMainCategory(any(MainCategory.class))).thenReturn(mainCategory);
 
@@ -50,7 +50,7 @@ class MainCategoryControllerTest {
 
     BDDMockito.when(iMainCategoryService.getMainCategoryByName(anyString())).thenReturn(mainCategory);
 
-    BDDMockito.when(iMainCategoryService.getAllMainCategory(any(Pageable.class))).thenReturn(mainCategoryPage);
+    BDDMockito.when(iMainCategoryService.getAllMainCategory(any(Pageable.class))).thenReturn(mainCategories);
   }
 
   @Test
