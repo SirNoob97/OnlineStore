@@ -11,6 +11,7 @@ import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.dto.ProductView;
+import com.sirnoob.productservice.dto.SubCategoryResponse;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
@@ -156,6 +157,18 @@ public class RandomEntityGenerator {
   public static SubCategory createSubSetCategoryStaticValues(int value, MainCategory mainCategory) {
     return SubCategory.builder().subCategoryName("Sub Category " + value).mainCategory(mainCategory).build();
   }
+
+  public static SubCategoryResponse createSubSetCategoryResponse() {
+    //@formatter:off
+    return SubCategoryResponse.builder()
+                              .subCategoryId(1L)
+                              .subCategoryName("Sub Category")
+                              .mainCategory("Main Category")
+                              .products(Set.of("Product"))
+                              .build();
+    //@formatter:on
+  }
+
   public static Long getRandomLongNumber() {
     Long rn = new Random().nextLong();
     return rn > 0 ? rn : rn * -1;
