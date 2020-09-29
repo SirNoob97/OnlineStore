@@ -6,8 +6,11 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
+import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.dto.ProductRequest;
+import com.sirnoob.productservice.dto.ProductResponse;
+import com.sirnoob.productservice.dto.ProductView;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
@@ -47,7 +50,9 @@ public class RandomEntityGenerator {
     //@formatter:on
   }
 
-
+  public static ProductInvoiceResponse createProductInvoiceResponse() {
+    return ProductInvoiceResponse.builder().productName(getRandomString()).productPrice(getRandomDoubleNumber()).build();
+  }
 
 
   /** static values **/
@@ -85,8 +90,63 @@ public class RandomEntityGenerator {
     //@formatter:on
   }
 
+  public static ProductResponse createProductResponseStaticValues(){
+    Set<String> subCategories = new HashSet<>();
+    subCategories.add("Sub Category 1");
+    subCategories.add("Sub Category 2");
+    subCategories.add("Sub Category 3");
+    //@formatter:off
+    return ProductResponse.builder()
+                          .productId(100L)
+                          .productBarCode(1023045090807L)
+                          .productName("Samsung Galaxy J7 (2016)")
+                          .productDescription("Color: Black, Camera: 13MP, Resolution: 720 x 1280")
+                          .productPrice(199.99)
+                          .productStock(50)
+                          .mainCategoryName("Main Category")
+                          .subCategories(subCategories)
+                          .build();
+    //@formatter:on
+  }
+
+  public static ProductResponse createProductResponseStaticValuesForUpdateTest(){
+    Set<String> subCategories = new HashSet<>();
+    subCategories.add("Sub Category 1");
+    subCategories.add("Sub Category 2");
+    subCategories.add("Sub Category 3");
+    //@formatter:off
+    return ProductResponse.builder()
+                          .productId(100L)
+                          .productBarCode(1023045000000L)
+                          .productName("Samsung Galaxy J7 (2000)")
+                          .productDescription("Color: Black, Camera: 13MP, Resolution: 720 x 1280")
+                          .productPrice(199.99)
+                          .productStock(100)
+                          .mainCategoryName("Main Category")
+                          .subCategories(subCategories)
+                          .build();
+    //@formatter:on
+  }
+
   public static ProductListView createProductListView() {
     return new ProductListView("Samsung Galaxy J7 (2016)","Color: Black, Camera: 13MP, Resolution: 720 x 1280" ,199.99);
+  }
+
+  public static ProductView createProductViewStaticValues(){
+    Set<String> subCategories = new HashSet<>();
+    subCategories.add("Sub Category 1");
+    subCategories.add("Sub Category 2");
+    subCategories.add("Sub Category 3");
+    //@formatter:off
+    return ProductView.builder()
+                          .productBarCode(1023045090807L)
+                          .productName("Samsung Galaxy J7 (2016)")
+                          .productDescription("Color: Black, Camera: 13MP, Resolution: 720 x 1280")
+                          .productPrice(199.99)
+                          .mainCategoryName("Main Category")
+                          .subCategories(subCategories)
+                          .build();
+    //@formatter:on
   }
 
   public static MainCategory createMainCategoryStaticValues() {
