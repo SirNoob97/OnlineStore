@@ -43,6 +43,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
+@DisplayName("Product Controller Test")
 class ProductControllerTest {
 
   @InjectMocks
