@@ -55,7 +55,7 @@ public class ProductMapperImpl implements IProductMapper {
                       .productDescription(product.getProductDescription())
                       .productPrice(product.getProductPrice())
                       .mainCategoryName(product.getMainCategory().getMainCategoryName())
-                      .subcategories(product.getSubCategories().stream().map(SubCategory::getSubCategoryName).collect(Collectors.toSet()))
+                      .subCategories(product.getSubCategories().stream().map(SubCategory::getSubCategoryName).collect(Collectors.toSet()))
                       .build();
   }
 }
