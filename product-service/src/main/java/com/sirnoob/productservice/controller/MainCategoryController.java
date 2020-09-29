@@ -41,7 +41,7 @@ public class MainCategoryController {
   }
 
   @DeleteMapping("/{mainCategoryId}")
-  public ResponseEntity<Void> deleteMainCategry(@PathVariable Long mainCategoryId){
+  public ResponseEntity<Void> deleteMainCategory(@PathVariable Long mainCategoryId){
     iMainCategoryService.deleteMainCategory(mainCategoryId);
     return ResponseEntity.noContent().build();
   }
