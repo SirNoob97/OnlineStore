@@ -1,7 +1,7 @@
 package com.sirnoob.productservice.controller;
 
 import static com.sirnoob.productservice.util.RandomEntityGenerator.createMainCategoryStaticValues;
-import static com.sirnoob.productservice.util.RandomEntityGenerator.createSubSetCategoryResponse;
+import static com.sirnoob.productservice.util.RandomEntityGenerator.createSubCategoryResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -47,7 +47,7 @@ class SubCategoryControllerTest {
   public void setUp() {
     MainCategory mainCategory = createMainCategoryStaticValues();
 
-    SubCategoryResponse subCategory = createSubSetCategoryResponse();
+    SubCategoryResponse subCategory = createSubCategoryResponse();
 
     Set<String> subCategories = Set.of(subCategory.getSubCategoryName());
 

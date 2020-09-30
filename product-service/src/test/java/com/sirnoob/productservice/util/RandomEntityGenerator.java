@@ -129,6 +129,24 @@ public class RandomEntityGenerator {
     //@formatter:on
   }
 
+  public static Product createProductForSubCategoryServiceDeleteTest(){
+    Set<SubCategory> subCategories = new HashSet<>();
+    subCategories.add(createSubCategoryStaticValues(1, createMainCategoryStaticValues()));
+    subCategories.add(createSubCategoryStaticValues(2, createMainCategoryStaticValues()));
+    //@formatter:off
+    return Product.builder()
+                  .productId(100L)
+                  .productBarCode(1023045000000L)
+                  .productName("Samsung Galaxy J7 (2000)")
+                  .productDescription("Color: Black, Camera: 13MP, Resolution: 720 x 1280")
+                  .productPrice(199.99)
+                  .productStock(100)
+                  .mainCategory(createMainCategoryStaticValues())
+                  .subCategories(subCategories)
+                  .build();
+    //@formatter:on
+  }
+
   public static ProductListView createProductListView() {
     return new ProductListView("Samsung Galaxy J7 (2016)","Color: Black, Camera: 13MP, Resolution: 720 x 1280" ,199.99);
   }
@@ -151,14 +169,14 @@ public class RandomEntityGenerator {
   }
 
   public static MainCategory createMainCategoryStaticValues() {
-    return MainCategory.builder().mainCategoryName("Main Category").build();
+    return MainCategory.builder().mainCategoryId(1L).mainCategoryName("Main Category").build();
   }
 
-  public static SubCategory createSubSetCategoryStaticValues(int value, MainCategory mainCategory) {
+  public static SubCategory createSubCategoryStaticValues(int value, MainCategory mainCategory) {
     return SubCategory.builder().subCategoryName("Sub Category " + value).mainCategory(mainCategory).build();
   }
 
-  public static SubCategoryResponse createSubSetCategoryResponse() {
+  public static SubCategoryResponse createSubCategoryResponse() {
     //@formatter:off
     return SubCategoryResponse.builder()
                               .subCategoryId(1L)
@@ -166,6 +184,20 @@ public class RandomEntityGenerator {
                               .mainCategory("Main Category")
                               .products(Set.of("Product"))
                               .build();
+    //@formatter:on
+  }
+
+  public static SubCategory createSubCategoryForDeleteTest(){
+    Set<Product> products = new HashSet<>();
+    products.add(createProductForSubCategoryServiceDeleteTest());
+    products.add(createProductForSubCategoryServiceDeleteTest());
+    //@formatter:off
+    return SubCategory.builder()
+                      .subCategoryId(1L)
+                      .subCategoryName("Sub Category")
+                      .mainCategory(createMainCategoryStaticValues())
+                      .products(products)
+                      .build();
     //@formatter:on
   }
 
