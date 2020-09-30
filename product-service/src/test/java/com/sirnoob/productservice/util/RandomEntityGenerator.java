@@ -51,16 +51,18 @@ public class RandomEntityGenerator {
     //@formatter:on
   }
 
-  public static ProductInvoiceResponse createProductInvoiceResponse() {
-    return ProductInvoiceResponse.builder().productName(getRandomString()).productPrice(getRandomDoubleNumber()).build();
-  }
-
 
   /** static values **/
 
-  public static Product createProductWithMainCategoryAndSubCategory(MainCategory mainCategory, SubCategory subCategory) {
+  public static ProductInvoiceResponse createProductInvoiceResponse() {
+    return ProductInvoiceResponse.builder().productName("Product").productPrice(10.95).build();
+  }
+
+  public static Product createProductWithMainCategoryAndSubCategory() {
+    MainCategory mainCategory = createMainCategoryStaticValues();
     Set<SubCategory> subCategories = new HashSet<>();
-    subCategories.add(subCategory);
+    subCategories.add(createSubCategoryStaticValues(1, mainCategory));
+    subCategories.add(createSubCategoryStaticValues(2, mainCategory));
     //@formatter:off
     return Product.builder()
                   .productName("Samsung Galaxy J7 (2016)")
@@ -104,6 +106,7 @@ public class RandomEntityGenerator {
                           .productDescription("Color: Black, Camera: 13MP, Resolution: 720 x 1280")
                           .productPrice(199.99)
                           .productStock(50)
+                          .productStatus("CREATED")
                           .mainCategoryName("Main Category")
                           .subCategories(subCategories)
                           .build();
@@ -147,7 +150,7 @@ public class RandomEntityGenerator {
     //@formatter:on
   }
 
-  public static ProductListView createProductListView() {
+  public static ProductListView createProductListViewStaticValues() {
     return new ProductListView("Samsung Galaxy J7 (2016)","Color: Black, Camera: 13MP, Resolution: 720 x 1280" ,199.99);
   }
 
