@@ -2,7 +2,7 @@ package com.sirnoob.productservice.controller;
 
 import static com.sirnoob.productservice.util.RandomEntityGenerator.createMainCategoryStaticValues;
 import static com.sirnoob.productservice.util.RandomEntityGenerator.createProductInvoiceResponse;
-import static com.sirnoob.productservice.util.RandomEntityGenerator.createProductListView;
+import static com.sirnoob.productservice.util.RandomEntityGenerator.createProductListViewStaticValues;
 import static com.sirnoob.productservice.util.RandomEntityGenerator.createProductRequest;
 import static com.sirnoob.productservice.util.RandomEntityGenerator.createProductResponseStaticValues;
 import static com.sirnoob.productservice.util.RandomEntityGenerator.createProductResponseStaticValuesForUpdateTest;
@@ -63,7 +63,7 @@ class ProductControllerTest {
 
     ProductResponse productUpdated = createProductResponseStaticValuesForUpdateTest();
 
-    PageImpl<ProductListView> productPage = new PageImpl<>(List.of(createProductListView()));
+    PageImpl<ProductListView> productPage = new PageImpl<>(List.of(createProductListViewStaticValues()));
 
     ProductView productView = createProductViewStaticValues();
 
