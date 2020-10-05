@@ -1,6 +1,7 @@
 package  com.sirnoob.productservice.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -63,6 +64,9 @@ public class Product {
   @Column(name = "create_at")
   private LocalDate createAt;
 
+  @Column(name = "last_modified_date")
+  private LocalDateTime lastModifiedDate;
+
   @Column(name = "product_status")
   private String productStatus;
 
@@ -70,7 +74,7 @@ public class Product {
   @EqualsAndHashCode.Exclude
   @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
   @ManyToOne(fetch =FetchType.LAZY)
-  @JoinColumn(name = "category_id")
+  @JoinColumn(name = "main_category_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private MainCategory mainCategory;
 
