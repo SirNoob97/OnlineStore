@@ -1,6 +1,5 @@
 package com.sirnoob.productservice.service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,7 +43,6 @@ public class ProductServiceImpl implements IProductService {
     Product product = iProductMapper.mapProductRequestToProduct(productRequest, mainCategory, subCategories);
 
     product.setProductStatus("CREATED");
-    product.setCreateAt(LocalDate.now());
 
     return iProductMapper.mapProductToProductResponse(iProductRepository.save(product));
   }

@@ -40,6 +40,7 @@ public class ProductMapperImpl implements IProductMapper {
                           .productStock(product.getProductStock())
                           .productPrice(product.getProductPrice())
                           .createAt(product.getCreateAt())
+                          .lastModifiedDate(product.getLastModifiedDate())
                           .productStatus(product.getProductStatus())
                           .mainCategoryName(product.getMainCategory().getMainCategoryName())
                           .subCategories(product.getSubCategories().stream().map(SubCategory::getSubCategoryName).collect(Collectors.toSet()))
