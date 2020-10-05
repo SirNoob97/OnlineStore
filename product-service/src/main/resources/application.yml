@@ -5,6 +5,8 @@ server:
     include-binding-errors: always
 
 spring:
+  application:
+    name: product-service
   h2:
     console:
       enabled: true
