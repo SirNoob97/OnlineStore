@@ -40,7 +40,6 @@ public class UserRestController {
   }
 
 
-//  TODO: quitar esto de aqui. solo fue para testear las validaciones en el metdo createUser
   private String formatMessage(BindingResult result) {
 
     List<Map<String, String>> errors = result.getFieldErrors().stream().map(err -> {
