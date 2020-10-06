@@ -16,6 +16,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -53,6 +54,7 @@ public class Product {
   private String productName;
 
   @Lob
+  @Column(name = "product_description")
   private String productDescription;
 
   @Column(name = "product_stock", nullable = false)
@@ -61,11 +63,13 @@ public class Product {
   @Column(name = "product_price", nullable = false)
   private Double productPrice;
 
-  @Column(name = "create_at")
-  private LocalDate createAt;
 
-  @Column(name = "last_modified_date")
+  @Column(name = "created_date", insertable = false, updatable = false)
+  private LocalDate createDate;
+
+  @Column(name = "last_modified_date", insertable = false)
   private LocalDateTime lastModifiedDate;
+
 
   @Column(name = "product_status")
   private String productStatus;
