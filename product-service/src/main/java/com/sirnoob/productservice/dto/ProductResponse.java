@@ -22,7 +22,7 @@ public class ProductResponse{
   private String productDescription;
   private Integer productStock;
   private Double productPrice;
-  private LocalDate createAt;
+  private LocalDate createDate;
   private LocalDateTime lastModifiedDate;
   private String productStatus;
   private String mainCategoryName;
