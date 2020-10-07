@@ -16,12 +16,14 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -54,6 +56,7 @@ public class Product {
   private String productName;
 
   @Lob
+  @Type(type = "org.hibernate.type.TextType")
   @Column(name = "product_description")
   private String productDescription;
 
@@ -63,10 +66,11 @@ public class Product {
   @Column(name = "product_price", nullable = false)
   private Double productPrice;
 
-
+  @CreationTimestamp
   @Column(name = "created_date", insertable = false, updatable = false)
   private LocalDate createDate;
 
+  @UpdateTimestamp
   @Column(name = "last_modified_date", insertable = false)
   private LocalDateTime lastModifiedDate;
 
