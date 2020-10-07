@@ -1,3 +1,14 @@
+# Execution Commands
+
+TEST spring and maven profile
+
+    mvn spring-boot:run -Dspring-boot.run.profiles=test -P test
+
+POSTGRESQL spring and maven profile
+
+    mvn spring-boot:run -Dspring-boot.run.profiles=postgresql -P postgresql
+
+
 # Endpoints
 
 ## Products
