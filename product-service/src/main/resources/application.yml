@@ -7,8 +7,8 @@ server:
 spring:
   application:
     name: product-service
-  profiles:
-    active: postgresql
+  #profiles:
+    #active: postgresql
 
 logging:
   pattern:
