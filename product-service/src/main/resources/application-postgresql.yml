@@ -5,7 +5,7 @@ spring:
     username: postgres
     password: postgres
   jpa:
-    show-sql: true
+    #show-sql: true
     hibernate.ddl-auto: none
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     #properties:
