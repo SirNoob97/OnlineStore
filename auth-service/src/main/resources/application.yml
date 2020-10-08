@@ -1,0 +1,11 @@
+server:
+  port: 8090
+  error:
+    include-message: always
+    include-binding-errors: always
+
+
+spring:
+  h2:
+    console:
+      enabled: true
