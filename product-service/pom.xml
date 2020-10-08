@@ -10,7 +10,7 @@
 
   <artifactId>product-service</artifactId>
   <name>product-service</name>
-  <description>Micro Service for the Products.</description>
+  <description>Microservice for products management.</description>
 
   <properties>
     <java.version>11</java.version>
