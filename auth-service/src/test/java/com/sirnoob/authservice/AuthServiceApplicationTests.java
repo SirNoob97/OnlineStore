@@ -1,10 +1,10 @@
-package com.sirnoob.userservice;
+package com.sirnoob.authservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class UserServiceApplicationTests {
+class AuthServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
