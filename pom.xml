@@ -16,7 +16,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>user-service</module>
+    <module>auth-service</module>
     <module>product-service</module>
   </modules>
 
