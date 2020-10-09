@@ -15,18 +15,6 @@ import io.r2dbc.spi.ConnectionFactory;
 @EnableR2dbcRepositories
 public class H2Config {
 
-  //@Bean
-  //public ConnectionFactory connectionFactory(){
-    //ConnectionFactoryOptions options = ConnectionFactoryOptions.builder()
-      //.option(ConnectionFactoryOptions.DRIVER, "h2")
-      //.option(ConnectionFactoryOptions.PROTOCOL, "mem")
-      //.option(ConnectionFactoryOptions.DATABASE, "r2dbc:h2:mem:///userTestDB")
-      //.option(ConnectionFactoryOptions.USER, "user")
-      //.option(ConnectionFactoryOptions.PASSWORD, "")
-      //.build();
-
-    //return ConnectionFactories.get(options);
-  //}
 
   @Bean
   public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory){
