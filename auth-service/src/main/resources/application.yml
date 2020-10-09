@@ -9,3 +9,10 @@ spring:
   h2:
     console:
       enabled: true
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          r2dbc: DEBUG
