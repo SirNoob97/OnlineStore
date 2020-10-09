@@ -1,6 +1,5 @@
 package com.sirnoob.productservice.service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,7 +43,6 @@ public class ProductServiceImpl implements IProductService {
     Product product = iProductMapper.mapProductRequestToProduct(productRequest, mainCategory, subCategories);
 
     product.setProductStatus("CREATED");
-    product.setCreateAt(LocalDate.now());
 
     return iProductMapper.mapProductToProductResponse(iProductRepository.save(product));
   }
@@ -79,6 +77,7 @@ public class ProductServiceImpl implements IProductService {
     iProductRepository.delete(getProductById(productId));
   }
 
+  @Transactional(readOnly = true)
   @Override
   public ProductResponse getProductResponseByBarCodeOrProductName(Long productBarCode, String productName) {
     return iProductMapper
@@ -108,24 +107,28 @@ public class ProductServiceImpl implements IProductService {
         .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND)));
   }
 
+  @Transactional(readOnly = true)
   @Override
   public Page<ProductListView> getPageOfProductListViewByName(String productName, Pageable pageable) {
     Page<ProductListView> products = iProductRepository.findByProductNameContainingIgnoreCase(productName, pageable);
     return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
+  @Transactional(readOnly = true)
   @Override
   public Page<ProductListView> getPageOfProductListView(Pageable pageable) {
     Page<ProductListView> products = iProductRepository.getAll(pageable);
     return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
+  @Transactional(readOnly = true)
   @Override
   public Page<ProductListView> getPageOfProductListViewByMainCategory(Long mainCategoryId, Pageable pageable) {
     Page<ProductListView> products = iProductRepository.findByMainCategoryMainCategoryId(mainCategoryId, pageable);
     return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
+  @Transactional(readOnly = true)
   @Override
   public Set<ProductListView> getSetOfProductListViewBySubCategory(String[] subCategoriesNames) {
     Set<ProductListView> products = iSubCategoryService.getSubcategoriesByName(subCategoriesNames).stream()

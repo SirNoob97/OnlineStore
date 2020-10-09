@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/store
+    username: postgres
+    password: postgres
+  jpa:
+    #show-sql: true
+    hibernate.ddl-auto: none
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    #properties:
+      #hibernate:
+        #show_sql: true
+        #use_sql_comments: false
+        #format_sql: false
+
+
+server:
+  error:
+    include-message: always
+    include-binding-errors: always

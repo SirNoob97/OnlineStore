@@ -5,35 +5,11 @@ server:
     include-binding-errors: always
 
 spring:
-  h2:
-    console:
-      enabled: true
-  datasource:
-    url: jdbc:h2:mem:productTestDB;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driverClassName: org.h2.Driver
-    platform: h2
-    username: product
-    password:
+  application:
+    name: product-service
+  #profiles:
+    #active: postgresql
 
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-    database-platform: org.hibernate.dialect.H2Dialect
-    #properties:
-      #hibernate:
-        #show_sql: true
-        #use_sql_comments: false
-        #format_sql: false
-
-loggin:
+logging:
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
-  level:
-    org:
-      hibernate:
-        SQL: DEBUG
-        type:
-          descriptor:
-            sql:
-              BasicBinder: TRACE
+    console: "%clr(%d{yy-MM-dd E HH:mm:ss.SSS}){blue} %clr(|%-5p|) %clr(${PID}){magenta} %clr(---){faint} %clr([%8.15t]){cyan} %clr(%-40.40logger{0}){blue} %clr(:){red} %clr(%m){faint}%n"

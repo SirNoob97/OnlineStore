@@ -1,6 +1,7 @@
 package com.sirnoob.productservice.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import lombok.AllArgsConstructor;
@@ -21,7 +22,8 @@ public class ProductResponse{
   private String productDescription;
   private Integer productStock;
   private Double productPrice;
-  private LocalDate createAt;
+  private LocalDate createDate;
+  private LocalDateTime lastModifiedDate;
   private String productStatus;
   private String mainCategoryName;
   private Set<String> subCategories;

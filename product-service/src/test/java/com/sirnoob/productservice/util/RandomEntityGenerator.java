@@ -1,6 +1,5 @@
 package com.sirnoob.productservice.util;
 
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -28,7 +27,6 @@ public class RandomEntityGenerator {
                   .productStock(new Random().nextInt(Integer.MAX_VALUE))
                   .productPrice(getRandomDoubleNumber())
                   .productStatus(getRandomString())
-                  .createAt(LocalDate.now())
                   .build();
     //@formatter:on
   }
@@ -71,7 +69,6 @@ public class RandomEntityGenerator {
                   .productStock(50)
                   .productPrice(199.99)
                   .productStatus("CREATED")
-                  .createAt(LocalDate.now())
                   .mainCategory(mainCategory)
                   .subCategories(subCategories)
                   .build();
