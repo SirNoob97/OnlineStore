@@ -1,6 +1,6 @@
 package com.sirnoob.authservice.repository;
 
-import com.sirnoob.authservice.entity.User;
+import com.sirnoob.authservice.domain.User;
 
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
