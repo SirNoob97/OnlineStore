@@ -1,4 +1,4 @@
-package com.sirnoob.authservice.entity;
+package com.sirnoob.authservice.domain;
 
 public enum Role {
 
