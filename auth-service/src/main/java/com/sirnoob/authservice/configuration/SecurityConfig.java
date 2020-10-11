@@ -40,7 +40,7 @@ public class SecurityConfig {
                               .authenticationManager(authenticationManager)
                               .securityContextRepository(securityContextRepository)
                               .authorizeExchange()
-                              .pathMatchers("/").permitAll()
+                              .pathMatchers("/auth/**", "/h2-console", "/favicon.ico").permitAll()
                               .and().build();
     //@formatter:on
   }
