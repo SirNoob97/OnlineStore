@@ -18,7 +18,6 @@ import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.exception.CustomException;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -36,8 +35,8 @@ public class JwtProvider {
   public void init() {
     try {
       keyStore = KeyStore.getInstance("JKS");
-      InputStream resourceAStream = getClass().getResourceAsStream("/auth-service-jks-file.jks");
-      keyStore.load(resourceAStream, "secret".toCharArray());
+      InputStream resourceAStream = getClass().getResourceAsStream("/auth-service-keystore.jks");
+      keyStore.load(resourceAStream, "auth-service".toCharArray());
     } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
       throw new CustomException("Exception occured while loading keystore");
     }
@@ -45,9 +44,7 @@ public class JwtProvider {
 
 
 
-  public String generateToken(Authentication authentication) {
-    User user = (User) authentication.getPrincipal();
-
+  public String generateToken(User user) {
     return Jwts.builder().setSubject(user.getUsername()).signWith(getPrivateKey())
         .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis))).compact();
   }
@@ -73,7 +70,7 @@ public class JwtProvider {
 
   private PrivateKey getPrivateKey() {
     try {
-      return (PrivateKey) keyStore.getKey("auth-service-jks-file", "SuperSecretWord".toCharArray());
+      return (PrivateKey) keyStore.getKey("auth-service", "auth-service".toCharArray());
     } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
       throw new CustomException("Exception occured while retreiving private key from keystore");
     }
@@ -81,7 +78,7 @@ public class JwtProvider {
 
   private PublicKey getPublicKey() {
     try {
-      return keyStore.getCertificate("auth-service-jks-file").getPublicKey();
+      return keyStore.getCertificate("auth-service").getPublicKey();
     } catch (KeyStoreException e) {
       throw new CustomException("Exception occured while retreiving public key from keystore");
     }
