@@ -16,3 +16,6 @@ logging:
       springframework:
         data:
           r2dbc: DEBUG
+jwt:
+  expiration:
+    time: 900000
