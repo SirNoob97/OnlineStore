@@ -17,22 +17,23 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
   private final AuthenticationManager authenticationManager;
 
-	@Override
-	public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
-		throw new IllegalStateException("save method not supported");
-	}
+  @Override
+  public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
+    throw new IllegalStateException("save method not supported");
+  }
 
-	@Override
-	public Mono<SecurityContext> load(ServerWebExchange exchange) {
+  @Override
+  public Mono<SecurityContext> load(ServerWebExchange exchange) {
     String header = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
-    if(header != null && header.startsWith("Bearer ")){
+    if (header != null && header.startsWith("Bearer ")) {
       String authToken = header.substring(7);
-      UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authToken, authToken);
+      UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authToken,
+          authToken);
 
       return authenticationManager.authenticate(authentication).map(SecurityContextImpl::new);
     }
     return Mono.empty();
-	}
+  }
 
 }
