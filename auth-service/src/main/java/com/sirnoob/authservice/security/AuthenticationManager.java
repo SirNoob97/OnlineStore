@@ -7,6 +7,7 @@ import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -35,6 +36,8 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
           .collect(Collectors.toList());
 
       UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, null, authorities);
+
+      SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
       return Mono.just(authenticationToken);
     }
