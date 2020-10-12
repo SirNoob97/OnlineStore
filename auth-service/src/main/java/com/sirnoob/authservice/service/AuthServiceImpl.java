@@ -11,6 +11,7 @@ import com.sirnoob.authservice.security.JwtProvider;
 
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @Service
-public class AuthService implements ReactiveUserDetailsService {
+public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService {
 
   private final IUserRepository iUserRepository;
   private final JwtProvider jwtProvider;
@@ -30,6 +31,7 @@ public class AuthService implements ReactiveUserDetailsService {
     return iUserRepository.findByUserName(username).cast(UserDetails.class);
   }
 
+  @Override
   public Mono<AuthResponse> signup(SignUpRequest signUpRequest){
     User user = User.builder()
       .userName(signUpRequest.getUserName())
@@ -43,22 +45,21 @@ public class AuthService implements ReactiveUserDetailsService {
       );
   }
 
+  @Override
   public Mono<AuthResponse> login(LoginRequest loginRequest){
     String password = loginRequest.getPassword();
 
     return findByUsername(loginRequest.getUserName())
+            .switchIfEmpty(Mono.error(new UsernameNotFoundException("User Not Found!")))
             .cast(User.class)
-            .defaultIfEmpty(new User())
-            .flatMap(user -> {
-                if(user.getId() == null) return Mono.empty();
+            .flatMap(user -> verifyPassword(user, password));
+  }
 
-                if (passwordEncoder.matches(password, user.getPassword())) {
-                  return Mono.just(
-                      AuthResponse.builder().authToken(jwtProvider.generateToken(user)).userName(user.getUsername()).build());
-                } else {
-                  return Mono.error(new CustomException(""));
-                }
-
-            });
+  public Mono<AuthResponse> verifyPassword(User user, String password){
+    if (passwordEncoder.matches(password, user.getPassword())) {
+      return Mono.just(AuthResponse.builder().authToken(jwtProvider.generateToken(user)).userName(user.getUsername()).build());
+    } else {
+      return Mono.error(new CustomException("Incorrect Password!"));
+    }
   }
 }
