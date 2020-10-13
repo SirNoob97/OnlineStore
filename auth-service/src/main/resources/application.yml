@@ -6,9 +6,10 @@ server:
 
 
 spring:
-  h2:
-    console:
-      enabled: true
+  r2dbc:
+    h2:
+      console:
+        enabled: true
 
 logging:
   level:
@@ -18,4 +19,4 @@ logging:
           r2dbc: DEBUG
 jwt:
   expiration:
-    time: 900000
+    time: 1200000
