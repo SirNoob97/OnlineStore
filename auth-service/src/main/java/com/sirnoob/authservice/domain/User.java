@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,7 +25,8 @@ public class User implements UserDetails{
   private static final long serialVersionUID = 1L;
 
   @Id
-  private Long id;
+  @Column("id")
+  private Long userId;
   private String userName;
   private String password;
   private String email;
@@ -59,7 +61,4 @@ public class User implements UserDetails{
   public boolean isEnabled() {
     return true;
   }
-
-
-
 }
