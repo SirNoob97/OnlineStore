@@ -26,9 +26,7 @@ import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Component
 public class JwtProvider {
 
@@ -53,16 +51,14 @@ public class JwtProvider {
   public String generateToken(User user) {
     Map<String, Object> claims = new HashMap<>();
     claims.put("role", List.of(user.getRole()));
-log.info("role name {}", user.getRole().name());
-log.info("role {}", user.getRole());
     return Jwts.builder().setClaims(claims).setSubject(user.getUsername()).setIssuedAt(new Date())
-        .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis))).signWith(getPrivateKey()).compact();
+        .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis))).signWith(getPrivateKey(), SignatureAlgorithm.RS256).compact();
   }
 
   public String generateTokenWithUserName(String userName) {
     return Jwts.builder().setSubject(userName).setIssuedAt(Date.from(Instant.now()))
         .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
-        .signWith(getPrivateKey(), SignatureAlgorithm.HS512).compact();
+        .signWith(getPrivateKey(), SignatureAlgorithm.RS256).compact();
   }
 
   public String getUsernameFromJwt(String token) {
