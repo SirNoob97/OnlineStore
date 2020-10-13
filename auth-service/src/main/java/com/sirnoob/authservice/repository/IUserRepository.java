@@ -12,11 +12,9 @@ public interface IUserRepository extends ReactiveCrudRepository<User, Long>{
 
   public Mono<User> findByUserName(String userName);
 
+  public Mono<Integer> deleteByUserId(Long userId);
+
   @Modifying
   @Query("UPDATE users SET users.password = :password WHERE users.id = :userId")
   public Mono<Integer> updatePasswordById(Long userId, String password);
-
-  @Modifying
-  @Query("DELETE FROM users WHERE users.id = :userId")
-  public Mono<Integer> deleteAccountById(Long userId);
 }
