@@ -37,14 +37,12 @@ public class AccountHandler {
 
   public Mono<ServerResponse> updatePassword(ServerRequest serverRequest){
     Mono<PasswordUpdateDto> body = serverRequest.bodyToMono(PasswordUpdateDto.class);
-    body.flatMap(iAccountService::updatePassword);
-    return ServerResponse.noContent().build();
+    return ServerResponse.noContent().build(body.flatMap(iAccountService::updatePassword));
   }
 
   public Mono<ServerResponse> deleteAccountById(ServerRequest serverRequest) {
     Long userId = Long.valueOf(serverRequest.pathVariable("userId"));
-    iAccountService.deleteAccount(userId);
-    return ServerResponse.noContent().build();
+    return ServerResponse.noContent().build(iAccountService.deleteAccount(userId));
   }
 
   public Mono<ServerResponse> getAllAccounts(ServerRequest serverRequest){
