@@ -36,13 +36,13 @@ public class AccountServiceImpl implements IAccountService {
 
   @Override
   public Mono<Void> deleteAccount(Long userId) {
-    return iUserRepository.deleteAccountById(userId).flatMap(num -> verifyOperation(num));
+    return iUserRepository.deleteByUserId(userId).flatMap(num -> verifyOperation(num));
   }
 
   @Transactional(readOnly = true)
   @Override
   public Flux<AccountView> getAllAccounts(){
-    return iUserRepository.findAll().map(user -> new AccountView(user.getUsername(), user.getEmail(), user.getRole()));
+    return iUserRepository.findAll().map(user -> new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), user.getRole()));
   }
 
   public Mono<Void> verifyOperation(Integer num){
