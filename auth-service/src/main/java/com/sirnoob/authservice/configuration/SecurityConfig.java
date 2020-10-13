@@ -41,7 +41,7 @@ public class SecurityConfig {
                               .securityContextRepository(securityContextRepository)
                               .authorizeExchange()
                               .pathMatchers("/auth/**", "/h2-console", "/favicon.ico").permitAll()
-                              .pathMatchers("/accounts", "/accounts/**").hasAuthority("ADMIN")//.anyExchange().authenticated()
+                              .pathMatchers("/accounts", "/accounts/**").hasAuthority("ADMIN")
                               .and().build();
     //@formatter:on
   }
