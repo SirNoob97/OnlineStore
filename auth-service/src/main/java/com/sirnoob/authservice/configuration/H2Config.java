@@ -8,6 +8,7 @@ import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
 import org.springframework.data.r2dbc.connectionfactory.init.CompositeDatabasePopulator;
 import org.springframework.data.r2dbc.connectionfactory.init.ConnectionFactoryInitializer;
 import org.springframework.data.r2dbc.connectionfactory.init.ResourceDatabasePopulator;
+import org.springframework.data.r2dbc.core.DatabaseClient;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 
 import io.r2dbc.spi.ConnectionFactories;
@@ -21,6 +22,11 @@ public class H2Config extends AbstractR2dbcConfiguration{
   @Override
   public ConnectionFactory connectionFactory(){
      return ConnectionFactories.get("r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
+  }
+
+  @Bean
+  public DatabaseClient databaseClient(ConnectionFactory connectionFactory){
+    return DatabaseClient.builder().connectionFactory(connectionFactory).build();
   }
 
   @Bean
