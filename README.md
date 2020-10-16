@@ -6,7 +6,7 @@ My goal whit this project is to use all knowledge that i have acquired over the 
 
 ### Dependencies to use
 
-  * Spring Boot Starter Web, JPA, Validation, Actuator, Security.
+  * Spring Boot Starter Web, Web Flux, JPA, R2DBC, Validation, Actuator, Security.
   * Spring Cloud Starter Config, Netflix Eureka Client and Server, Sleuth, Config Server, Gateway, Openfeign, Netflix Hystrix and Dashboard.
   * JWT
   * H2.
