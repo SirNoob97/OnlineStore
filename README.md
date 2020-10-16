@@ -8,8 +8,10 @@ My goal whit this project is to use all knowledge that i have acquired over the 
 
   * Spring Boot Starter Web, JPA, Validation, Actuator, Security.
   * Spring Cloud Starter Config, Netflix Eureka Client and Server, Sleuth, Config Server, Gateway, Openfeign, Netflix Hystrix and Dashboard.
+  * JWT
   * H2.
-  * Lombok(maybe).
+  * PostgreSQL
+  * Lombok
   * Codecentric Admin Starter Client and Server.
 
 The project will consists of three microservices connected from the consumer thaks to Openfeign:
@@ -26,9 +28,7 @@ Hystrix's will be used for monitoring thaks to Actuator and Admin Starter, which
 
 Cloud Gateway to have a single acces endpoint.
 
-Spring Security for the authentication and authorization of the app.
-
-These will be the initial dependencies for the app, I'll leave the microservices security for the end, to which I'll add JWT dependencies, for the official database I'll use Postgres when I make sure that the crud operations of the microservices work correctly.
+Spring Security and JWT for the authentication and authorization of the app.
 
 #### Product-Service [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
 ---
