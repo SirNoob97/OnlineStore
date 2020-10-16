@@ -4,13 +4,6 @@ server:
     include-message: always
     include-binding-errors: always
 
-
-spring:
-  r2dbc:
-    h2:
-      console:
-        enabled: true
-
 logging:
   level:
     org:
