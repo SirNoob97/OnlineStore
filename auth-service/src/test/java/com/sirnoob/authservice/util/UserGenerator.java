@@ -6,14 +6,13 @@ import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.domain.User;
 
 public class UserGenerator{
-  
+
   public static User generateUserRandomValues(Role role){
     return User.builder().userName(getRandomString())
                           .password(getRandomString())
                           .email(getRandomString())
                           .role(role)
                           .build();
-                          
   }
 
   public static User generateUserStaticValues(){
