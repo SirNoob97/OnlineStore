@@ -42,7 +42,9 @@ public class AccountServiceImpl implements IAccountService {
   @Transactional(readOnly = true)
   @Override
   public Flux<AccountView> getAllAccounts(){
-    return iUserRepository.findAll().map(user -> new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), user.getRole()));
+    return iUserRepository.findAll()
+                          .switchIfEmpty(Flux.error(new UserNotFoundException("No Users Found!")))
+                          .map(user -> new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), user.getRole()));
   }
 
   public Mono<Void> verifyOperation(Integer num){
