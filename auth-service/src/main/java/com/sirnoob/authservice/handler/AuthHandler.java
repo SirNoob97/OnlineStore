@@ -3,7 +3,7 @@ package com.sirnoob.authservice.handler;
 import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
-import com.sirnoob.authservice.exception.CustomException;
+import com.sirnoob.authservice.exception.WrongPasswordException;
 import com.sirnoob.authservice.service.IAuthService;
 
 import org.springframework.http.HttpStatus;
@@ -37,7 +37,7 @@ public class AuthHandler {
     return authResponse.flatMap(data -> ServerResponse.ok().contentType(JSON).bodyValue(data))
                         .switchIfEmpty(ServerResponse.notFound().build())
                         .onErrorResume(error -> {
-                            return error instanceof CustomException ? ServerResponse.badRequest().build() : ServerResponse.status(500).build();
+                            return error instanceof WrongPasswordException ? ServerResponse.badRequest().build() : ServerResponse.status(500).build();
                         });
   }
 

@@ -5,7 +5,7 @@ import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
-import com.sirnoob.authservice.exception.CustomException;
+import com.sirnoob.authservice.exception.WrongPasswordException;
 import com.sirnoob.authservice.repository.IUserRepository;
 import com.sirnoob.authservice.security.JwtProvider;
 
@@ -59,7 +59,7 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
     if (passwordEncoder.matches(password, user.getPassword())) {
       return Mono.just(AuthResponse.builder().authToken(jwtProvider.generateToken(user)).userName(user.getUsername()).build());
     } else {
-      return Mono.error(new CustomException("Incorrect Password!"));
+      return Mono.error(new WrongPasswordException());
     }
   }
 }
