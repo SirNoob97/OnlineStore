@@ -1,18 +1,15 @@
 package com.sirnoob.authservice.repository;
 
 import static com.sirnoob.authservice.util.UserGenerator.generateUserRandomValues;
-import static com.sirnoob.authservice.util.UserGenerator.generateUserStaticValues;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.domain.User;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,12 +17,9 @@ import org.springframework.data.r2dbc.core.DatabaseClient;
 
 import reactor.test.StepVerifier;
 
-@TestInstance(Lifecycle.PER_CLASS)
 @DataR2dbcTest
 @DisplayName("User Repository Test")
 class UserRepositoryTest {
-
-  private final String TEST = "TEST";
 
   @Autowired
   private IUserRepository iUserRepository;
@@ -33,8 +27,13 @@ class UserRepositoryTest {
   @Autowired
   private DatabaseClient databaseClient;
 
-  @BeforeAll
+
+  private static final User staticUser = generateUserRandomValues(Role.EMPLOYEE);
+
+  @BeforeEach
   public void init(){
+    final String dropSql = "DROP TABLE IF EXISTS users";
+
     final String initSql = "CREATE TABLE IF NOT EXISTS users (" +
               "id identity NOT NULL," +
               "user_name character varying(60) NOT NULL UNIQUE," +
@@ -43,13 +42,17 @@ class UserRepositoryTest {
               "role character varying(10) NOT NULL," +
               "check (role in ('CUSTOMER', 'EMPLOYEE', 'ADMIN')))";
 
+    StepVerifier.create(databaseClient.execute(dropSql).then())
+                .expectSubscription()
+                .verifyComplete();
+
     StepVerifier.create(databaseClient.execute(initSql).fetch().rowsUpdated())
                 .expectNextCount(1)
                 .verifyComplete();
 
     StepVerifier.create(databaseClient.insert()
                                       .into(User.class)
-                                      .using(generateUserStaticValues())
+                                      .using(staticUser)
                                       .then())
                 .verifyComplete();
   }
@@ -82,7 +85,7 @@ class UserRepositoryTest {
   @Test
   @DisplayName("save throw DataIntegrityViolationException when there is already a user saved with that name")
   public void save_ThrowDataIntegrityViolationException_WhenThereIsAlreadyAUserSavedWithThatName(){
-    User user = User.builder().userName(TEST).password("password").email("fake@email.com").role(Role.ADMIN).build();
+    User user = User.builder().userName(staticUser.getUsername()).password("password").email("fake@email.com").role(Role.ADMIN).build();
 
     StepVerifier.create(iUserRepository.save(user))
                 .expectError(DataIntegrityViolationException.class)
@@ -92,7 +95,7 @@ class UserRepositoryTest {
   @Test
   @DisplayName("save throw DataIntegrityViolationException when there is already a user saved with that email")
   public void save_ThrowDataIntegrityViolationException_WhenThereIsAlreadyAUserSavedWithThatEmail(){
-    User user = User.builder().userName("name").password("password").email("TEST@TEST.com").role(Role.ADMIN).build();
+    User user = User.builder().userName("name").password("password").email(staticUser.getEmail()).role(Role.ADMIN).build();
 
     StepVerifier.create(iUserRepository.save(user))
                 .expectError(DataIntegrityViolationException.class)
@@ -100,10 +103,34 @@ class UserRepositoryTest {
   }
 
   @Test
+  @DisplayName("findAll return a users flux when successful")
+  public void findAll_ReturnAUsersFlux_WhenSuccesful() {
+    StepVerifier.create(iUserRepository.findAll())
+                .expectNextCount(1)
+                .expectComplete()
+                .verify();
+  }
+
+  @Test
+  @DisplayName("findAll return a flux empty when there is no users in the registry")
+  public void findAll_ReturnAFluxEmpty_WhenSuccesful_() {
+    StepVerifier.create(iUserRepository.deleteAll())
+                .expectSubscription()
+                .verifyComplete();
+
+    StepVerifier.create(iUserRepository.findAll())
+                .expectSubscription()
+                .expectNextCount(0)
+                .expectComplete()
+                .verify();
+  }
+
+  @Test
   @DisplayName("findByUserName return a user when successful")
   public void findByUserName_ReturnAUser_WhenSuccesfful(){
-    StepVerifier.create(iUserRepository.findByUserName(TEST))
-                .expectNextMatches(user -> user.getUsername().equals(TEST))
+    String name = staticUser.getUsername();
+    StepVerifier.create(iUserRepository.findByUserName(name))
+                .expectNextMatches(user -> user.getUsername().equals(name))
                 .expectComplete()
                 .verify();
   }
@@ -140,7 +167,7 @@ class UserRepositoryTest {
   @Test
   @DisplayName("updatePasswordById return an integer equals to 1 and update the password of a user log when successful")
   public void deleteByUserIdReturnAIntegerEqualsToOneAndUpdateThePasswordOfAUserLog_WhenSuccessful(){
-    User userDB = iUserRepository.findByUserName(TEST).block();
+    User userDB = iUserRepository.findByUserName(staticUser.getUsername()).block();
     Long id = userDB.getUserId();
     String oldPassword = userDB.getPassword();
 
@@ -149,7 +176,7 @@ class UserRepositoryTest {
                 .expectComplete()
                 .verify();
 
-    StepVerifier.create(iUserRepository.findByUserName(TEST))
+    StepVerifier.create(iUserRepository.findByUserName(userDB.getUsername()))
                 .expectNextMatches(user -> user.getPassword().equals("new Password") && !user.getPassword().equals(oldPassword))
                 .expectComplete()
                 .verify();
