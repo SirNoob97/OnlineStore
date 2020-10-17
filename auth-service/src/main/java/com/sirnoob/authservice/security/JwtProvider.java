@@ -18,7 +18,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import com.sirnoob.authservice.domain.User;
-import com.sirnoob.authservice.exception.CustomException;
+import com.sirnoob.authservice.exception.JwtProviderException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -42,7 +42,7 @@ public class JwtProvider {
       InputStream resourceAStream = getClass().getResourceAsStream("/auth-service-keystore.jks");
       keyStore.load(resourceAStream, "auth-service".toCharArray());
     } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
-      throw new CustomException("Exception occured while loading keystore");
+      throw new JwtProviderException("Exception occured while loading keystore");
     }
   }
 
@@ -79,7 +79,7 @@ public class JwtProvider {
     try {
       return (PrivateKey) keyStore.getKey("auth-service", "auth-service".toCharArray());
     } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-      throw new CustomException("Exception occured while retreiving private key from keystore");
+      throw new JwtProviderException("Exception occured while retreiving private key from keystore");
     }
   }
 
@@ -87,7 +87,7 @@ public class JwtProvider {
     try {
       return keyStore.getCertificate("auth-service").getPublicKey();
     } catch (KeyStoreException e) {
-      throw new CustomException("Exception occured while retreiving public key from keystore");
+      throw new JwtProviderException("Exception occured while retreiving public key from keystore");
     }
   }
 }
