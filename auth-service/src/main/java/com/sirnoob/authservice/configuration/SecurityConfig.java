@@ -1,5 +1,6 @@
 package com.sirnoob.authservice.configuration;
 
+import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.security.AuthenticationManager;
 import com.sirnoob.authservice.security.SecurityContextRepository;
 
@@ -41,7 +42,7 @@ public class SecurityConfig {
                               .securityContextRepository(securityContextRepository)
                               .authorizeExchange()
                               .pathMatchers("/auth/**", "/h2-console", "/favicon.ico").permitAll()
-                              .pathMatchers("/accounts", "/accounts/**").hasAuthority("ADMIN")
+                              .pathMatchers("/accounts", "/accounts/**").hasAuthority(Role.ADMIN.name())
                               .and().build();
     //@formatter:on
   }
