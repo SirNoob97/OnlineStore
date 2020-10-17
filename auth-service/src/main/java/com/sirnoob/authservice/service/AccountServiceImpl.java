@@ -3,7 +3,7 @@ package com.sirnoob.authservice.service;
 import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
-import com.sirnoob.authservice.exception.CustomException;
+import com.sirnoob.authservice.exception.UserNotFoundException;
 import com.sirnoob.authservice.repository.IUserRepository;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,6 +47,6 @@ public class AccountServiceImpl implements IAccountService {
 
   public Mono<Void> verifyOperation(Integer num){
     if (num > 0) return Mono.empty();
-    return Mono.error(new CustomException("User Not Found!"));
+    return Mono.error(new UserNotFoundException("User Not Found!"));
   }
 }
