@@ -55,12 +55,6 @@ public class JwtProvider {
         .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis))).signWith(getPrivateKey(), SignatureAlgorithm.RS256).compact();
   }
 
-  public String generateTokenWithUserName(String userName) {
-    return Jwts.builder().setSubject(userName).setIssuedAt(Date.from(Instant.now()))
-        .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
-        .signWith(getPrivateKey(), SignatureAlgorithm.RS256).compact();
-  }
-
   public String getUsernameFromJwt(String token) {
     return getClaims(token).getSubject();
   }
@@ -89,5 +83,9 @@ public class JwtProvider {
     } catch (KeyStoreException e) {
       throw new JwtProviderException("Exception occured while retreiving public key from keystore");
     }
+  }
+
+  public Instant getJwtExpirationTime() {
+    return Instant.now().plusMillis(jwtExpirationInMillis);
   }
 }
