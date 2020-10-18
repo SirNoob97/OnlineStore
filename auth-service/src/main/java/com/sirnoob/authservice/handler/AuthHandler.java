@@ -2,9 +2,11 @@ package com.sirnoob.authservice.handler;
 
 import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
+import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
 import com.sirnoob.authservice.exception.WrongPasswordException;
 import com.sirnoob.authservice.service.IAuthService;
+import com.sirnoob.authservice.service.IRefreshTokenService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +21,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthHandler {
 
+  private final IRefreshTokenService iRefreshTokenService;
   private final IAuthService iAuthService;
 
   private static final MediaType JSON = MediaType.APPLICATION_JSON;
@@ -35,10 +38,21 @@ public class AuthHandler {
     Mono<AuthResponse> authResponse = body.flatMap(iAuthService::login);
 
     return authResponse.flatMap(data -> ServerResponse.ok().contentType(JSON).bodyValue(data))
-                        .switchIfEmpty(ServerResponse.notFound().build())
-                        .onErrorResume(error -> {
-                            return error instanceof WrongPasswordException ? ServerResponse.badRequest().build() : ServerResponse.status(500).build();
-                        });
+                        .onErrorResume(error -> error instanceof WrongPasswordException ? ServerResponse.badRequest().build()
+                                                                                        : ServerResponse.notFound().build());
   }
 
+  public Mono<ServerResponse> refreshToken(ServerRequest serverRequest){
+    Mono<RefreshTokenRequest> body = serverRequest.bodyToMono(RefreshTokenRequest.class);
+    Mono<AuthResponse> authResponse = body.flatMap(iAuthService::refreshToken);
+
+    return authResponse.flatMap(data -> ServerResponse.ok().contentType(JSON).bodyValue(data))
+                        .onErrorResume(error -> ServerResponse.ok().bodyValue(error.getMessage()));
+  }
+
+  public Mono<ServerResponse> logout(ServerRequest serverRequest){
+    Mono<RefreshTokenRequest> body = serverRequest.bodyToMono(RefreshTokenRequest.class);
+
+    return ServerResponse.noContent().build(body.flatMap(token -> iRefreshTokenService.deleteRefreshToken(token.getToken())));
+  }
 }
