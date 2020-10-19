@@ -12,6 +12,5 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS refresh_tokens (
       id bigint NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1 INCREMENT 1),
       token character varying(60) NOT NULL,
-      created_date date NOT NULL DEFAULT CURRENT_DATE,
       PRIMARY KEY(id),
       CONSTRAINT unique_token UNIQUE (token));
