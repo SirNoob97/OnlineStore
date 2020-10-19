@@ -145,6 +145,26 @@ class UserRepositoryTest {
   }
 
   @Test
+  @DisplayName("findByUserName return a mono void when there is no users in the registry")
+  public void findByToken_ReturnAMonoVoid_WhenThereIsNoRefreshTokensInTheRegistry(){
+    String name = staticUser.getUsername();
+    User defaultUser = User.builder().userId(0L).userName("DEFAULT").email("DEFAULT").role(Role.CUSTOMER).build();
+
+    StepVerifier.create(iUserRepository.deleteAll())
+                .expectSubscription()
+                .verifyComplete();
+
+    StepVerifier.create(iUserRepository.findByUserName(name).defaultIfEmpty(defaultUser))
+                .expectSubscription()
+                .assertNext(defaultU -> {
+                    assertThat(defaultU).isEqualTo(defaultUser);
+                    assertThat(defaultU.getUserId()).isEqualTo(0L);
+                    assertThat(defaultU.getUsername()).isEqualTo(defaultUser.getUsername());
+                })
+                .verifyComplete();
+  }
+
+  @Test
   @DisplayName("deleteByUserId return an integer equals to 1 and delete/remove an user log when successful")
   public void deleteByUserId_DeleteRemoveAnUserLog_WhenSuccessful(){
     Long userId = iUserRepository.save(generateUserRandomValues(Role.EMPLOYEE)).map(User::getUserId).block();
@@ -156,17 +176,30 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("delete does not throw exception when user id parameter is null")
+  @DisplayName("deleteByUserId does not throw exception when user id parameter is null")
   public void deleteByUserId_ReturnZeroAndDoesNotThrowException_WhenUserIdParameterIsNull(){
     StepVerifier.create(iUserRepository.deleteByUserId(null))
+                .expectSubscription()
+                .assertNext(num -> assertThat(num).isGreaterThan(-1))
+                .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("deleteByUserId return 0 when there is no users in the registry")
+  public void deleteByUserId_ReturnZero_WhenThereIsNoUsersInTheRegistry(){
+    StepVerifier.create(iUserRepository.deleteAll())
+                .expectSubscription()
+                .verifyComplete();
+
+    StepVerifier.create(iUserRepository.deleteByUserId(1L))
+                .expectSubscription()
                 .expectNextMatches(num -> num.equals(0))
-                .expectComplete()
-                .verify();
+                .verifyComplete();
   }
 
   @Test
   @DisplayName("updatePasswordById return an integer equals to 1 and update the password of a user log when successful")
-  public void deleteByUserIdReturnAIntegerEqualsToOneAndUpdateThePasswordOfAUserLog_WhenSuccessful(){
+  public void updatePasswordById_ReturnAIntegerEqualsToOneAndUpdateThePasswordOfAUserLog_WhenSuccessful(){
     User userDB = iUserRepository.findByUserName(staticUser.getUsername()).block();
     Long id = userDB.getUserId();
     String oldPassword = userDB.getPassword();
@@ -183,11 +216,24 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("updatePasswordById return 0 and does not throw exception when parameter are null")
+  @DisplayName("updatePasswordById return 0 and does not throw exception when parameters are null")
   public void updatePasswordById_ReturnZeroAndDoesNotThrowException_WhenParametersAreNull(){
     StepVerifier.create(iUserRepository.updatePasswordById(null, null))
                 .expectNextMatches(num -> num.equals(0))
                 .expectComplete()
                 .verify();
+  }
+
+  @Test
+  @DisplayName("updatePasswordById return 0 when there is no users in the registry")
+  public void updatePasswordById_ReturnZero_WhenThereIsNoUsersInTheRegistry(){
+    StepVerifier.create(iUserRepository.deleteAll())
+                .expectSubscription()
+                .verifyComplete();
+
+    StepVerifier.create(iUserRepository.updatePasswordById(1L, "password"))
+                .expectSubscription()
+                .expectNextMatches(num -> num.equals(0))
+                .verifyComplete();
   }
 }
