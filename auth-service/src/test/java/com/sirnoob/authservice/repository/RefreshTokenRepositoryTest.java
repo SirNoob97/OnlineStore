@@ -1,9 +1,9 @@
 package com.sirnoob.authservice.repository;
 
-import java.util.UUID;
-
 import com.sirnoob.authservice.domain.RefreshToken;
 
+import static com.sirnoob.authservice.util.Provider.generateRefreshToken;
+import static com.sirnoob.authservice.util.Provider.getDefaultRefreshToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,7 @@ import reactor.test.StepVerifier;
 
 @DataR2dbcTest
 @DisplayName("Refresh Token Repository Test")
-public class RefreshTokenRepositoryTest {
+class RefreshTokenRepositoryTest {
 
   @Autowired
   private IRefreshTokenRepository iRefreshTokenRepository;
@@ -26,8 +26,7 @@ public class RefreshTokenRepositoryTest {
   @Autowired
   private DatabaseClient databaseClient;
 
-  private static final RefreshToken staticRefreshToken = RefreshToken.builder().token(UUID.randomUUID().toString()).build();
-
+  private static final RefreshToken staticRefreshToken = generateRefreshToken();
   @BeforeEach
   private void setUp(){
     final String dropSql = "DROP TABLE IF EXISTS refresh_tokens";
@@ -56,7 +55,7 @@ public class RefreshTokenRepositoryTest {
   @Test
   @DisplayName("save save/persist and return a new refresh token where successful")
   public void save_SavePersistAndReturnANewRefreshToken_WhereSuccessful(){
-    final RefreshToken refreshToken = RefreshToken.builder().token(UUID.randomUUID().toString()).build();
+    RefreshToken refreshToken = generateRefreshToken();
     String token = refreshToken.getToken();
 
     StepVerifier.create(iRefreshTokenRepository.save(refreshToken))
@@ -119,7 +118,7 @@ public class RefreshTokenRepositoryTest {
   @DisplayName("findByToken return a mono void when there is no refresh tokens in the registry")
   public void findByToken_ReturnAMonoVoid_WhenThereIsNoRefreshTokensInTheRegistry(){
     String token = staticRefreshToken.getToken();
-    RefreshToken defaultToken = RefreshToken.builder().id(0L).token("DEFAULT").build();
+    RefreshToken defaultToken = getDefaultRefreshToken();
 
     StepVerifier.create(iRefreshTokenRepository.deleteAll())
                 .expectSubscription()
