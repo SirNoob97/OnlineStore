@@ -9,7 +9,8 @@ import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
 import com.sirnoob.authservice.exception.UserNotFoundException;
 import com.sirnoob.authservice.repository.IUserRepository;
-import static com.sirnoob.authservice.util.UserGenerator.generateUserStaticValues;
+import static com.sirnoob.authservice.util.Provider.generateUserStaticValues;
+import static com.sirnoob.authservice.util.Provider.PASSWORD;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +25,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @SpringBootTest
-public class AccountServiceTest {
+class AccountServiceTest {
 
   @Mock
   private PasswordEncoder passwordEncoder;
@@ -34,7 +35,6 @@ public class AccountServiceTest {
 
   private IAccountService iAccountService;
 
-  private static final String PASSWORD = "password";
   private static final User user = generateUserStaticValues();
 
   @BeforeEach
@@ -58,7 +58,7 @@ public class AccountServiceTest {
 
   @Test
   @DisplayName("persistAccount save/update and return a user account when successful")
-  public void persistAccount_SaveUpdateAndReturnAConfirmationMessage_WhenSuccessful() {
+  public void persistAccount_ReturnAConfirmationMessage_WhenSuccessful() {
     StepVerifier.create(iAccountService.persistAccount(generateUserStaticValues()))
                 .expectSubscription()
                 .expectNext("User " + user.getUsername() + " was successfully persisted!")
@@ -67,7 +67,7 @@ public class AccountServiceTest {
 
   @Test
   @DisplayName("updatePassword update password and return a mono void when query operation returns an integer greater than 0")
-  public void updatePassword_UpdatePasswordAndReturnAMonoVoid_WheQueryOperationReturnAIntegerGreaterThanZero() {
+  public void updatePassword_ReturnAMonoVoid_WheQueryOperationReturnAIntegerGreaterThanZero() {
     StepVerifier.create(iAccountService.updatePassword(new PasswordUpdateDto(1L, PASSWORD)))
                 .expectSubscription()
                 .verifyComplete();
@@ -78,14 +78,14 @@ public class AccountServiceTest {
   public void updatePassword_ReturnAMonoErrorOfUserNotFoundException_WhenTheQueryOperationReturnsAnIntegerLessThanZero() {
     BDDMockito.when(iUserRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(0));
 
-    StepVerifier.create(iAccountService.updatePassword(new PasswordUpdateDto(0L, "")))
+    StepVerifier.create(iAccountService.updatePassword(new PasswordUpdateDto(-1L, "")))
                 .expectError(UserNotFoundException.class)
                 .verify();
   }
 
   @Test
   @DisplayName("deleteAccount delete an account and return a mono void when query operation returns an integer greater than 0")
-  public void deleteAccount_DeleteAnAccountAndReturnAMonoVoid_WheQueryOperationReturnAIntegerGreaterThanZero() {
+  public void deleteAccount_ReturnAMonoVoid_WheQueryOperationReturnAIntegerGreaterThanZero() {
     StepVerifier.create(iAccountService.deleteAccount(1L))
                 .expectSubscription()
                 .verifyComplete();
@@ -96,7 +96,7 @@ public class AccountServiceTest {
   public void deleteAccount_ReturnAMonoErrorOfUserNotFoundException_WhenTheQueryOperationReturnsAnIntegerLessThanZero() {
     BDDMockito.when(iUserRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(0));
 
-    StepVerifier.create(iAccountService.deleteAccount(0L))
+    StepVerifier.create(iAccountService.deleteAccount(-1L))
                 .expectError(UserNotFoundException.class)
                 .verify();
   }
