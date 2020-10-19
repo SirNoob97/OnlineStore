@@ -3,9 +3,6 @@ package com.sirnoob.authservice.dto;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-import lombok.Data;
-
-@Data
 public class LoginRequest {
 
   @NotEmpty(message = "The UserNames is Required!!")
@@ -15,4 +12,18 @@ public class LoginRequest {
   @NotEmpty(message = "The Password is Required!!")
   @Size(max = 60, message = "The Maximum Characters Allowed For The Password Is {max}!!")
   private String password;
+
+  public LoginRequest(String userName, String password) {
+    this.userName = userName;
+    this.password = password;
+  }
+
+  public String getUserName() {
+    return userName;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
 }
