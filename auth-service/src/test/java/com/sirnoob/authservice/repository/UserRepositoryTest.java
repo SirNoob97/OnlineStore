@@ -1,6 +1,9 @@
 package com.sirnoob.authservice.repository;
 
-import static com.sirnoob.authservice.util.UserGenerator.generateUserRandomValues;
+import static com.sirnoob.authservice.util.Provider.generateUserRandomValues;
+import static com.sirnoob.authservice.util.Provider.PASSWORD;
+import static com.sirnoob.authservice.util.Provider.NEW_PASSWORD;
+import static com.sirnoob.authservice.util.Provider.DEFAULT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -85,7 +88,7 @@ class UserRepositoryTest {
   @Test
   @DisplayName("save throw DataIntegrityViolationException when there is already a user saved with that name")
   public void save_ThrowDataIntegrityViolationException_WhenThereIsAlreadyAUserSavedWithThatName(){
-    User user = User.builder().userName(staticUser.getUsername()).password("password").email("fake@email.com").role(Role.ADMIN).build();
+    User user = User.builder().userName(staticUser.getUsername()).password(PASSWORD).email("fake@email.com").role(Role.ADMIN).build();
 
     StepVerifier.create(iUserRepository.save(user))
                 .expectError(DataIntegrityViolationException.class)
@@ -95,7 +98,7 @@ class UserRepositoryTest {
   @Test
   @DisplayName("save throw DataIntegrityViolationException when there is already a user saved with that email")
   public void save_ThrowDataIntegrityViolationException_WhenThereIsAlreadyAUserSavedWithThatEmail(){
-    User user = User.builder().userName("name").password("password").email(staticUser.getEmail()).role(Role.ADMIN).build();
+    User user = User.builder().userName("name").password(PASSWORD).email(staticUser.getEmail()).role(Role.ADMIN).build();
 
     StepVerifier.create(iUserRepository.save(user))
                 .expectError(DataIntegrityViolationException.class)
@@ -148,7 +151,7 @@ class UserRepositoryTest {
   @DisplayName("findByUserName return a mono void when there is no users in the registry")
   public void findByToken_ReturnAMonoVoid_WhenThereIsNoRefreshTokensInTheRegistry(){
     String name = staticUser.getUsername();
-    User defaultUser = User.builder().userId(0L).userName("DEFAULT").email("DEFAULT").role(Role.CUSTOMER).build();
+    User defaultUser = User.builder().userId(0L).userName(DEFAULT).email(DEFAULT).role(Role.CUSTOMER).build();
 
     StepVerifier.create(iUserRepository.deleteAll())
                 .expectSubscription()
@@ -204,13 +207,13 @@ class UserRepositoryTest {
     Long id = userDB.getUserId();
     String oldPassword = userDB.getPassword();
 
-    StepVerifier.create(iUserRepository.updatePasswordById(id, "new Password"))
+    StepVerifier.create(iUserRepository.updatePasswordById(id, NEW_PASSWORD))
                 .expectNextMatches(num -> num.equals(1))
                 .expectComplete()
                 .verify();
 
     StepVerifier.create(iUserRepository.findByUserName(userDB.getUsername()))
-                .expectNextMatches(user -> user.getPassword().equals("new Password") && !user.getPassword().equals(oldPassword))
+                .expectNextMatches(user -> user.getPassword().equals(NEW_PASSWORD) && !user.getPassword().equals(oldPassword))
                 .expectComplete()
                 .verify();
   }
@@ -231,7 +234,7 @@ class UserRepositoryTest {
                 .expectSubscription()
                 .verifyComplete();
 
-    StepVerifier.create(iUserRepository.updatePasswordById(1L, "password"))
+    StepVerifier.create(iUserRepository.updatePasswordById(1L, PASSWORD))
                 .expectSubscription()
                 .expectNextMatches(num -> num.equals(0))
                 .verifyComplete();
