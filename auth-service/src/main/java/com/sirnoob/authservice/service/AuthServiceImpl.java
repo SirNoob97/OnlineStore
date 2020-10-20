@@ -1,5 +1,7 @@
 package com.sirnoob.authservice.service;
 
+import javax.validation.Valid;
+
 import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AuthResponse;
