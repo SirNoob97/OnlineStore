@@ -47,7 +47,7 @@ public class AuthHandler {
     Mono<AuthResponse> authResponse = body.flatMap(iAuthService::refreshToken);
 
     return authResponse.flatMap(data -> ServerResponse.ok().contentType(JSON).bodyValue(data))
-                        .onErrorResume(error -> ServerResponse.ok().bodyValue(error.getMessage()));
+                        .onErrorResume(error -> ServerResponse.notFound().build());
   }
 
   public Mono<ServerResponse> logout(ServerRequest serverRequest){
