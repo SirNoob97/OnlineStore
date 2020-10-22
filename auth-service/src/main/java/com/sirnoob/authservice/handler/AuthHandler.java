@@ -1,6 +1,6 @@
 package com.sirnoob.authservice.handler;
 
-import java.util.Iterator;
+import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -9,7 +9,6 @@ import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
-import com.sirnoob.authservice.exception.WrongPasswordException;
 import com.sirnoob.authservice.service.IAuthService;
 import com.sirnoob.authservice.service.IRefreshTokenService;
 
@@ -42,16 +41,16 @@ public class AuthHandler {
   public Mono<ServerResponse> login(ServerRequest serverRequest){
     Mono<LoginRequest> body = serverRequest.bodyToMono(LoginRequest.class);
 
-    String message = validation(body).block();
+    return body.flatMap(b -> {
+      String errors = validation(b);
+      if(errors != null & !errors.isEmpty())
+        return ServerResponse.badRequest().bodyValue(errors);
 
-    if (message == null || message.isEmpty()) {
-      Mono<AuthResponse> authResponse = body.flatMap(iAuthService::login);
+    Mono<AuthResponse> authResponse = iAuthService.login(b);
 
-      return authResponse.flatMap(data -> ServerResponse.ok().contentType(JSON).bodyValue(data))
-          .onErrorResume(error -> ServerResponse.notFound().build());
-    } else {
-      return ServerResponse.badRequest().contentType(JSON).bodyValue(message);
-    }
+    return authResponse.flatMap(data -> ServerResponse.ok().contentType(JSON).bodyValue(data))
+        .onErrorResume(error -> ServerResponse.notFound().build());
+    });
   }
 
   public Mono<ServerResponse> refreshToken(ServerRequest serverRequest){
@@ -68,15 +67,7 @@ public class AuthHandler {
     return ServerResponse.noContent().build(body.flatMap(token -> iRefreshTokenService.deleteRefreshToken(token.getToken())));
   }
 
-  private <T> Mono<String> validation(Mono<T> t) {
-    return t.flatMap(m -> {
-     Iterator<ConstraintViolation<T>> it = validator.validate(m).iterator();
-      String message = "";
-      while (it.hasNext()) {
-        ConstraintViolation<T> constraintViolation = it.next();
-         message = constraintViolation.getMessage();
-      }
-      return Mono.just(message);
-    });
+  private <T> String validation(T t) {
+    return validator.validate(t).stream().map(cv -> cv.getMessage()).collect(Collectors.joining(", "));
   }
 }
