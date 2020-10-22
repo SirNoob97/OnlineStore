@@ -1,14 +1,16 @@
 package com.sirnoob.authservice.handler;
 
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
 import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
+import com.sirnoob.authservice.exception.WrongPasswordException;
 import com.sirnoob.authservice.service.IAuthService;
 import com.sirnoob.authservice.service.IRefreshTokenService;
 
@@ -39,18 +41,14 @@ public class AuthHandler {
   }
 
   public Mono<ServerResponse> login(ServerRequest serverRequest){
-    Mono<LoginRequest> body = serverRequest.bodyToMono(LoginRequest.class);
+    Mono<LoginRequest> body = serverRequest.bodyToMono(LoginRequest.class).doOnNext(b -> validation(b));
 
-    return body.flatMap(b -> {
-      String errors = validation(b);
-      if(errors != null & !errors.isEmpty())
-        return ServerResponse.badRequest().bodyValue(errors);
-
-    Mono<AuthResponse> authResponse = iAuthService.login(b);
-
-    return authResponse.flatMap(data -> ServerResponse.ok().contentType(JSON).bodyValue(data))
-        .onErrorResume(error -> ServerResponse.notFound().build());
-    });
+    return body.flatMap(lr -> {
+                  return iAuthService.login(lr)
+                                      .flatMap(data -> ServerResponse.ok().contentType(JSON).bodyValue(data))
+                                      .onErrorResume(error -> error instanceof WrongPasswordException ? ServerResponse.badRequest().bodyValue(error.getMessage())
+                                                                                                      : ServerResponse.notFound().build());
+                });
   }
 
   public Mono<ServerResponse> refreshToken(ServerRequest serverRequest){
@@ -67,7 +65,11 @@ public class AuthHandler {
     return ServerResponse.noContent().build(body.flatMap(token -> iRefreshTokenService.deleteRefreshToken(token.getToken())));
   }
 
-  private <T> String validation(T t) {
-    return validator.validate(t).stream().map(cv -> cv.getMessage()).collect(Collectors.joining(", "));
+  private <T> Mono<T> validation(T t) {
+    Set<ConstraintViolation<T>> errors = validator.validate(t);
+    if(!errors.isEmpty())
+      throw new ConstraintViolationException(errors);
+
+    return Mono.just(t);
   }
 }
