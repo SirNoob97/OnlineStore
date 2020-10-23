@@ -59,8 +59,8 @@ class RefreshTokenServiceTest {
     }
 
     @Test
-    @DisplayName("validateRefreshToken throw RefreshTokenNotFoundException when the token was not found")
-    public void validateRefreshToken_ReturnAMonoErrorRefreshTokenNotFoundException_WhenTheRepositoryReturnsAnMonoEmpty(){
+    @DisplayName("validateRefreshToken throw ResponseStatusException when the token was not found")
+    public void validateRefreshToken_ReturnAMonoErrorResponseStatusException_WhenTheRepositoryReturnsAnMonoEmpty(){
       BDDMockito.when(iRefreshTokenRepository.findByToken(anyString())).thenReturn(Mono.empty());
 
       StepVerifier.create(iRefreshTokenService.validateRefreshToken(""))
@@ -77,8 +77,8 @@ class RefreshTokenServiceTest {
     }
 
     @Test
-    @DisplayName("deleteRefreshToken throw RefreshTokenNotFoundException when the query operation returns 0")
-    public void deleteRefreshToken_ReturnAMonoErrorRefreshTokenNotFoundException_WhenTheQueryOperationReturnsZero() {
+    @DisplayName("deleteRefreshToken throw ResponseStatusException when the query operation returns 0")
+    public void deleteRefreshToken_ReturnAMonoErrorResponseStatusException_WhenTheQueryOperationReturnsZero() {
       BDDMockito.when(iRefreshTokenRepository.deleteByToken(anyString())).thenReturn(Mono.just(0));
 
       StepVerifier.create(iRefreshTokenService.deleteRefreshToken(""))

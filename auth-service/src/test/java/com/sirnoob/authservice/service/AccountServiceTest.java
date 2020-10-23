@@ -74,8 +74,8 @@ class AccountServiceTest {
   }
 
   @Test
-  @DisplayName("updatePassword return a mono error UserNotFoundException when the query operation returns an integer less than zero")
-  public void updatePassword_ReturnAMonoErrorOfUserNotFoundException_WhenTheQueryOperationReturnsAnIntegerLessThanZero() {
+  @DisplayName("updatePassword return a mono error ResponseStatusException when the query operation returns an integer less than zero")
+  public void updatePassword_ReturnAMonoErrorResponseStatusException_WhenTheQueryOperationReturnsAnIntegerLessThanZero() {
     BDDMockito.when(iUserRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(0));
 
     StepVerifier.create(iAccountService.updatePassword(new PasswordUpdateDto(-1L, "")))
@@ -92,8 +92,8 @@ class AccountServiceTest {
   }
 
   @Test
-  @DisplayName("deleteAccount return a mono error UserNotFoundException when the query operation returns an integer less than zero")
-  public void deleteAccount_ReturnAMonoErrorOfUserNotFoundException_WhenTheQueryOperationReturnsAnIntegerLessThanZero() {
+  @DisplayName("deleteAccount return a mono error ResponseStatusException when the query operation returns an integer less than zero")
+  public void deleteAccount_ReturnAMonoErrorResponseStatusException_WhenTheQueryOperationReturnsAnIntegerLessThanZero() {
     BDDMockito.when(iUserRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(0));
 
     StepVerifier.create(iAccountService.deleteAccount(-1L))
@@ -114,8 +114,8 @@ class AccountServiceTest {
   }
 
   @Test
-  @DisplayName("getAllAccounts return a flux error UserNotFoundException when there is no users in the registry")
-  public void getAllAccounts_ReturnAFluxErrorUserNotFoundException_WhenThereIsNoUsersInTheRegistry() {
+  @DisplayName("getAllAccounts return a flux error ResponseStatusException when there is no users in the registry")
+  public void getAllAccounts_ReturnAFluxErrorResponseStatusException_WhenThereIsNoUsersInTheRegistry() {
     BDDMockito.when(iUserRepository.findAll()).thenReturn(Flux.empty());
 
     StepVerifier.create(iAccountService.getAllAccounts())

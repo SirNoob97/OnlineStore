@@ -30,7 +30,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -114,19 +113,19 @@ class AuthServiceTest {
   }
 
   @Test
-  @DisplayName("login return a MonoError UsernameNotFoundException when the repository returns an MonoEmpty")
-  public void login_ReturnAMonoErrorUserNameNotFoundException_WhenTheRepositoryReturnsAnMonoEmpty(){
+  @DisplayName("login return a MonoError ResponseStatusException when the repository returns an MonoEmpty")
+  public void login_ReturnAMonoErrorResponseStatusException_WhenTheRepositoryReturnsAnMonoEmpty(){
     BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(Mono.empty());
 
     StepVerifier.create(iAuthService.login(staticLoginRequest))
                 .expectSubscription()
-                .expectError(UsernameNotFoundException.class)
+                .expectError(ResponseStatusException.class)
                 .verify();
   }
 
   @Test
-  @DisplayName("login return a MonoError when passwords do not match")
-  public void login_ReturnAMonoError_WhenPasswordsDoNotMatch(){
+  @DisplayName("login return a MonoError ResponseStatusException when passwords do not match")
+  public void login_ReturnAMonoErrorResponseStatusException_WhenPasswordsDoNotMatch(){
     BDDMockito.when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
     StepVerifier.create(iAuthService.login(staticLoginRequest))
