@@ -1,15 +1,23 @@
 package com.sirnoob.authservice.util;
 
+import java.time.Instant;
+import java.util.Random;
 import java.util.UUID;
 
 import com.sirnoob.authservice.domain.RefreshToken;
 import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.domain.User;
+import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
 
+import org.springframework.beans.factory.annotation.Value;
+
 public class Provider{
+
+  @Value("${jwt.expiration.time}")
+  private static Long EXPIRATION_TIME;
 
   public static final String PASSWORD = "PASSWORD";
 
@@ -46,6 +54,15 @@ public class Provider{
                           .build();
   }
 
+  public static User generateUserStaticValuesForIT(){
+    return User.builder().userId(1L)
+                          .userName(TEST)
+                          .password(TEST)
+                          .email(TEST_EMAIL)
+                          .role(Role.EMPLOYEE)
+                          .build();
+  }
+
   public static RefreshToken generateRefreshToken(){
     return RefreshToken.builder()
                         .token(getRandomString())
@@ -56,6 +73,13 @@ public class Provider{
     return RefreshToken.builder()
                         .id(0L)
                         .token(DEFAULT)
+                        .build();
+  }
+
+  public static RefreshToken generateRefreshTokenForIT(){
+    return RefreshToken.builder()
+                        .id(new Random().nextLong())
+                        .token(getRandomString())
                         .build();
   }
 
@@ -73,6 +97,14 @@ public class Provider{
 
   public static RefreshTokenRequest generateRefreshTokenRequest(){
     return new RefreshTokenRequest(TOKEN, TEST);
+  }
+
+  public static AuthResponse generateAuthResponse(){
+    return AuthResponse.builder().userName(TEST)
+                                  .authToken(TOKEN)
+                                  .refreshToken(TOKEN)
+                                  .expiresAt(Instant.now().plusMillis(1200000L))
+                                  .build();
   }
 
   private static String getRandomString(){
