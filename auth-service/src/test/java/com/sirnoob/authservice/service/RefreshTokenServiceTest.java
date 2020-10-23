@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static com.sirnoob.authservice.util.Provider.generateRefreshToken;
 import com.sirnoob.authservice.domain.RefreshToken;
-import com.sirnoob.authservice.exception.RefreshTokenNotFoundException;
 import com.sirnoob.authservice.repository.IRefreshTokenRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.server.ResponseStatusException;
 
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -64,7 +64,7 @@ class RefreshTokenServiceTest {
       BDDMockito.when(iRefreshTokenRepository.findByToken(anyString())).thenReturn(Mono.empty());
 
       StepVerifier.create(iRefreshTokenService.validateRefreshToken(""))
-                  .expectError(RefreshTokenNotFoundException.class)
+                  .expectError(ResponseStatusException.class)
                   .verify();
     }
 
@@ -83,7 +83,7 @@ class RefreshTokenServiceTest {
 
       StepVerifier.create(iRefreshTokenService.deleteRefreshToken(""))
                   .expectSubscription()
-                  .expectError(RefreshTokenNotFoundException.class)
+                  .expectError(ResponseStatusException.class)
                   .verify();
     }
 }

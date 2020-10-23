@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
-import com.sirnoob.authservice.exception.UserNotFoundException;
 import com.sirnoob.authservice.repository.IUserRepository;
 import static com.sirnoob.authservice.util.Provider.generateUserStaticValues;
 import static com.sirnoob.authservice.util.Provider.PASSWORD;
@@ -19,6 +18,7 @@ import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -79,7 +79,7 @@ class AccountServiceTest {
     BDDMockito.when(iUserRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(0));
 
     StepVerifier.create(iAccountService.updatePassword(new PasswordUpdateDto(-1L, "")))
-                .expectError(UserNotFoundException.class)
+                .expectError(ResponseStatusException.class)
                 .verify();
   }
 
@@ -97,7 +97,7 @@ class AccountServiceTest {
     BDDMockito.when(iUserRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(0));
 
     StepVerifier.create(iAccountService.deleteAccount(-1L))
-                .expectError(UserNotFoundException.class)
+                .expectError(ResponseStatusException.class)
                 .verify();
   }
 
@@ -119,7 +119,7 @@ class AccountServiceTest {
     BDDMockito.when(iUserRepository.findAll()).thenReturn(Flux.empty());
 
     StepVerifier.create(iAccountService.getAllAccounts())
-                .expectError(UserNotFoundException.class)
+                .expectError(ResponseStatusException.class)
                 .verify();
   }
 }

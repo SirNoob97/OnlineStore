@@ -19,7 +19,6 @@ import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
-import com.sirnoob.authservice.exception.WrongPasswordException;
 import com.sirnoob.authservice.repository.IUserRepository;
 import com.sirnoob.authservice.security.JwtProvider;
 
@@ -33,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -131,7 +131,7 @@ class AuthServiceTest {
 
     StepVerifier.create(iAuthService.login(staticLoginRequest))
                 .expectSubscription()
-                .expectError(WrongPasswordException.class)
+                .expectError(ResponseStatusException.class)
                 .verify();
   }
 
