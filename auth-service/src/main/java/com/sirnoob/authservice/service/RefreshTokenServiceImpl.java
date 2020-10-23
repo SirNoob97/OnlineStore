@@ -3,11 +3,12 @@ package com.sirnoob.authservice.service;
 import java.util.UUID;
 
 import com.sirnoob.authservice.domain.RefreshToken;
-import com.sirnoob.authservice.exception.RefreshTokenNotFoundException;
 import com.sirnoob.authservice.repository.IRefreshTokenRepository;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -30,17 +31,18 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
     @Override
     public Mono<String> validateRefreshToken(String token) {
       return iRefreshTokenRepository.findByToken(token)
-                                    .switchIfEmpty(Mono.error(new RefreshTokenNotFoundException(TOKEN_NOT_FOUND)))
+                                    .switchIfEmpty(tokenNotFound())
                                     .map(RefreshToken::getToken);
     }
 
     @Override
     public Mono<Void> deleteRefreshToken(String token) {
       return iRefreshTokenRepository.deleteByToken(token)
-                                    .flatMap(num -> {
-                                      return num > 0 ? Mono.empty()
-                                                      : Mono.error(new RefreshTokenNotFoundException(TOKEN_NOT_FOUND));
-                                  });
+                                    .flatMap(num -> num > 0 ? Mono.empty() : tokenNotFound());
+  }
+
+  private <T> Mono<T> tokenNotFound(){
+    return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, TOKEN_NOT_FOUND));
   }
 
 }

@@ -3,12 +3,13 @@ package com.sirnoob.authservice.service;
 import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
-import com.sirnoob.authservice.exception.UserNotFoundException;
 import com.sirnoob.authservice.repository.IUserRepository;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
@@ -18,6 +19,9 @@ import reactor.core.publisher.Mono;
 @Transactional
 @Service
 public class AccountServiceImpl implements IAccountService {
+
+  private static final String USER_NOT_FOUND = "User Not Found!!";
+  private static final String NO_USERS_FOUND = "Users Not Found!!";
 
   private final PasswordEncoder passwordEncoder;
   private final IUserRepository iUserRepository;
@@ -43,12 +47,12 @@ public class AccountServiceImpl implements IAccountService {
   @Override
   public Flux<AccountView> getAllAccounts(){
     return iUserRepository.findAll()
-                          .switchIfEmpty(Flux.error(new UserNotFoundException("No Users Found!")))
+                          .switchIfEmpty(Flux.error(new ResponseStatusException(HttpStatus.NOT_FOUND, NO_USERS_FOUND)))
                           .map(user -> new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), user.getRole()));
   }
 
   public Mono<Void> verifyOperation(Integer num){
     if (num > 0) return Mono.empty();
-    return Mono.error(new UserNotFoundException("User Not Found!"));
+    return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
   }
 }
