@@ -3,6 +3,11 @@ package com.sirnoob.authservice.domain;
 import java.util.Collection;
 import java.util.List;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -27,9 +32,21 @@ public class User implements UserDetails{
   @Id
   @Column("id")
   private Long userId;
+
+  @NotEmpty(message = "The UserName is Required!!")
+  @Size(max = 60, message = "The Maximum Characters Allowed For The Username Is {max}!!")
   private String userName;
+
+  @NotEmpty(message = "The Password is Required!!")
+  @Size(max = 60, message = "The Maximum Characters Allowed For The Password Is {max}!!")
   private String password;
+
+  @NotEmpty(message = "The Email is Required!!")
+  @Size(max = 60, message = "The Maximum Characters Allowed For The Email Is {max}!!")
+  @Email(regexp = "[^@ '\\t\\r\\n]+@[^@ '\\t\\r\\n]+\\.[^@ '\\t\\r\\n]+", message = "Invalid Email Format!!")
   private String email;
+
+  @NotNull(message = "The User Must Have A Role!!")
   private Role role;
 
   @Override
