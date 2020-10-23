@@ -1,18 +1,11 @@
 package com.sirnoob.authservice.handler;
 
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-
-import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
-import com.sirnoob.authservice.exception.WrongPasswordException;
 import com.sirnoob.authservice.service.IAuthService;
 import com.sirnoob.authservice.service.IRefreshTokenService;
+import com.sirnoob.authservice.validator.ConstraintValidator;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,49 +20,42 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthHandler {
 
-  private final IRefreshTokenService iRefreshTokenService;
-  private final IAuthService iAuthService;
-  private final Validator validator;
-
   private static final MediaType JSON = MediaType.APPLICATION_JSON;
 
-  public Mono<ServerResponse> signup(ServerRequest serverRequest){
-    Mono<SignUpRequest> body = serverRequest.bodyToMono(SignUpRequest.class);
-    Mono<AuthResponse> authResponse = body.flatMap(iAuthService::signup);
+  private final IRefreshTokenService iRefreshTokenService;
+  private final IAuthService iAuthService;
+  private final ConstraintValidator constraintValidator;
 
-    return authResponse.flatMap(data -> ServerResponse.status(HttpStatus.CREATED).contentType(JSON).bodyValue(data));
+  public Mono<ServerResponse> signup(ServerRequest serverRequest){
+    return serverRequest.bodyToMono(SignUpRequest.class)
+                        .doOnNext(constraintValidator::validateRequest)
+                        .flatMap(iAuthService::signup)
+                        .flatMap(data -> getServerResponse(HttpStatus.CREATED, data));
   }
 
   public Mono<ServerResponse> login(ServerRequest serverRequest){
-    Mono<LoginRequest> body = serverRequest.bodyToMono(LoginRequest.class).doOnNext(b -> validation(b));
-
-    return body.flatMap(lr -> {
-                  return iAuthService.login(lr)
-                                      .flatMap(data -> ServerResponse.ok().contentType(JSON).bodyValue(data))
-                                      .onErrorResume(error -> error instanceof WrongPasswordException ? ServerResponse.badRequest().bodyValue(error.getMessage())
-                                                                                                      : ServerResponse.notFound().build());
-                });
+    return serverRequest.bodyToMono(LoginRequest.class)
+                        .doOnNext(constraintValidator::validateRequest)
+                        .flatMap(iAuthService::login)
+                        .flatMap(data -> getServerResponse(HttpStatus.OK, data));
   }
 
   public Mono<ServerResponse> refreshToken(ServerRequest serverRequest){
-    Mono<RefreshTokenRequest> body = serverRequest.bodyToMono(RefreshTokenRequest.class);
-    Mono<AuthResponse> authResponse = body.flatMap(iAuthService::refreshToken);
-
-    return authResponse.flatMap(data -> ServerResponse.ok().contentType(JSON).bodyValue(data))
-                        .onErrorResume(error -> ServerResponse.notFound().build());
+    return serverRequest.bodyToMono(RefreshTokenRequest.class)
+                        .doOnNext(constraintValidator::validateRequest)
+                        .flatMap(iAuthService::refreshToken)
+                        .flatMap(data -> getServerResponse(HttpStatus.OK, data));
   }
 
   public Mono<ServerResponse> logout(ServerRequest serverRequest){
-    Mono<RefreshTokenRequest> body = serverRequest.bodyToMono(RefreshTokenRequest.class);
-
-    return ServerResponse.noContent().build(body.flatMap(token -> iRefreshTokenService.deleteRefreshToken(token.getToken())));
+    return serverRequest.bodyToMono(RefreshTokenRequest.class)
+                        .doOnNext(constraintValidator::validateRequest)
+                        .flatMap(token -> iRefreshTokenService.deleteRefreshToken(token.getToken()))
+                        .flatMap(v -> ServerResponse.noContent().build());
   }
 
-  private <T> Mono<T> validation(T t) {
-    Set<ConstraintViolation<T>> errors = validator.validate(t);
-    if(!errors.isEmpty())
-      throw new ConstraintViolationException(errors);
 
-    return Mono.just(t);
+  private <T> Mono<ServerResponse> getServerResponse(HttpStatus status, T data){
+    return ServerResponse.status(status).contentType(JSON).bodyValue(data);
   }
 }
