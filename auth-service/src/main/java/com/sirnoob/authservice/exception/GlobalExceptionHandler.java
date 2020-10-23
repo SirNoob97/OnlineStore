@@ -24,20 +24,21 @@ import reactor.core.publisher.Mono;
 
 @Component
 @Order(-2)
-public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler{
+public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
 
   public GlobalExceptionHandler(ErrorAttributes errorAttributes, ResourceProperties resourceProperties,
       ApplicationContext applicationContext, ServerCodecConfigurer serverCodecConfigurer) {
-		super(errorAttributes, resourceProperties, applicationContext);
+    super(errorAttributes, resourceProperties, applicationContext);
+    this.setMessageReaders(serverCodecConfigurer.getReaders());
     this.setMessageWriters(serverCodecConfigurer.getWriters());
-	}
+  }
 
-	@Override
-	protected RouterFunction<ServerResponse> getRoutingFunction(ErrorAttributes errorAttributes) {
-		return RouterFunctions.route(RequestPredicates.all(), this::formatErrorResponse);
-	}
+  @Override
+  protected RouterFunction<ServerResponse> getRoutingFunction(ErrorAttributes errorAttributes) {
+    return RouterFunctions.route(RequestPredicates.all(), this::formatErrorResponse);
+  }
 
-  private Mono<ServerResponse> formatErrorResponse(ServerRequest serverRequest){
+  private Mono<ServerResponse> formatErrorResponse(ServerRequest serverRequest) {
     String query = serverRequest.uri().getQuery();
 
     ErrorAttributeOptions options = isTraceEnabled(query) ? ErrorAttributeOptions.of(Include.STACK_TRACE)
@@ -46,10 +47,12 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler{
     Map<String, Object> errorAttributes = getErrorAttributes(serverRequest, options);
     int status = (int) Optional.ofNullable(errorAttributes.get("status")).orElse(500);
 
-    return ServerResponse.status(status).contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(errorAttributes));
+    return ServerResponse.status(status)
+                          .contentType(MediaType.APPLICATION_JSON)
+                          .body(BodyInserters.fromValue(errorAttributes));
   }
 
-  private boolean isTraceEnabled(String query){
+  private boolean isTraceEnabled(String query) {
     return query != null && !query.isEmpty() && query.contains("trace=true");
   }
 
