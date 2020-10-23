@@ -24,8 +24,8 @@ public class Router {
 
   @Bean
   public RouterFunction<ServerResponse> authEndPoints (AuthHandler authHandler){
-    return RouterFunctions.route(POST("/auth/signup").and(accept(JSON).and(contentType(JSON))), authHandler::signup)
-                          .andRoute(POST("/auth/login").and(accept(JSON).and(contentType(JSON))), authHandler::login)
+    return RouterFunctions.route(POST("/auth/signup").and(accept(JSON)).and(contentType(JSON)), authHandler::signup)
+                          .andRoute(POST("/auth/login").and(accept(JSON)).and(contentType(JSON)), authHandler::login)
                           .andRoute(POST("/auth/logout").and(accept(JSON)), authHandler::logout)
                           .andRoute(POST("/auth/refresh-token").and(accept(JSON)).and(contentType(JSON)), authHandler::refreshToken);
   }
