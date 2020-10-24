@@ -12,9 +12,13 @@ import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
 
+import org.springframework.http.MediaType;
+
 public class Provider{
 
-  protected static Long EXPIRATION_TIME = 1200000L;
+  public static final MediaType JSON = MediaType.APPLICATION_JSON;
+
+  public static final Long EXPIRATION_TIME = 1200000L;
 
   public static final String PASSWORD = "PASSWORD";
 
