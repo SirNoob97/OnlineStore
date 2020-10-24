@@ -12,12 +12,9 @@ import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
 
-import org.springframework.beans.factory.annotation.Value;
-
 public class Provider{
 
-  @Value("${jwt.expiration.time}")
-  private static Long EXPIRATION_TIME;
+  protected static Long EXPIRATION_TIME = 1200000L;
 
   public static final String PASSWORD = "PASSWORD";
 
@@ -103,8 +100,12 @@ public class Provider{
     return AuthResponse.builder().userName(TEST)
                                   .authToken(TOKEN)
                                   .refreshToken(TOKEN)
-                                  .expiresAt(Instant.now().plusMillis(1200000L))
+                                  .expiresAt(getJwtExpirationTime())
                                   .build();
+  }
+
+  public static Instant getJwtExpirationTime(){
+    return Instant.now().plusMillis(EXPIRATION_TIME);
   }
 
   private static String getRandomString(){
