@@ -3,6 +3,7 @@ package com.sirnoob.authservice.service;
 import static com.sirnoob.authservice.util.Provider.PASSWORD;
 import static com.sirnoob.authservice.util.Provider.TEST;
 import static com.sirnoob.authservice.util.Provider.generateRefreshToken;
+import static com.sirnoob.authservice.util.Provider.getJwtExpirationTime;
 import static com.sirnoob.authservice.util.Provider.generateRefreshTokenRequest;
 import static com.sirnoob.authservice.util.Provider.generateSignUpRequest;
 import static com.sirnoob.authservice.util.Provider.generateLoginRequest;
@@ -10,8 +11,6 @@ import static com.sirnoob.authservice.util.Provider.generateUserForSignUpTest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-
-import java.time.Instant;
 
 import com.sirnoob.authservice.domain.RefreshToken;
 import com.sirnoob.authservice.domain.User;
@@ -28,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
@@ -38,9 +36,6 @@ import reactor.test.StepVerifier;
 
 @SpringBootTest
 class AuthServiceTest {
-
-  @Value("${jwt.expiration.time}")
-  private Long jwtExpirationInMillis;
 
   @Mock
   private IRefreshTokenService iRefreshTokenService;
@@ -67,21 +62,21 @@ class AuthServiceTest {
     MockitoAnnotations.initMocks(this);
     iAuthService = new AuthServiceImpl(iRefreshTokenService, iUserRepository, jwtProvider, passwordEncoder);
 
-    Mono<User> staticUser = Mono.just(generateUserForSignUpTest());
+    Mono<User> monoUser = Mono.just(generateUserForSignUpTest());
 
     Mono<String> token = Mono.just(staticRefreshToken.getToken());
 
     BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
 
-    BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(staticUser);
+    BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(monoUser);
 
     BDDMockito.when(iRefreshTokenService.generateRefreshToken()).thenReturn(token);
 
     BDDMockito.when(jwtProvider.generateToken(any(User.class))).thenReturn("TOKEN");
 
-    BDDMockito.when(jwtProvider.getJwtExpirationTime()).thenReturn(Instant.now().plusMillis(jwtExpirationInMillis));
+    BDDMockito.when(jwtProvider.getJwtExpirationTime()).thenReturn(getJwtExpirationTime());
 
-    BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(staticUser);
+    BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(monoUser);
 
     BDDMockito.when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
