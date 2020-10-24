@@ -50,8 +50,8 @@ public class AuthHandler {
   public Mono<ServerResponse> logout(ServerRequest serverRequest){
     return serverRequest.bodyToMono(RefreshTokenRequest.class)
                         .doOnNext(constraintValidator::validateRequest)
-                        .flatMap(token -> iRefreshTokenService.deleteRefreshToken(token.getToken()))
-                        .flatMap(v -> ServerResponse.noContent().build());
+                        .map(RefreshTokenRequest::getToken)
+                        .flatMap(token -> ServerResponse.noContent().build(iRefreshTokenService.deleteRefreshToken(token)));
   }
 
 
