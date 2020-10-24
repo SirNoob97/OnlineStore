@@ -27,7 +27,10 @@ public class SecurityConfig {
   @Bean
   public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity serverHttpSecurity){
     //@formatter:off
-    return serverHttpSecurity.exceptionHandling()
+    return serverHttpSecurity.csrf().disable()
+                              .formLogin().disable()
+                              .httpBasic().disable()
+                              .exceptionHandling()
                               .authenticationEntryPoint(
                                   (swe, aex) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED))
                               )
@@ -35,13 +38,11 @@ public class SecurityConfig {
                                   (swe, aex) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN))
                               )
                               .and()
-                              .csrf().disable()
-                              .formLogin().disable()
-                              .httpBasic().disable()
                               .authenticationManager(authenticationManager)
                               .securityContextRepository(securityContextRepository)
                               .authorizeExchange()
-                              .pathMatchers("/auth/**", "/h2-console", "/favicon.ico").permitAll()
+                              .pathMatchers("/auth/login", "/auth/signup").permitAll()
+                              .pathMatchers("/auth/logout", "/auth/refresh-token").authenticated()
                               .pathMatchers("/accounts", "/accounts/**").hasAuthority(Role.ADMIN.name())
                               .and().build();
     //@formatter:on
