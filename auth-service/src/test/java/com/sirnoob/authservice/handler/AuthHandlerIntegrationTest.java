@@ -1,6 +1,12 @@
 package com.sirnoob.authservice.handler;
 
-import static com.sirnoob.authservice.util.Provider.*;
+import static com.sirnoob.authservice.util.Provider.JSON;
+import static com.sirnoob.authservice.util.Provider.PASSWORD;
+import static com.sirnoob.authservice.util.Provider.TEST;
+import static com.sirnoob.authservice.util.Provider.generateLoginRequest;
+import static com.sirnoob.authservice.util.Provider.generateRefreshTokenForIT;
+import static com.sirnoob.authservice.util.Provider.generateSignUpRequest;
+import static com.sirnoob.authservice.util.Provider.generateUserStaticValuesForIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -336,6 +342,37 @@ class AuthHandlerIntegrationTest {
                   .body(Mono.just(refreshTokenRequest), RefreshTokenRequest.class)
                   .exchange()
                   .expectStatus().isNoContent()
+                  .expectBody(Void.class);
+
+    verify(iRefreshTokenRepository, times(1)).deleteByToken(anyString());
+  }
+
+  @Test
+  @DisplayName("logout return 404 status code when refresh token was not found")
+  public void logout_Return404StatusCode_WhenRefreshTokenWasNotFound() {
+    BDDMockito.when(iRefreshTokenRepository.deleteByToken(anyString())).thenReturn(Mono.just(0));
+    AuthResponse authResponse = webTestClient.post()
+                                .uri("/auth/login")
+                                .contentType(JSON)
+                                .accept(JSON)
+                                .body(Mono.just(staticLoginRequest), LoginRequest.class)
+                                .exchange()
+                                .expectStatus().isOk()
+                                .expectHeader().contentType(JSON)
+                                .expectBody(AuthResponse.class)
+                                .returnResult()
+                                .getResponseBody();
+
+    RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest(authResponse.getRefreshToken(), authResponse.getUserName());
+
+    webTestClient.post()
+                  .uri("/auth/logout")
+                  .contentType(JSON)
+                  .accept(JSON)
+                  .header("Authorization", "Bearer " + authResponse.getAuthToken())
+                  .body(Mono.just(refreshTokenRequest), RefreshTokenRequest.class)
+                  .exchange()
+                  .expectStatus().isNotFound()
                   .expectBody(Void.class);
 
     verify(iRefreshTokenRepository, times(1)).deleteByToken(anyString());
