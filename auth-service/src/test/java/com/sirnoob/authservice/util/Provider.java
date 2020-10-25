@@ -26,9 +26,9 @@ public class Provider{
 
   public static final String NEW_PASSWORD = "NEW PASSWORD";
 
-  public static final String TEST = "TEST";
+  public static final String TEST = "test";
 
-  public static final String TEST_EMAIL = "TEST@TEST.com";
+  public static final String TEST_EMAIL = "test@email.com";
 
   public static final String TOKEN = "TOKEN";
 
@@ -60,7 +60,7 @@ public class Provider{
                           .userName(TEST)
                           .password(TEST)
                           .email(TEST_EMAIL)
-                          .role(Role.EMPLOYEE)
+                          .role(Role.ADMIN)
                           .build();
   }
 
@@ -93,7 +93,7 @@ public class Provider{
   }
 
   public static LoginRequest generateLoginRequest() {
-    return new LoginRequest(TEST, PASSWORD);
+    return new LoginRequest(TEST, TEST);
   }
 
   public static RefreshTokenRequest generateRefreshTokenRequest(){
