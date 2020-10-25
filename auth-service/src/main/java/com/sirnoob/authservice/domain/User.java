@@ -8,6 +8,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -47,6 +49,7 @@ public class User implements UserDetails{
   private String email;
 
   @NotNull(message = "The User Must Have A Role!!")
+  @JsonIgnore
   private Role role;
 
   @Override
