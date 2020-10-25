@@ -41,15 +41,13 @@ public class AuthHandler {
   }
 
   public Mono<ServerResponse> refreshToken(ServerRequest serverRequest){
-    return serverRequest.bodyToMono(RefreshTokenRequest.class)
-                        .doOnNext(constraintValidator::validateRequest)
+    return getRefreshTokenRequestAndValidate(serverRequest)
                         .flatMap(iAuthService::refreshToken)
                         .flatMap(data -> getServerResponse(HttpStatus.OK, data));
   }
 
   public Mono<ServerResponse> logout(ServerRequest serverRequest){
-    return serverRequest.bodyToMono(RefreshTokenRequest.class)
-                        .doOnNext(constraintValidator::validateRequest)
+    return getRefreshTokenRequestAndValidate(serverRequest)
                         .map(RefreshTokenRequest::getToken)
                         .flatMap(token -> ServerResponse.noContent().build(iRefreshTokenService.deleteRefreshToken(token)));
   }
@@ -57,5 +55,9 @@ public class AuthHandler {
 
   private <T> Mono<ServerResponse> getServerResponse(HttpStatus status, T data){
     return ServerResponse.status(status).contentType(JSON).bodyValue(data);
+  }
+
+  private Mono<RefreshTokenRequest> getRefreshTokenRequestAndValidate(ServerRequest serverRequest){
+    return serverRequest.bodyToMono(RefreshTokenRequest.class).doOnNext(constraintValidator::validateRequest);
   }
 }
