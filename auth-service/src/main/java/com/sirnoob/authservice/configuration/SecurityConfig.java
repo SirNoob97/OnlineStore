@@ -32,10 +32,10 @@ public class SecurityConfig {
                               .httpBasic().disable()
                               .exceptionHandling()
                               .authenticationEntryPoint(
-                                  (swe, aex) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN))
+                                  (swe, authex) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN))
                               )
                               .accessDeniedHandler(
-                                  (swe, aex) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED))
+                                  (swe, accdex) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED))
                               )
                               .and()
                               .authenticationManager(authenticationManager)
