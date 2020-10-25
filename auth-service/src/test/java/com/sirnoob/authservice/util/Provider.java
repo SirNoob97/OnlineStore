@@ -32,6 +32,8 @@ public class Provider{
 
   public static final String TOKEN = "TOKEN";
 
+  public static final String NEW_USER = "new user";
+
   public static User generateUserRandomValues(Role role){
     return User.builder().userName(getRandomString())
                           .password(getRandomString())
