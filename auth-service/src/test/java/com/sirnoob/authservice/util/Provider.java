@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.sirnoob.authservice.domain.RefreshToken;
 import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.domain.User;
+import com.sirnoob.authservice.dto.AccountPayload;
 import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
@@ -31,6 +32,8 @@ public class Provider{
   public static final String TEST_EMAIL = "test@email.com";
 
   public static final String TOKEN = "TOKEN";
+
+  public static final String EMPLOYEE = "EMPLOYEE";
 
   public static final String NEW_USER = "new user";
 
@@ -63,6 +66,14 @@ public class Provider{
                           .password(TEST)
                           .email(TEST_EMAIL)
                           .role(Role.ADMIN)
+                          .build();
+  }
+
+  public static AccountPayload generateAccountPayloadStaticValues(){
+    return AccountPayload.builder().userName(TEST)
+                          .password(TEST)
+                          .email(TEST_EMAIL)
+                          .role(EMPLOYEE)
                           .build();
   }
 
