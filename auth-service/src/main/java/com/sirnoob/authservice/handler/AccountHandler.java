@@ -1,6 +1,7 @@
 package com.sirnoob.authservice.handler;
 
 import com.sirnoob.authservice.domain.User;
+import com.sirnoob.authservice.dto.AccountPayload;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
 import com.sirnoob.authservice.service.IAccountService;
 import com.sirnoob.authservice.validator.ConstraintValidator;
@@ -34,8 +35,7 @@ public class AccountHandler {
   public Mono<ServerResponse> updatePassword(ServerRequest serverRequest){
     return serverRequest.bodyToMono(PasswordUpdateDto.class)
                         .doOnNext(validator::validateRequest)
-                        .flatMap(iAccountService::updatePassword)
-                        .flatMap(v -> ServerResponse.noContent().build());
+                        .flatMap(dto -> ServerResponse.noContent().build(iAccountService.updatePassword(dto)));
   }
 
   public Mono<ServerResponse> deleteAccountById(ServerRequest serverRequest) {
@@ -51,7 +51,7 @@ public class AccountHandler {
 
 
   private Mono<String> persistUser(ServerRequest serverRequest){
-    return serverRequest.bodyToMono(User.class)
+    return serverRequest.bodyToMono(AccountPayload.class)
                         .doOnNext(validator::validateRequest)
                         .flatMap(iAccountService::persistAccount);
   }
