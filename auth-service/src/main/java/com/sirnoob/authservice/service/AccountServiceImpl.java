@@ -1,6 +1,8 @@
 package com.sirnoob.authservice.service;
 
+import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.domain.User;
+import com.sirnoob.authservice.dto.AccountPayload;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
 import com.sirnoob.authservice.repository.IUserRepository;
@@ -21,15 +23,15 @@ import reactor.core.publisher.Mono;
 public class AccountServiceImpl implements IAccountService {
 
   private static final String USER_NOT_FOUND = "User Not Found!!";
-  private static final String NO_USERS_FOUND = "Users Not Found!!";
+  private static final String NO_USERS_FOUND = "No Users Found!!";
+  private static final String USER_SUCCESSFULLY_PERSISTED ="User was successfully persisted!";
 
   private final PasswordEncoder passwordEncoder;
   private final IUserRepository iUserRepository;
 
   @Override
-  public Mono<String> persistAccount(User user) {
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
-    return iUserRepository.save(user).flatMap(u -> Mono.just("User " + u.getUsername() + " was successfully persisted!"));
+  public Mono<String> persistAccount(AccountPayload accountPayload) {
+    return iUserRepository.save(mapAccountPayloadToUser(accountPayload)).flatMap(u -> Mono.just(USER_SUCCESSFULLY_PERSISTED));
   }
 
   @Override
@@ -51,8 +53,17 @@ public class AccountServiceImpl implements IAccountService {
                           .map(user -> new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), user.getRole()));
   }
 
-  public Mono<Void> verifyOperation(Integer num){
+  private Mono<Void> verifyOperation(Integer num){
     if (num > 0) return Mono.empty();
     return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
+  }
+
+  private User mapAccountPayloadToUser(AccountPayload accountPayload){
+    return User.builder().userId(accountPayload.getUserId())
+                          .userName(accountPayload.getUserName())
+                          .password(passwordEncoder.encode(accountPayload.getPassword()))
+                          .email(accountPayload.getEmail())
+                          .role(Role.valueOf(accountPayload.getRole()))
+                          .build();
   }
 }
