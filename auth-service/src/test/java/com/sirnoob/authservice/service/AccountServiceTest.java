@@ -9,6 +9,7 @@ import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
 import com.sirnoob.authservice.repository.IUserRepository;
 import static com.sirnoob.authservice.util.Provider.generateUserStaticValues;
+import static com.sirnoob.authservice.util.Provider.generateAccountPayloadStaticValues;
 import static com.sirnoob.authservice.util.Provider.PASSWORD;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -59,9 +60,9 @@ class AccountServiceTest {
   @Test
   @DisplayName("persistAccount save/update and return a user account when successful")
   public void persistAccount_ReturnAConfirmationMessage_WhenSuccessful() {
-    StepVerifier.create(iAccountService.persistAccount(generateUserStaticValues()))
+    StepVerifier.create(iAccountService.persistAccount(generateAccountPayloadStaticValues()))
                 .expectSubscription()
-                .expectNext("User " + user.getUsername() + " was successfully persisted!")
+                .expectNext("User was successfully persisted!")
                 .verifyComplete();
   }
 
