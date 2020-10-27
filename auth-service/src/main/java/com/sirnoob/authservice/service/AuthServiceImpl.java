@@ -2,6 +2,7 @@ package com.sirnoob.authservice.service;
 
 import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.domain.User;
+import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
@@ -10,10 +11,12 @@ import com.sirnoob.authservice.repository.IUserRepository;
 import com.sirnoob.authservice.security.JwtProvider;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,7 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
   private final JwtProvider jwtProvider;
   private final PasswordEncoder passwordEncoder;
 
+  @Transactional(readOnly = true)
   @Override
   public Mono<UserDetails> findByUsername(String username) {
     return iUserRepository.findByUserName(username)
@@ -38,6 +42,7 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
                           .cast(UserDetails.class);
   }
 
+  @Transactional
   @Override
   public Mono<AuthResponse> signup(SignUpRequest signUpRequest) {
     return iUserRepository.save(mapSignUpRequestToUser(signUpRequest))
@@ -45,6 +50,7 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
                                                                   .flatMap(refreshToken -> createAuthResponse(userDb, refreshToken)));
   }
 
+  @Transactional
   @Override
   public Mono<AuthResponse> login(LoginRequest loginRequest) {
     String password = loginRequest.getPassword();
@@ -54,6 +60,15 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
                                                                                                       .flatMap(refreshToken -> createAuthResponse(user, refreshToken))));
   }
 
+  @Override
+  public Mono<AccountView> getCurrentUser() {
+    return ReactiveSecurityContextHolder.getContext().map(sc -> sc.getAuthentication().getName())
+                                                    .flatMap(name -> findByUsername(name))
+                                                    .cast(User.class)
+                                                    .map(user -> maptUserToAccountView(user));
+  }
+
+  @Transactional
   @Override
   public Mono<AuthResponse> refreshToken(RefreshTokenRequest refreshTokenRequest) {
     return iRefreshTokenService.validateRefreshToken(refreshTokenRequest.getToken())
@@ -74,6 +89,11 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
                                             .authToken(jwtProvider.generateToken(user))
                                             .refreshToken(refreshToken)
                                             .expiresAt(jwtProvider.getJwtExpirationTime()).build());
+  }
+
+  private AccountView maptUserToAccountView (User user){
+    return user.getRole().name().equals("CUSTOMER") ?  new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), "")
+                                                    :  new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), user.getRole().name());
   }
 
   private Mono<Boolean> verifyPassword(User user, String password) {
