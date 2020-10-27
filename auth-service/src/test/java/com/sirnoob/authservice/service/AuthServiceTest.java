@@ -2,12 +2,13 @@ package com.sirnoob.authservice.service;
 
 import static com.sirnoob.authservice.util.Provider.PASSWORD;
 import static com.sirnoob.authservice.util.Provider.TEST;
+import static com.sirnoob.authservice.util.Provider.TOKEN;
+import static com.sirnoob.authservice.util.Provider.generateLoginRequest;
 import static com.sirnoob.authservice.util.Provider.generateRefreshToken;
-import static com.sirnoob.authservice.util.Provider.getJwtExpirationTime;
 import static com.sirnoob.authservice.util.Provider.generateRefreshTokenRequest;
 import static com.sirnoob.authservice.util.Provider.generateSignUpRequest;
-import static com.sirnoob.authservice.util.Provider.generateLoginRequest;
 import static com.sirnoob.authservice.util.Provider.generateUserForSignUpTest;
+import static com.sirnoob.authservice.util.Provider.getJwtExpirationTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -72,7 +73,7 @@ class AuthServiceTest {
 
     BDDMockito.when(iRefreshTokenService.generateRefreshToken()).thenReturn(token);
 
-    BDDMockito.when(jwtProvider.generateToken(any(User.class))).thenReturn("TOKEN");
+    BDDMockito.when(jwtProvider.generateToken(any(User.class))).thenReturn(TOKEN);
 
     BDDMockito.when(jwtProvider.getJwtExpirationTime()).thenReturn(getJwtExpirationTime());
 
@@ -133,6 +134,7 @@ class AuthServiceTest {
   @DisplayName("refreshTokenRequest return a MonoAuthResponse when successful")
   public void refreshTokenRequest_ReturnAMonoAuthResponse_WhenSuccessful() {
     StepVerifier.create(iAuthService.refreshToken(staticRefreshTokenRequest))
+                .expectSubscription()
                 .assertNext(authResponse -> {
                   assertThat(authResponse.getClass()).isEqualTo(AuthResponse.class);
                   assertThat(authResponse.getUserName()).isEqualTo(TEST);
