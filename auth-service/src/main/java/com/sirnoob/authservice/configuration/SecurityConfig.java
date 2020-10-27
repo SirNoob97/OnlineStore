@@ -5,6 +5,7 @@ import com.sirnoob.authservice.security.AuthenticationManager;
 import com.sirnoob.authservice.security.SecurityContextRepository;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -41,9 +42,12 @@ public class SecurityConfig {
                               .authenticationManager(authenticationManager)
                               .securityContextRepository(securityContextRepository)
                               .authorizeExchange()
+                              .pathMatchers(HttpMethod.GET, "/accounts").hasAuthority(Role.ADMIN.name())
+                              .pathMatchers(HttpMethod.POST, "/accounts").hasAuthority(Role.ADMIN.name())
+                              .pathMatchers(HttpMethod.PUT, "/accounts", "/accounts/**").authenticated()
+                              .pathMatchers(HttpMethod.DELETE, "/accounts/{userId}").authenticated()
+                              .pathMatchers("/auth/users", "/auth/logout", "/auth/refresh-token").authenticated()
                               .pathMatchers("/auth/login", "/auth/signup").permitAll()
-                              .pathMatchers("/auth/logout", "/auth/refresh-token").authenticated()
-                              .pathMatchers("/accounts", "/accounts/**").hasAuthority(Role.ADMIN.name())
                               .and().build();
     //@formatter:on
   }
