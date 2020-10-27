@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import com.sirnoob.authservice.domain.User;
-import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
 import com.sirnoob.authservice.repository.IUserRepository;
 import static com.sirnoob.authservice.util.Provider.generateUserStaticValues;
@@ -105,11 +104,9 @@ class AccountServiceTest {
   @Test
   @DisplayName("getAllAccounts return a users flux when successful")
   public void getAllAccounts_ReturnAAccountViewsFlux_WhenSuccessful() {
-    AccountView account = new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), user.getRole());
-
     StepVerifier.create(iAccountService.getAllAccounts())
                 .expectSubscription()
-                .expectNext(account)
+                .expectNextCount(1)
                 .expectComplete()
                 .verify();
   }
