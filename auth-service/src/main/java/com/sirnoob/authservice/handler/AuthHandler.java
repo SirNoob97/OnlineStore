@@ -1,5 +1,6 @@
 package com.sirnoob.authservice.handler;
 
+import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
@@ -38,6 +39,10 @@ public class AuthHandler {
                         .doOnNext(constraintValidator::validateRequest)
                         .flatMap(iAuthService::login)
                         .flatMap(data -> getServerResponse(HttpStatus.OK, data));
+  }
+
+  public Mono<ServerResponse> getCurrentUser(ServerRequest serverRequest){
+    return  ServerResponse.ok().contentType(JSON).body(iAuthService.getCurrentUser(), AccountView.class);
   }
 
   public Mono<ServerResponse> refreshToken(ServerRequest serverRequest){
