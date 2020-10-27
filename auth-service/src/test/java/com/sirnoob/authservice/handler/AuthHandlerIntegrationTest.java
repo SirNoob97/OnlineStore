@@ -17,6 +17,7 @@ import com.sirnoob.authservice.configuration.Router;
 import com.sirnoob.authservice.configuration.SecurityConfig;
 import com.sirnoob.authservice.domain.RefreshToken;
 import com.sirnoob.authservice.domain.User;
+import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
@@ -41,6 +42,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -222,6 +224,26 @@ class AuthHandlerIntegrationTest {
     verify(iUserRepository, times(0)).findByUserName(anyString());
     verify(passwordEncoder, times(0)).matches(anyString(), anyString());
     verify(iRefreshTokenRepository, times(0)).save(any(RefreshToken.class));
+  }
+
+  @Test
+  @WithMockUser(username = TEST, password = TEST, authorities = "ADMIN")
+  @DisplayName("getCurrentUser return 200 status code and MonoAccountView when successful")
+  public void getCurrentUser_Return200StaticCodeAndMonoAccountView_WhenSuccessful() {
+    webTestClient.get()
+                  .uri("/auth/users")
+                  .accept(JSON)
+                  //.header("Authorization", "Bearer " + authResponse.getAuthToken())
+                  .exchange()
+                  .expectStatus().isOk()
+                  .expectHeader().contentType(JSON)
+                  .expectBody(AccountView.class)
+                  .value(ac -> {
+                    assertThat(ac).isNotNull();
+                    assertThat(ac.getRole()).isEqualTo("ADMIN");
+                  });
+
+    verify(iUserRepository, times(1)).findByUserName(anyString());
   }
 
   @Test
