@@ -93,7 +93,35 @@ class AccountHandlerIntegrationTest{
                   .body(Mono.just(staticAccountPayload), User.class)
                   .exchange()
                   .expectStatus().isCreated()
-                  .expectHeader().contentType(JSON);
+                  .expectHeader().contentType(JSON)
+                  .expectBody(String.class);
+  }
+
+  @Test
+  @DisplayName("createAccount return 403 status code when access is denied")
+  public void createAccount_Return403StatusCode_WhenAccesIsDenied(){
+    webTestClient.post()
+                  .uri("/accounts")
+                  .contentType(JSON)
+                  .accept(JSON)
+                  .body(Mono.just(staticAccountPayload), User.class)
+                  .exchange()
+                  .expectStatus().isForbidden();
+  }
+
+  @Test
+  @WithMockUser(username = TEST, password = TEST, authorities  = ADMIN)
+  @DisplayName("updateAccount return 200 status code and a confirmation message when succesful")
+  public void updateAccount_Return200StatusCodeAndAConfirmationMessage_WhenSuccesful(){
+    webTestClient.put()
+                  .uri("/accounts")
+                  .contentType(JSON)
+                  .accept(JSON)
+                  .body(Mono.just(staticAccountPayload), User.class)
+                  .exchange()
+                  .expectStatus().isOk()
+                  .expectHeader().contentType(JSON)
+                  .expectBody(String.class);
   }
 
   @Test
