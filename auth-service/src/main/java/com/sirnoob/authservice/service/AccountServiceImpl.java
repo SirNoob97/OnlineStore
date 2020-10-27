@@ -50,7 +50,7 @@ public class AccountServiceImpl implements IAccountService {
   public Flux<AccountView> getAllAccounts(){
     return iUserRepository.findAll()
                           .switchIfEmpty(Flux.error(new ResponseStatusException(HttpStatus.NOT_FOUND, NO_USERS_FOUND)))
-                          .map(user -> new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), user.getRole()));
+                          .map(user -> new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), user.getRole().name()));
   }
 
   private Mono<Void> verifyOperation(Integer num){
