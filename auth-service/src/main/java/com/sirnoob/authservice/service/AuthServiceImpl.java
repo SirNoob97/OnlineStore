@@ -1,12 +1,12 @@
 package com.sirnoob.authservice.service;
 
-import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
+import com.sirnoob.authservice.mapper.IUserMapper;
 import com.sirnoob.authservice.repository.IUserRepository;
 import com.sirnoob.authservice.security.JwtProvider;
 
@@ -31,6 +31,7 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
 
   private final IRefreshTokenService iRefreshTokenService;
   private final IUserRepository iUserRepository;
+  private final IUserMapper iUserMapper;
   private final JwtProvider jwtProvider;
   private final PasswordEncoder passwordEncoder;
 
@@ -45,7 +46,7 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
   @Transactional
   @Override
   public Mono<AuthResponse> signup(SignUpRequest signUpRequest) {
-    return iUserRepository.save(mapSignUpRequestToUser(signUpRequest))
+    return iUserRepository.save(iUserMapper.mapSignUpRequestToUser(signUpRequest))
                           .flatMap(userDb -> iRefreshTokenService.generateRefreshToken()
                                                                   .flatMap(refreshToken -> createAuthResponse(userDb, refreshToken)));
   }
@@ -65,7 +66,7 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
     return ReactiveSecurityContextHolder.getContext().map(sc -> sc.getAuthentication().getName())
                                                     .flatMap(name -> findByUsername(name))
                                                     .cast(User.class)
-                                                    .map(user -> maptUserToAccountView(user));
+                                                    .map(user -> iUserMapper.maptUserToAccountView(user));
   }
 
   @Transactional
@@ -77,23 +78,11 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
                                 .flatMap(userDb -> createAuthResponse(userDb, result)));
   }
 
-  private User mapSignUpRequestToUser(SignUpRequest signUpRequest) {
-    return User.builder().userName(signUpRequest.getUserName())
-                          .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                          .email(signUpRequest.getEmail())
-                          .role(Role.CUSTOMER).build();
-  }
-
   private Mono<AuthResponse> createAuthResponse(User user, String refreshToken) {
     return Mono.just(AuthResponse.builder().userName(user.getUsername())
                                             .authToken(jwtProvider.generateToken(user))
                                             .refreshToken(refreshToken)
                                             .expiresAt(jwtProvider.getJwtExpirationTime()).build());
-  }
-
-  private AccountView maptUserToAccountView (User user){
-    return user.getRole().name().equals("CUSTOMER") ?  new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), "")
-                                                    :  new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), user.getRole().name());
   }
 
   private Mono<Boolean> verifyPassword(User user, String password) {

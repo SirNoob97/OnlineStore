@@ -1,10 +1,9 @@
 package com.sirnoob.authservice.service;
 
-import com.sirnoob.authservice.domain.Role;
-import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountPayload;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
+import com.sirnoob.authservice.mapper.IUserMapper;
 import com.sirnoob.authservice.repository.IUserRepository;
 
 import org.springframework.http.HttpStatus;
@@ -28,10 +27,11 @@ public class AccountServiceImpl implements IAccountService {
 
   private final PasswordEncoder passwordEncoder;
   private final IUserRepository iUserRepository;
+  private final IUserMapper iUserMapper;
 
   @Override
   public Mono<String> persistAccount(AccountPayload accountPayload) {
-    return iUserRepository.save(mapAccountPayloadToUser(accountPayload)).flatMap(u -> Mono.just(USER_SUCCESSFULLY_PERSISTED));
+    return iUserRepository.save(iUserMapper.mapAccountPayloadToUser(accountPayload)).flatMap(u -> Mono.just(USER_SUCCESSFULLY_PERSISTED));
   }
 
   @Override
@@ -50,20 +50,11 @@ public class AccountServiceImpl implements IAccountService {
   public Flux<AccountView> getAllAccounts(){
     return iUserRepository.findAll()
                           .switchIfEmpty(Flux.error(new ResponseStatusException(HttpStatus.NOT_FOUND, NO_USERS_FOUND)))
-                          .map(user -> new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), user.getRole().name()));
+                          .map(user -> iUserMapper.maptUserToAccountView(user));
   }
 
   private Mono<Void> verifyOperation(Integer num){
     if (num > 0) return Mono.empty();
     return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
-  }
-
-  private User mapAccountPayloadToUser(AccountPayload accountPayload){
-    return User.builder().userId(accountPayload.getUserId())
-                          .userName(accountPayload.getUserName())
-                          .password(passwordEncoder.encode(accountPayload.getPassword()))
-                          .email(accountPayload.getEmail())
-                          .role(Role.valueOf(accountPayload.getRole()))
-                          .build();
   }
 }
