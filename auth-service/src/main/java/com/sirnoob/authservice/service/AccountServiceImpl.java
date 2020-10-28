@@ -17,7 +17,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class AccountServiceImpl implements IAccountService {
 
@@ -29,6 +28,7 @@ public class AccountServiceImpl implements IAccountService {
   private final IUserRepository iUserRepository;
   private final IUserMapper iUserMapper;
 
+  @Transactional
   @Override
   public Mono<String> persistAccount(AccountPayload accountPayload) {
     return iUserRepository.save(iUserMapper.mapAccountPayloadToUser(accountPayload)).flatMap(u -> Mono.just(USER_SUCCESSFULLY_PERSISTED));
@@ -45,7 +45,6 @@ public class AccountServiceImpl implements IAccountService {
     return iUserRepository.deleteByUserId(userId).flatMap(num -> verifyOperation(num));
   }
 
-  @Transactional(readOnly = true)
   @Override
   public Flux<AccountView> getAllAccounts(){
     return iUserRepository.findAll()
@@ -53,8 +52,7 @@ public class AccountServiceImpl implements IAccountService {
                           .map(user -> iUserMapper.maptUserToAccountView(user));
   }
 
-  private Mono<Void> verifyOperation(Integer num){
-    if (num > 0) return Mono.empty();
-    return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
+  private <T> Mono<T> verifyOperation(Integer num){
+    return num > 0 ? Mono.empty() : Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
   }
 }
