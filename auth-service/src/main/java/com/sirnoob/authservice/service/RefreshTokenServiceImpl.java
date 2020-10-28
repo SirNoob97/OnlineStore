@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class RefreshTokenServiceImpl implements IRefreshTokenService {
 
@@ -22,6 +21,7 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
 
     private final IRefreshTokenRepository iRefreshTokenRepository;
 
+    @Transactional
     @Override
     public Mono<String> generateRefreshToken() {
       return iRefreshTokenRepository.save(RefreshToken.builder().token(UUID.randomUUID().toString()).build())

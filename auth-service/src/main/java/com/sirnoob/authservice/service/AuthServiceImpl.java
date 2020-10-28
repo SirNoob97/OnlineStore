@@ -35,7 +35,6 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
   private final JwtProvider jwtProvider;
   private final PasswordEncoder passwordEncoder;
 
-  @Transactional(readOnly = true)
   @Override
   public Mono<UserDetails> findByUsername(String username) {
     return iUserRepository.findByUserName(username)
@@ -51,7 +50,6 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
                                                                   .flatMap(refreshToken -> createAuthResponse(userDb, refreshToken)));
   }
 
-  @Transactional
   @Override
   public Mono<AuthResponse> login(LoginRequest loginRequest) {
     String password = loginRequest.getPassword();
@@ -69,7 +67,6 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
                                                     .map(user -> iUserMapper.maptUserToAccountView(user));
   }
 
-  @Transactional
   @Override
   public Mono<AuthResponse> refreshToken(RefreshTokenRequest refreshTokenRequest) {
     return iRefreshTokenService.validateRefreshToken(refreshTokenRequest.getToken())
