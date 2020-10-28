@@ -1,12 +1,6 @@
 package com.sirnoob.authservice.handler;
 
-import static com.sirnoob.authservice.util.Provider.JSON;
-import static com.sirnoob.authservice.util.Provider.PASSWORD;
-import static com.sirnoob.authservice.util.Provider.TEST;
-import static com.sirnoob.authservice.util.Provider.generateLoginRequest;
-import static com.sirnoob.authservice.util.Provider.generateRefreshTokenForIT;
-import static com.sirnoob.authservice.util.Provider.generateSignUpRequest;
-import static com.sirnoob.authservice.util.Provider.generateUserStaticValuesForIT;
+import static com.sirnoob.authservice.util.Provider.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -22,6 +16,7 @@ import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
+import com.sirnoob.authservice.mapper.IUserMapper;
 import com.sirnoob.authservice.repository.IRefreshTokenRepository;
 import com.sirnoob.authservice.repository.IUserRepository;
 import com.sirnoob.authservice.security.AuthenticationManager;
@@ -58,6 +53,9 @@ class AuthHandlerIntegrationTest {
   private IUserRepository iUserRepository;
 
   @MockBean
+  private IUserMapper iUserMapper;
+
+  @MockBean
   private IRefreshTokenRepository iRefreshTokenRepository;
 
   @MockBean
@@ -70,6 +68,8 @@ class AuthHandlerIntegrationTest {
 
   private static final User staticUser = generateUserStaticValuesForIT();
   private static final LoginRequest staticLoginRequest = generateLoginRequest();
+  private static final RefreshTokenRequest staticRefreshTokenRequest = new RefreshTokenRequest(TOKEN, TEST);
+  private static final AccountView staticAccountView = new AccountView(1L, TEST, TEST_EMAIL, ADMIN);
 
   @BeforeEach
   public void setUp() {
@@ -79,11 +79,15 @@ class AuthHandlerIntegrationTest {
 
     Mono<RefreshToken> refreshToken = Mono.just(generateRefreshTokenForIT());
 
+    BDDMockito.when(iUserMapper.mapSignUpRequestToUser(any(SignUpRequest.class))).thenReturn(staticUser);
+
     BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(user);
 
     BDDMockito.when(iRefreshTokenRepository.save(any(RefreshToken.class))).thenReturn(refreshToken);
 
     BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
+
+    BDDMockito.when(iUserMapper.maptUserToAccountView(any(User.class))).thenReturn(staticAccountView);
 
     BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(user);
 
@@ -117,16 +121,13 @@ class AuthHandlerIntegrationTest {
 
     verify(iUserRepository, times(1)).save(any(User.class));
     verify(iRefreshTokenRepository, times(1)).save(any(RefreshToken.class));
-    verify(passwordEncoder, times(1)).encode(anyString());
+    verify(iUserMapper, times(1)).mapSignUpRequestToUser(any(SignUpRequest.class));
   }
 
   @Test
   @DisplayName("signup return 400 status code when SignUpRequest has invalid fields")
   public void signup_Return400StatusCode_WhenSignUpRequestHasInvalidFields() {
-    SignUpRequest invalidSignUpRequest = SignUpRequest.builder().userName("")
-                                                          .email("")
-                                                          .password("")
-                                                          .build();
+    SignUpRequest invalidSignUpRequest = SignUpRequest.builder().userName("").email("").password("").build();
 
     webTestClient.post()
                   .uri("/auth/signup")
@@ -208,7 +209,7 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  @DisplayName("login return 400 status code when passwords does not match")
+  @DisplayName("login return 400 status code when LoginRequest has invalid fields")
   public void login_Return400StatusCode_WhenLoginRequestHasInvalidFields() {
     LoginRequest invalidLoginRequest = new LoginRequest("", "");
     webTestClient.post()
@@ -227,48 +228,46 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  @WithMockUser(username = TEST, password = TEST, authorities = "ADMIN")
+  @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
   @DisplayName("getCurrentUser return 200 status code and MonoAccountView when successful")
   public void getCurrentUser_Return200StaticCodeAndMonoAccountView_WhenSuccessful() {
     webTestClient.get()
                   .uri("/auth/users")
                   .accept(JSON)
-                  //.header("Authorization", "Bearer " + authResponse.getAuthToken())
                   .exchange()
                   .expectStatus().isOk()
                   .expectHeader().contentType(JSON)
                   .expectBody(AccountView.class)
                   .value(ac -> {
                     assertThat(ac).isNotNull();
-                    assertThat(ac.getRole()).isEqualTo("ADMIN");
+                    assertThat(ac.getRole()).isEqualTo(ADMIN);
                   });
 
     verify(iUserRepository, times(1)).findByUserName(anyString());
   }
 
   @Test
+  @DisplayName("getCurrentUser return 403 status code when user is not authenticated")
+  public void getCurrentUser_Return403StaticCode_WhenUserIsNotAuthenticated() {
+    webTestClient.get()
+                  .uri("/auth/users")
+                  .accept(JSON)
+                  .exchange()
+                  .expectStatus().isForbidden()
+                  .expectBody(Void.class);
+
+    verify(iUserRepository, times(0)).findByUserName(anyString());
+  }
+
+  @Test
+  @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
   @DisplayName("refreshToken return AuthResponse and 200 status code when successful")
   public void refreshToken_ReturnAuthResponseAnd200StatusCode_WhenSuccessful() {
-    AuthResponse authResponse = webTestClient.post()
-                                .uri("/auth/login")
-                                .contentType(JSON)
-                                .accept(JSON)
-                                .body(Mono.just(staticLoginRequest), LoginRequest.class)
-                                .exchange()
-                                .expectStatus().isOk()
-                                .expectHeader().contentType(JSON)
-                                .expectBody(AuthResponse.class)
-                                .returnResult()
-                                .getResponseBody();
-
-    RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest(authResponse.getRefreshToken(), authResponse.getUserName());
-
     webTestClient.post()
                   .uri("/auth/refresh-token")
                   .contentType(JSON)
                   .accept(JSON)
-                  .header("Authorization", "Bearer " + authResponse.getAuthToken())
-                  .body(Mono.just(refreshTokenRequest), RefreshTokenRequest.class)
+                  .body(Mono.just(staticRefreshTokenRequest), RefreshTokenRequest.class)
                   .exchange()
                   .expectStatus().isOk()
                   .expectHeader().contentType(JSON)
@@ -276,27 +275,22 @@ class AuthHandlerIntegrationTest {
                   .value(authR -> {
                     assertThat(authR).isNotNull();
                     assertThat(authR.getUserName()).isNotNull();
-                    assertThat(authR.getUserName()).isEqualTo(authResponse.getUserName());
                     assertThat(authR.getUserName()).isEqualTo(staticLoginRequest.getUserName());
                     assertThat(authR.getAuthToken()).isNotNull();
                   });
 
-    verify(iRefreshTokenRepository, times(1)).save(any(RefreshToken.class));
     verify(iRefreshTokenRepository, times(1)).findByToken(anyString());
-    verify(iUserRepository, times(2)).findByUserName(anyString());
-    verify(passwordEncoder, times(1)).matches(anyString(), anyString());
+    verify(iUserRepository, times(1)).findByUserName(anyString());
   }
 
   @Test
   @DisplayName("refreshToken return 403 status code when user is not authenticated")
   public void refreshToken_Return403StatusCode_WhenUserIsNotAuthenticated() {
-    RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest(TEST, TEST);
-
     webTestClient.post()
                   .uri("/auth/refresh-token")
                   .contentType(JSON)
                   .accept(JSON)
-                  .body(Mono.just(refreshTokenRequest), RefreshTokenRequest.class)
+                  .body(Mono.just(staticRefreshTokenRequest), RefreshTokenRequest.class)
                   .exchange()
                   .expectStatus().isForbidden()
                   .expectBody(Void.class);
@@ -308,25 +302,13 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
+  @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
   @DisplayName("refreshToken return 400 status code when RefreshTokenRequest has invalid fields")
   public void refreshToken_Return400StatusCode_WhenRefreshTokenRequestHasInvalidFields() {
-    AuthResponse authResponse = webTestClient.post()
-                                .uri("/auth/login")
-                                .contentType(JSON)
-                                .accept(JSON)
-                                .body(Mono.just(staticLoginRequest), LoginRequest.class)
-                                .exchange()
-                                .expectStatus().isOk()
-                                .expectHeader().contentType(JSON)
-                                .expectBody(AuthResponse.class)
-                                .returnResult()
-                                .getResponseBody();
-
     webTestClient.post()
                   .uri("/auth/refresh-token")
                   .contentType(JSON)
                   .accept(JSON)
-                  .header("Authorization", "Bearer " + authResponse.getAuthToken())
                   .body(Mono.just(new RefreshTokenRequest()), RefreshTokenRequest.class)
                   .exchange()
                   .expectStatus().isBadRequest()
@@ -334,34 +316,18 @@ class AuthHandlerIntegrationTest {
                   .expectBody(Void.class);
 
     verify(iRefreshTokenRepository, times(0)).findByToken(anyString());
-    verify(iRefreshTokenRepository, times(1)).save(any(RefreshToken.class));
-    verify(iUserRepository, times(1)).findByUserName(anyString());
-    verify(passwordEncoder, times(1)).matches(anyString(), anyString());
+    verify(iUserRepository, times(0)).findByUserName(anyString());
   }
 
   @Test
+  @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
   @DisplayName("logout return 204 status code when successful")
   public void logout_Return204StatusCode_WhenSuccessful() {
-    AuthResponse authResponse = webTestClient.post()
-                                .uri("/auth/login")
-                                .contentType(JSON)
-                                .accept(JSON)
-                                .body(Mono.just(staticLoginRequest), LoginRequest.class)
-                                .exchange()
-                                .expectStatus().isOk()
-                                .expectHeader().contentType(JSON)
-                                .expectBody(AuthResponse.class)
-                                .returnResult()
-                                .getResponseBody();
-
-    RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest(authResponse.getRefreshToken(), authResponse.getUserName());
-
     webTestClient.post()
                   .uri("/auth/logout")
                   .contentType(JSON)
                   .accept(JSON)
-                  .header("Authorization", "Bearer " + authResponse.getAuthToken())
-                  .body(Mono.just(refreshTokenRequest), RefreshTokenRequest.class)
+                  .body(Mono.just(staticRefreshTokenRequest), RefreshTokenRequest.class)
                   .exchange()
                   .expectStatus().isNoContent()
                   .expectBody(Void.class);
@@ -370,29 +336,16 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
+  @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
   @DisplayName("logout return 404 status code when refresh token was not found")
   public void logout_Return404StatusCode_WhenRefreshTokenWasNotFound() {
     BDDMockito.when(iRefreshTokenRepository.deleteByToken(anyString())).thenReturn(Mono.just(0));
-    AuthResponse authResponse = webTestClient.post()
-                                .uri("/auth/login")
-                                .contentType(JSON)
-                                .accept(JSON)
-                                .body(Mono.just(staticLoginRequest), LoginRequest.class)
-                                .exchange()
-                                .expectStatus().isOk()
-                                .expectHeader().contentType(JSON)
-                                .expectBody(AuthResponse.class)
-                                .returnResult()
-                                .getResponseBody();
-
-    RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest(authResponse.getRefreshToken(), authResponse.getUserName());
 
     webTestClient.post()
                   .uri("/auth/logout")
                   .contentType(JSON)
                   .accept(JSON)
-                  .header("Authorization", "Bearer " + authResponse.getAuthToken())
-                  .body(Mono.just(refreshTokenRequest), RefreshTokenRequest.class)
+                  .body(Mono.just(staticRefreshTokenRequest), RefreshTokenRequest.class)
                   .exchange()
                   .expectStatus().isNotFound()
                   .expectBody(Void.class);
@@ -403,13 +356,11 @@ class AuthHandlerIntegrationTest {
   @Test
   @DisplayName("logout return 403 status code when user is not authenticated")
   public void logout_Return403StatusCode_WhenUserIsNotAuthenticated() {
-    RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest(TEST, TEST);
-
     webTestClient.post()
                   .uri("/auth/logout")
                   .contentType(JSON)
                   .accept(JSON)
-                  .body(Mono.just(refreshTokenRequest), RefreshTokenRequest.class)
+                  .body(Mono.just(staticRefreshTokenRequest), RefreshTokenRequest.class)
                   .exchange()
                   .expectStatus().isForbidden()
                   .expectBody(Void.class);

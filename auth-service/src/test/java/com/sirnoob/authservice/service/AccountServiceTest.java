@@ -5,11 +5,12 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import com.sirnoob.authservice.domain.User;
+import com.sirnoob.authservice.dto.AccountPayload;
+import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
+import com.sirnoob.authservice.mapper.IUserMapper;
 import com.sirnoob.authservice.repository.IUserRepository;
-import static com.sirnoob.authservice.util.Provider.generateUserStaticValues;
-import static com.sirnoob.authservice.util.Provider.generateAccountPayloadStaticValues;
-import static com.sirnoob.authservice.util.Provider.PASSWORD;
+import static com.sirnoob.authservice.util.Provider.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,13 +34,17 @@ class AccountServiceTest {
   @Mock
   private IUserRepository iUserRepository;
 
+  @Mock
+  private IUserMapper iUserMapper;
+
   private IAccountService iAccountService;
 
   private static final User user = generateUserStaticValues();
+  private static final AccountView accountView = new AccountView(1L, TEST, TEST_EMAIL, EMPLOYEE);
 
   @BeforeEach
   public void setUp() {
-    iAccountService = new AccountServiceImpl(passwordEncoder, iUserRepository);
+    iAccountService = new AccountServiceImpl(passwordEncoder, iUserRepository, iUserMapper);
 
     Mono<User> monoUser = Mono.just(user);
 
@@ -47,11 +52,15 @@ class AccountServiceTest {
 
     BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
 
+    BDDMockito.when(iUserMapper.mapAccountPayloadToUser(any(AccountPayload.class))).thenReturn(user);
+
     BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(monoUser);
 
     BDDMockito.when(iUserRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(1));
 
     BDDMockito.when(iUserRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(1));
+
+    BDDMockito.when(iUserMapper.maptUserToAccountView(any(User.class))).thenReturn(accountView);
 
     BDDMockito.when(iUserRepository.findAll()).thenReturn(fluxUser);
   }

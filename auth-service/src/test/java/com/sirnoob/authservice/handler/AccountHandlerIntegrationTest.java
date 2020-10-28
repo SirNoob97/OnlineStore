@@ -7,10 +7,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 import com.sirnoob.authservice.configuration.Router;
 import com.sirnoob.authservice.configuration.SecurityConfig;
-import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountPayload;
+import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
+import com.sirnoob.authservice.mapper.IUserMapper;
 import com.sirnoob.authservice.repository.IRefreshTokenRepository;
 import com.sirnoob.authservice.repository.IUserRepository;
 import com.sirnoob.authservice.security.AuthenticationManager;
@@ -53,27 +54,34 @@ class AccountHandlerIntegrationTest{
   @MockBean
   private PasswordEncoder passwordEncoder;
 
+  @MockBean
+  private IUserMapper iUserMapper;
+
   @Autowired
   private ApplicationContext applicationContext;
 
   private WebTestClient webTestClient;
 
-  private static final String ADMIN = "ADMIN";
-  private static final User staticUser = User.builder().userName(NEW_USER).password(PASSWORD).email(TEST_EMAIL).role(Role.EMPLOYEE).build();
+  private static final User staticUser = generateUserStaticValuesForIT();
+  private static final AccountView staticAccountView = new AccountView(1L, TEST, TEST_EMAIL, EMPLOYEE);
   private static final PasswordUpdateDto staticPasswordUpdateDto = new PasswordUpdateDto(1L, PASSWORD);
-  private static final AccountPayload staticAccountPayload = AccountPayload.builder().userName(NEW_USER).password(PASSWORD).email(TEST_EMAIL).role("EMPLOYEE").build();
+  private static final AccountPayload staticAccountPayload = AccountPayload.builder().userName(NEW_USER).password(PASSWORD).email(TEST_EMAIL).role(EMPLOYEE).build();
 
   @BeforeEach
   public void  setUp() {
     webTestClient = WebTestClient.bindToApplicationContext(applicationContext).build();
 
-    Mono<User> user = Mono.just(generateUserStaticValuesForIT());
+    Mono<User> user = Mono.just(staticUser);
 
     BDDMockito.when(iUserRepository.findByUserName(TEST)).thenReturn(user);
 
     BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
 
+    BDDMockito.when(iUserMapper.mapAccountPayloadToUser(any(AccountPayload.class))).thenReturn(staticUser);
+
     BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(user);
+
+    BDDMockito.when(iUserMapper.maptUserToAccountView(any(User.class))).thenReturn(staticAccountView);
 
     BDDMockito.when(iUserRepository.findAll()).thenReturn(Flux.just(staticUser));
 
@@ -99,7 +107,7 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @DisplayName("createAccount return 403 status code when access is denied")
-  public void createAccount_Return403StatusCode_WhenAccesIsDenied(){
+  public void createAccount_Return403StatusCode_WhenUserIsNotAuhenticated(){
     webTestClient.post()
                   .uri("/accounts")
                   .contentType(JSON)
@@ -107,6 +115,20 @@ class AccountHandlerIntegrationTest{
                   .body(Mono.just(staticAccountPayload), User.class)
                   .exchange()
                   .expectStatus().isForbidden();
+  }
+
+
+  @Test
+  @WithMockUser(username = TEST, password = TEST, authorities  = EMPLOYEE)
+  @DisplayName("createAccount return 403 status code when access is denied")
+  public void createAccount_Return401StatusCode_WhenAccessIsDenied(){
+    webTestClient.post()
+                  .uri("/accounts")
+                  .contentType(JSON)
+                  .accept(JSON)
+                  .body(Mono.just(staticAccountPayload), User.class)
+                  .exchange()
+                  .expectStatus().isUnauthorized();
   }
 
   @Test
@@ -151,10 +173,8 @@ class AccountHandlerIntegrationTest{
   }
 
   @Test
-  @DisplayName("updatePassword return 403 status code when access is denied")
-  public void updatePassword_Return403StatusCode_WhenAccessIsDenied() {
-    BDDMockito.when(iUserRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(0));
-
+  @DisplayName("updatePassword return 403 status code when user is not authenticated")
+  public void updatePassword_Return403StatusCode_WhenUserIsNotAuthenticated() {
     webTestClient.put()
                   .uri("/accounts/passwords")
                   .contentType(JSON)
@@ -186,8 +206,8 @@ class AccountHandlerIntegrationTest{
   }
 
   @Test
-  @DisplayName("getAllAccounts return 403 status code and when access is denied")
-  public void deleteByUserId_Return403StatusCode_WhenAccessIsDenied() {
+  @DisplayName("getAllAccounts return 403 status code and when user is not authenticated")
+  public void deleteByUserId_Return403StatusCode_WhenUserIsNotAuthenticated() {
     webTestClient.delete()
                   .uri("/accounts/1")
                   .exchange()
@@ -221,14 +241,25 @@ class AccountHandlerIntegrationTest{
   }
 
   @Test
-  @DisplayName("getAllAccounts return 403 status code and when access is denied")
-  public void getAllAccounts_Return403StatusCode_WhenAccessIsDenied() {
+  @DisplayName("getAllAccounts return 403 status code and when user is not authenticated")
+  public void getAllAccounts_Return403StatusCode_WhenUserIsNotAuthenticated() {
+    webTestClient.get()
+                  .uri("/accounts")
+                  .accept(JSON)
+                  .exchange()
+                  .expectStatus().isForbidden();
+  }
+
+  @Test
+  @WithMockUser(username = TEST, password = TEST, authorities  = EMPLOYEE)
+  @DisplayName("getAllAccounts return 404 status code and when access is denied")
+  public void getAllAccounts_Return401StatusCode_WhenAccesIsDenied() {
     BDDMockito.when(iUserRepository.findAll()).thenReturn(Flux.empty());
 
     webTestClient.get()
                   .uri("/accounts")
                   .accept(JSON)
                   .exchange()
-                  .expectStatus().isForbidden();
+                  .expectStatus().isUnauthorized();
   }
 }

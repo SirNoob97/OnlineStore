@@ -19,6 +19,7 @@ import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
+import com.sirnoob.authservice.mapper.IUserMapper;
 import com.sirnoob.authservice.repository.IUserRepository;
 import com.sirnoob.authservice.security.JwtProvider;
 
@@ -45,6 +46,9 @@ class AuthServiceTest {
   private IUserRepository iUserRepository;
 
   @Mock
+  private IUserMapper iUserMapper;
+
+  @Mock
   private JwtProvider jwtProvider;
 
   @Mock
@@ -53,6 +57,7 @@ class AuthServiceTest {
   private IAuthService iAuthService;
 
 
+  private static final User staticUser = generateUserForSignUpTest();
   private static final RefreshToken staticRefreshToken = generateRefreshToken();
   private static final LoginRequest staticLoginRequest = generateLoginRequest();
   private static final SignUpRequest staticSignUpRequest = generateSignUpRequest();
@@ -61,13 +66,15 @@ class AuthServiceTest {
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    iAuthService = new AuthServiceImpl(iRefreshTokenService, iUserRepository, jwtProvider, passwordEncoder);
+    iAuthService = new AuthServiceImpl(iRefreshTokenService, iUserRepository, iUserMapper, jwtProvider, passwordEncoder);
 
-    Mono<User> monoUser = Mono.just(generateUserForSignUpTest());
+    Mono<User> monoUser = Mono.just(staticUser);
 
     Mono<String> token = Mono.just(staticRefreshToken.getToken());
 
     BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
+
+    BDDMockito.when(iUserMapper.mapSignUpRequestToUser(any(SignUpRequest.class))).thenReturn(staticUser);
 
     BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(monoUser);
 
