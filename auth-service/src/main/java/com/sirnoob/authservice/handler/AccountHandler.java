@@ -44,7 +44,10 @@ public class AccountHandler {
     //iAccountService.deleteAccount(userId).subscribe();
 
     //return ServerResponse.noContent().build();
-    return ServerResponse.noContent().build(iAccountService.deleteAccount(userId));
+
+    //return ServerResponse.noContent().build(iAccountService.deleteAccount(userId).then());
+
+    return iAccountService.deleteAccount(userId).flatMap(v -> ServerResponse.noContent().build());
   }
 
   public Mono<ServerResponse> getAllAccounts(ServerRequest serverRequest){
