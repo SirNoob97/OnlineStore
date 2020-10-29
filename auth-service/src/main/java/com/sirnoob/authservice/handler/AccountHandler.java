@@ -41,6 +41,9 @@ public class AccountHandler {
   public Mono<ServerResponse> deleteAccountById(ServerRequest serverRequest) {
     Long userId = Long.valueOf(serverRequest.pathVariable("userId"));
 
+    //iAccountService.deleteAccount(userId).subscribe();
+
+    //return ServerResponse.noContent().build();
     return ServerResponse.noContent().build(iAccountService.deleteAccount(userId));
   }
 
