@@ -34,15 +34,18 @@ public class AccountServiceImpl implements IAccountService {
     return iUserRepository.save(iUserMapper.mapAccountPayloadToUser(accountPayload)).flatMap(u -> Mono.just(USER_SUCCESSFULLY_PERSISTED));
   }
 
+  @Transactional
   @Override
   public Mono<Void> updatePassword(PasswordUpdateDto password) {
     return iUserRepository.updatePasswordById(password.getUserId(), passwordEncoder.encode(password.getPassword()))
                           .flatMap(num -> verifyOperation(num));
   }
 
+  @Transactional
   @Override
   public Mono<Void> deleteAccount(Long userId) {
-    return iUserRepository.deleteByUserId(userId).flatMap(num -> verifyOperation(num));
+    return iUserRepository.deleteByUserId(userId)
+      .flatMap(num -> verifyOperation(num));
   }
 
   @Override

@@ -35,6 +35,7 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
                                     .map(RefreshToken::getToken);
     }
 
+    @Transactional
     @Override
     public Mono<Void> deleteRefreshToken(String token) {
       return iRefreshTokenRepository.deleteByToken(token)

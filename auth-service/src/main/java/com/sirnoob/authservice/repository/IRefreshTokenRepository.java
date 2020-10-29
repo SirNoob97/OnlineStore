@@ -4,7 +4,6 @@ import com.sirnoob.authservice.domain.RefreshToken;
 
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import reactor.core.publisher.Mono;
 
@@ -13,6 +12,5 @@ public interface IRefreshTokenRepository extends ReactiveCrudRepository<RefreshT
 
   public Mono<RefreshToken> findByToken(String token);
 
-  @Transactional
   public Mono<Integer> deleteByToken(String token);
 }
