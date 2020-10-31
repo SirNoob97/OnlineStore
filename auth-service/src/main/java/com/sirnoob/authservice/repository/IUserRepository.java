@@ -17,6 +17,6 @@ public interface IUserRepository extends R2dbcRepository<User, Long> {
   public Mono<Integer> deleteByUserId(Long userId);
 
   @Modifying
-  @Query("UPDATE users SET users.password = :password WHERE users.id = :userId")
+  @Query("UPDATE users SET password = :password WHERE users.id = :userId")
   public Mono<Integer> updatePasswordById(Long userId, String password);
 }
