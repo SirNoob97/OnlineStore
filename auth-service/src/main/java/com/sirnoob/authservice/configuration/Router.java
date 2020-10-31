@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.handler.ResponseStatusExceptionHandler;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
@@ -21,6 +22,11 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 public class Router {
 
   private static final MediaType JSON = MediaType.APPLICATION_JSON;
+
+  @Bean
+  public ResponseStatusExceptionHandler handler (){
+    return new ResponseStatusExceptionHandler();
+  }
 
   @Bean
   public RouterFunction<ServerResponse> authEndPoints (AuthHandler authHandler){
