@@ -120,7 +120,7 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = EMPLOYEE)
-  @DisplayName("createAccount return 403 status code when access is denied")
+  @DisplayName("createAccount return 401 status code when access is denied")
   public void createAccount_Return401StatusCode_WhenAccessIsDenied(){
     webTestClient.post()
                   .uri("/accounts")
@@ -169,7 +169,9 @@ class AccountHandlerIntegrationTest{
                   .contentType(JSON)
                   .body(Mono.just(staticPasswordUpdateDto), PasswordUpdateDto.class)
                   .exchange()
-                  .expectStatus().isNotFound();
+                  .expectStatus().isNotFound()
+                  .expectHeader().contentType(JSON)
+                  .expectBody(Void.class);
   }
 
   @Test
@@ -202,7 +204,9 @@ class AccountHandlerIntegrationTest{
     webTestClient.delete()
                   .uri("/accounts/1")
                   .exchange()
-                  .expectStatus().isNotFound();
+                  .expectStatus().isNotFound()
+                  .expectHeader().contentType(JSON)
+                  .expectBody(Void.class);
   }
 
   @Test
@@ -237,7 +241,8 @@ class AccountHandlerIntegrationTest{
                   .accept(JSON)
                   .exchange()
                   .expectHeader().contentType(JSON)
-                  .expectStatus().isNotFound();
+                  .expectStatus().isNotFound()
+                  .expectBody(Void.class);
   }
 
   @Test
@@ -252,7 +257,7 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = EMPLOYEE)
-  @DisplayName("getAllAccounts return 404 status code and when access is denied")
+  @DisplayName("getAllAccounts return 401 status code and when access is denied")
   public void getAllAccounts_Return401StatusCode_WhenAccesIsDenied() {
     BDDMockito.when(iUserRepository.findAll()).thenReturn(Flux.empty());
 

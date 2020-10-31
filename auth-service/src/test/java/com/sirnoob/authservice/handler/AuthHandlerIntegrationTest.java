@@ -348,6 +348,7 @@ class AuthHandlerIntegrationTest {
                   .body(Mono.just(staticRefreshTokenRequest), RefreshTokenRequest.class)
                   .exchange()
                   .expectStatus().isNotFound()
+                  .expectHeader().contentType(JSON)
                   .expectBody(Void.class);
 
     verify(iRefreshTokenRepository, times(1)).deleteByToken(anyString());
