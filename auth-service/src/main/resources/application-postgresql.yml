@@ -1,0 +1,3 @@
+jwt:
+  expiration:
+    time: 1200000 #20 min

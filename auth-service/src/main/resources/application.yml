@@ -4,16 +4,12 @@ server:
     include-message: always
     include-binding-errors: always
 
+spring:
+  application:
+    name: auth-service
+  #profiles:
+    #active: postgresql
+
 logging:
-  level:
-    org:
-      springframework:
-        data:
-          r2dbc: DEBUG
-        transaction: TRACE
   pattern:
     console: "%clr(%d{yy-MM-dd E HH:mm:ss.SSS}){blue} %clr(|%-5p|) %clr(${PID}){magenta} %clr(---){faint} %clr([%8.15t]){cyan} %clr(%-40.40logger{0}){blue} %clr(:){red} %clr(%m){faint}%n"
-
-jwt:
-  expiration:
-    time: 1200000

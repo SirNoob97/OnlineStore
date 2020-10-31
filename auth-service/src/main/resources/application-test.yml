@@ -1,0 +1,12 @@
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          r2dbc: DEBUG
+        transaction: TRACE
+
+
+jwt:
+  expiration:
+    time: 600000 #10 min
