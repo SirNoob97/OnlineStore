@@ -13,6 +13,8 @@ public class LoginRequest {
   @Size(max = 60, message = "The Maximum Characters Allowed For The Password Is {max}!!")
   private String password;
 
+  public LoginRequest(){}
+
   public LoginRequest(String userName, String password) {
     this.userName = userName;
     this.password = password;
