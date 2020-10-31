@@ -13,9 +13,3 @@ spring:
         #show_sql: true
         #use_sql_comments: false
         #format_sql: false
-
-
-server:
-  error:
-    include-message: always
-    include-binding-errors: always
