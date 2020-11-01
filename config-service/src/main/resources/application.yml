@@ -8,11 +8,10 @@ spring:
     config:
       server:
         git:
-          uri: git@github.com:SirNoob97/OnlineStore.git
+          uri: https://github.com/SirNoob97/OnlineStore.git
           search-paths: config-files
-          username: ${GET_USER}
-          password: ${GET_PASSWORD}
-    fail-fast: true
+          username: ${GIT_USER}
+          password: ${GIT_PASSWORD}
 
 security:
   user:
