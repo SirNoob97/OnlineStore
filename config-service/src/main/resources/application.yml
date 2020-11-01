@@ -1,7 +1,9 @@
 server:
   port: 8081
-      
+
 spring:
+  application:
+    name: config-service
   cloud:
     config:
       server:
@@ -10,6 +12,7 @@ spring:
           search-paths: config-files
           username: ${GET_USER}
           password: ${GET_PASSWORD}
+    fail-fast: true
 
 security:
   user:
