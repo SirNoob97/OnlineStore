@@ -31,6 +31,7 @@ Cloud Gateway to have a single acces endpoint.
 Spring Security and JWT for the authentication and authorization of the app.
 
 #### Product-Service [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
+#### Auth-Service [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/auth-service/README.md)
 ---
 This project will only be to demonstrate the knowledge that I have acquired so far this year.
 
