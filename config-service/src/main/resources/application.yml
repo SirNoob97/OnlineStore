@@ -13,7 +13,7 @@ spring:
           username: ${GIT_USER}
           password: ${GIT_PASSWORD}
 
-security:
-  user:
-    name: root
-    password: root
+  security:
+    user:
+      name: root
+      password: root
