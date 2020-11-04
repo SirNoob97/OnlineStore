@@ -1,5 +1,4 @@
 server:
-  #port: 8091
   error:
     include-message: always
     include-binding-errors: always
@@ -7,14 +6,8 @@ server:
 spring:
   application:
     name: product-service
-  profiles:
-    active: test
   cloud:
     config:
       uri: http://localhost:8081
       username: root
       password: root
-
-#logging:
-  #pattern:
-    #console: "%clr(%d{yy-MM-dd E HH:mm:ss.SSS}){blue} %clr(|%-5p|) %clr(${PID}){magenta} %clr(---){faint} %clr([%8.15t]){cyan} %clr(%-40.40logger{0}){blue} %clr(:){red} %clr(%m){faint}%n"
