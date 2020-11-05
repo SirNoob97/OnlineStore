@@ -2,9 +2,9 @@ package com.sirnoob.gatewayservice;
 
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
-import org.springframework.context.annotation.Configuration;
+//import org.springframework.context.annotation.Configuration;
 
-@Configuration
+//@Configuration
 public class Router {
 
   public RouteLocator routeLocator(RouteLocatorBuilder routeLocatorBuilder) {
