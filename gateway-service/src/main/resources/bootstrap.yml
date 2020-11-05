@@ -7,32 +7,6 @@ spring:
       username: root
       password: root
 
-    gateway:
-      discovery:
-        locator:
-          enabled: true
-      routes:
-        - id: auth-service
-          uri: lb://auth-service
-          predicates:
-            - Path=/auth/**
-        - id: auth-service
-          uri: lb://auth-service
-          predicates:
-            - Path=/accounts/**
-        - id: product-service
-          uri: lb://product-service
-          predicates:
-            - Path=/products/**
-        - id: product-service
-          uri: lb://product-service
-          predicates:
-            - Path=/main-categories/**
-        - id: product-service
-          uri: lb://product-service
-          predicates:
-            - Path=/sub-categories/**
-
 server:
   error:
     include-message: always
