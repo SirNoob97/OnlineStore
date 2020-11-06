@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: auth-service
+  profiles:
+    active: test
+  cloud:
+    config:
+      uri: http://localhost:8081
+      username: root
+      password: root
