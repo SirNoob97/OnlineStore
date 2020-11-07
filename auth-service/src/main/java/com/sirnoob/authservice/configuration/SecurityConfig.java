@@ -22,6 +22,9 @@ import reactor.core.publisher.Mono;
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
 
+  private static final String ADMIN = Role.ADMIN.name();
+  private static final String EMPLOYEE = Role.EMPLOYEE.name();
+
   private final AuthenticationManager authenticationManager;
   private final SecurityContextRepository securityContextRepository;
 
@@ -33,22 +36,30 @@ public class SecurityConfig {
                               .httpBasic().disable()
                               .exceptionHandling()
                               .authenticationEntryPoint(
-                                  (swe, authex) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN))
-                              )
+                                  (swe, authex) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN)))
                               .accessDeniedHandler(
-                                  (swe, accdex) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED))
-                              )
+                                  (swe, accdex) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED)))
                               .and()
                               .authenticationManager(authenticationManager)
                               .securityContextRepository(securityContextRepository)
                               .authorizeExchange()
-                              .pathMatchers(HttpMethod.GET, "/accounts").hasAuthority(Role.ADMIN.name())
-                              .pathMatchers(HttpMethod.POST, "/accounts").hasAuthority(Role.ADMIN.name())
+                              .pathMatchers(HttpMethod.GET, "/accounts").hasAuthority(ADMIN)
+                              .pathMatchers(HttpMethod.POST, "/accounts").hasAuthority(ADMIN)
                               .pathMatchers(HttpMethod.PUT, "/accounts", "/accounts/**").authenticated()
-                              .pathMatchers(HttpMethod.DELETE, "/accounts/{userId}").authenticated()
+                              .pathMatchers(HttpMethod.DELETE, "/accounts/**").authenticated()
                               .pathMatchers("/auth/users", "/auth/logout", "/auth/refresh-token").authenticated()
                               .pathMatchers("/auth/login", "/auth/signup").permitAll()
-                              .and().build();
+                              .pathMatchers(HttpMethod.POST, "/products").hasAuthority(ADMIN)
+                              .pathMatchers(HttpMethod.PUT, "/products/**").hasAuthority(ADMIN)
+                              .pathMatchers(HttpMethod.DELETE, "/products/**").hasAuthority(ADMIN)
+                              .pathMatchers(HttpMethod.GET, "/products/responses", "/products/invoices").hasAnyAuthority(ADMIN, EMPLOYEE)
+                              .pathMatchers(HttpMethod.POST, "/main-categories", "/sub-categories").hasAuthority(ADMIN)
+                              .pathMatchers(HttpMethod.PUT, "/main-categories/**", "/sub-categories/**").hasAuthority(ADMIN)
+                              .pathMatchers(HttpMethod.DELETE, "/main-categories/**", "/sub-categories/**").hasAuthority(ADMIN)
+                              .pathMatchers(HttpMethod.GET, "/main-categories/{}", "/sub-categories/{}").hasAnyAuthority(ADMIN, EMPLOYEE)
+                              .anyExchange().permitAll()
+                              .and()
+                              .build();
     //@formatter:on
   }
 
