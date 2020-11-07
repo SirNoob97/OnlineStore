@@ -3,6 +3,8 @@ package com.sirnoob.authservice.configuration;
 import com.sirnoob.authservice.handler.AccountHandler;
 import com.sirnoob.authservice.handler.AuthHandler;
 
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -29,6 +31,15 @@ public class Router {
   }
 
   @Bean
+  public RouteLocator routeLocator(RouteLocatorBuilder routeLocatorBuilder) {
+    return routeLocatorBuilder.routes()
+                              .route(route -> route.path("/products/**", "/main-categories/**", "/sub-categories/**")
+                                                    .uri("lb://product-service")
+                                                    .id("product-service"))
+                              .build();
+  }
+
+  @Bean
   public RouterFunction<ServerResponse> authEndPoints (AuthHandler authHandler){
     return RouterFunctions.route(POST("/auth/signup").and(accept(JSON)).and(contentType(JSON)), authHandler::signup)
                           .andRoute(POST("/auth/login").and(accept(JSON)).and(contentType(JSON)), authHandler::login)
@@ -45,4 +56,5 @@ public class Router {
                           .andRoute(DELETE("/accounts/{userId}"), accountHandler::deleteAccountById)
                           .andRoute(GET("/accounts").and(accept(JSON)), accountHandler::getAllAccounts);
   }
+
 }
