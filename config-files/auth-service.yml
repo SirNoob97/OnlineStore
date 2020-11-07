@@ -10,6 +10,15 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:8082/eureka/
 
+spring:
+  cloud:
+    gateway:
+      loadbalancer:
+        use404: true
+      discovery:
+        locator:
+          lower-case-service-id: true
+
 management:
   endpoints:
     web:
