@@ -63,6 +63,7 @@ public class RandomEntityGenerator {
     subCategories.add(createSubCategoryStaticValues(2, mainCategory));
     //@formatter:off
     return Product.builder()
+                  .productId(1L)
                   .productName("Samsung Galaxy J7 (2016)")
                   .productBarCode(1023045090807L)
                   .productDescription("Color: Black, Camera: 13MP, Resolution: 720 x 1280")
