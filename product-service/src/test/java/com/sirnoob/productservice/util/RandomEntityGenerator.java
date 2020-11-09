@@ -10,6 +10,7 @@ import com.sirnoob.productservice.dto.ProductListView;
 import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.dto.ProductResponse;
 import com.sirnoob.productservice.dto.ProductView;
+import com.sirnoob.productservice.dto.SubCategoryRequest;
 import com.sirnoob.productservice.dto.SubCategoryResponse;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
@@ -173,6 +174,10 @@ public class RandomEntityGenerator {
     return MainCategory.builder().mainCategoryId(1L).mainCategoryName("Main Category").build();
   }
 
+  public static SubCategory createSubCategoryForIT() {
+    return SubCategory.builder().subCategoryName("Sub Category").mainCategory(createMainCategoryStaticValues()).build();
+  }
+
   public static SubCategory createSubCategoryStaticValues(int value, MainCategory mainCategory) {
     return SubCategory.builder().subCategoryName("Sub Category " + value).mainCategory(mainCategory).build();
   }
@@ -186,6 +191,10 @@ public class RandomEntityGenerator {
                               .products(Set.of("Product"))
                               .build();
     //@formatter:on
+  }
+
+  public static SubCategoryRequest createSubCategoryRequest(){
+    return new SubCategoryRequest(getRandomString(), getRandomString());
   }
 
   public static SubCategory createSubCategoryForDeleteTest(){
