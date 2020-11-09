@@ -9,6 +9,7 @@ import com.sirnoob.productservice.service.IMainCategoryService;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,9 +30,11 @@ public class MainCategoryController {
 
   private final IMainCategoryService iMainCategoryService;
 
+  private static final MediaType JSON = MediaType.APPLICATION_JSON;
+
   @PostMapping
   public ResponseEntity<MainCategory> createMainCategory(@Valid @RequestBody MainCategory mainCategory){
-    return ResponseEntity.status(HttpStatus.CREATED).body(iMainCategoryService.createMainCategory(mainCategory));
+    return ResponseEntity.status(HttpStatus.CREATED).contentType(JSON).body(iMainCategoryService.createMainCategory(mainCategory));
   }
 
   @PutMapping("/{mainCategoryId}")
@@ -48,11 +51,11 @@ public class MainCategoryController {
 
   @GetMapping("/{mainCategoryName}")
   public ResponseEntity<MainCategory> getMainCategoryByName(@PathVariable String mainCategoryName){
-    return ResponseEntity.ok().body(iMainCategoryService.getMainCategoryByName(mainCategoryName));
+    return ResponseEntity.ok().contentType(JSON).body(iMainCategoryService.getMainCategoryByName(mainCategoryName));
   }
 
   @GetMapping
   public ResponseEntity<Set<String>> getAllMainCategory(Pageable pageable){
-    return ResponseEntity.ok().body(iMainCategoryService.getAllMainCategory(pageable));
+    return ResponseEntity.ok().contentType(JSON).body(iMainCategoryService.getAllMainCategory(pageable));
   }
 }
