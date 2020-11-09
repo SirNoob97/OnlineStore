@@ -13,6 +13,8 @@ public class SubCategoryRequest {
   @NotNull(message = "The Sub Category must belong to a Main Category")
   private String mainCategoryName;
 
+  public SubCategoryRequest(){}
+
   public SubCategoryRequest(String subCategoryName, String mainCategoryName) {
     this.subCategoryName = subCategoryName;
     this.mainCategoryName = mainCategoryName;
