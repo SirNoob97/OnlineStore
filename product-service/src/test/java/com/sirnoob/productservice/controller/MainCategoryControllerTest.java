@@ -83,8 +83,8 @@ class MainCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("createMainCategory return a main category when successful")
-  public void createMainCategory_ReturnAMainCategory_WhenSuccessful() throws Exception{
+  @DisplayName("createMainCategory return 201 status code when successful")
+  public void createMainCategory_Return201StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(post("/main-categories").contentType(JSON)
                                             .content(OBJECT_MAPPER.writeValueAsString(MAINCATEGORY))
                                             .accept(JSON))
@@ -93,29 +93,29 @@ class MainCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("updateMainCategory update the name of a main category when successful")
-  public void updateMainCategory_UpdateTheNameOfAMainCategory_WhenSuccessful() throws Exception{
+  @DisplayName("updateMainCategory return 204 status code when successful")
+  public void updateMainCategory_Return204StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(put("/main-categories/1?mainCategoryName=maincategory"))
             .andExpect(status().isNoContent());
   }
 
   @Test
-  @DisplayName("deleteMainCategory delete a main category when successful")
-  public void deleteMainCategory_DelteAMainCategory_WhenSuccessful() throws Exception{
+  @DisplayName("deleteMainCategory return 204 status code when successful")
+  public void deleteMainCategory_Return204StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(delete("/main-categories/1")).andExpect(status().isNoContent());
   }
 
   @Test
-  @DisplayName("getMainCategoryByName return a main category when successful")
-  public void getMainCategoryByName_ResturnAMainCategory_WhenSuccesful() throws Exception{
+  @DisplayName("getMainCategoryByName return 200 status code when successful")
+  public void getMainCategoryByName_Return200StatusCode_WhenSuccesful() throws Exception{
     mockMvc.perform(get("/main-categories/maincategory").accept(JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(JSON));
   }
 
   @Test
-  @DisplayName("getAllMainCategory return a set of main categories names when successful")
-  public void getAllMainCategory_ReturnASetOfMainCategoriesNamesWhenSuccessful() throws Exception{
+  @DisplayName("getAllMainCategory return 201 status code when successful")
+  public void getAllMainCategory_Return200StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(get("/main-categories?page=0&size=10").accept(JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(JSON));
