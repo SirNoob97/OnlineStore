@@ -1,106 +1,123 @@
 package com.sirnoob.productservice.controller;
 
-import static com.sirnoob.productservice.util.RandomEntityGenerator.createMainCategory;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.sirnoob.productservice.util.RandomEntityGenerator.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 
-import java.util.Set;
+import java.util.List;
+import java.util.Optional;
 
+import org.springframework.http.MediaType;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sirnoob.productservice.entity.MainCategory;
-import com.sirnoob.productservice.service.IMainCategoryService;
+import com.sirnoob.productservice.entity.Product;
+import com.sirnoob.productservice.entity.SubCategory;
+import com.sirnoob.productservice.mapper.ProductMapperImpl;
+import com.sirnoob.productservice.mapper.SubCategoryMapperImpl;
+import com.sirnoob.productservice.repository.IMainCategoryRepository;
+import com.sirnoob.productservice.repository.IProductRepository;
+import com.sirnoob.productservice.repository.ISubCategoryRepository;
+import com.sirnoob.productservice.service.MainCategoryServiceImpl;
+import com.sirnoob.productservice.service.ProductServiceImpl;
+import com.sirnoob.productservice.service.SubCategoryServiceImpl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
-@ExtendWith(SpringExtension.class)
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
+
+@WebMvcTest
+@Import({ MainCategoryServiceImpl.class, ProductServiceImpl.class, ProductMapperImpl.class, SubCategoryServiceImpl.class, SubCategoryMapperImpl.class })
 @DisplayName("Main Category Controller Test")
 class MainCategoryControllerTest {
 
-  @InjectMocks
-  private MainCategoryController mainCategoryController;
+  @MockBean
+  private IMainCategoryRepository iMainCategoryRepository;
 
-  @Mock
-  private IMainCategoryService iMainCategoryService;
+  @MockBean
+  private ISubCategoryRepository iSubCategoryRespository;
+
+  @MockBean
+  private IProductRepository iProductRepository;
+
+  @Autowired
+  private MockMvc mockMvc;
+
+  private static final MediaType JSON = MediaType.APPLICATION_JSON;
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+  private static final MainCategory MAINCATEGORY = createMainCategory();
+  private static final SubCategory SUBCATEGORY = createSubCategory();
+  private static final Product PRODUCT = createProduct();
 
   @BeforeEach
   public void setUp() {
-    MainCategory mainCategory = createMainCategory();
+    BDDMockito.when(iMainCategoryRepository.save(any(MainCategory.class))).thenReturn(MAINCATEGORY);
 
-    Set<String> mainCategories = Set.of(mainCategory.getMainCategoryName());
+    BDDMockito.when(iMainCategoryRepository.updateMainCategoryName(anyString(), anyLong())).thenReturn(1);
 
-    BDDMockito.when(iMainCategoryService.createMainCategory(any(MainCategory.class))).thenReturn(mainCategory);
+    BDDMockito.when(iSubCategoryRespository.findById(anyLong())).thenReturn(Optional.of(SUBCATEGORY));
 
-    BDDMockito.doNothing().when(iMainCategoryService).updateMainCategoryName(anyLong(), anyString());
+    BDDMockito.when(iMainCategoryRepository.findById(anyLong())).thenReturn(Optional.of(MAINCATEGORY));
 
-    BDDMockito.doNothing().when(iMainCategoryService).deleteMainCategory(anyLong());
+    BDDMockito.doNothing().when(iSubCategoryRespository).delete(any(SubCategory.class));
 
-    BDDMockito.when(iMainCategoryService.getMainCategoryByName(anyString())).thenReturn(mainCategory);
+    BDDMockito.when(iProductRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of(PRODUCT));
 
-    BDDMockito.when(iMainCategoryService.getAllMainCategory(any(Pageable.class))).thenReturn(mainCategories);
+    BDDMockito.when(iMainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.of(MAINCATEGORY));
+
+    BDDMockito.when(iMainCategoryRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(MAINCATEGORY)));
   }
 
   @Test
   @DisplayName("createMainCategory return a main category when successful")
-  public void createMainCategory_ReturnAMainCategory_WhenSuccessful() {
-    ResponseEntity<MainCategory> mainCategory = mainCategoryController.createMainCategory(createMainCategory());
-
-    assertThat(mainCategory).isNotNull();
-    assertThat(mainCategory.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    assertThat(mainCategory.getBody()).isNotNull();
+  public void createMainCategory_ReturnAMainCategory_WhenSuccessful() throws Exception{
+    mockMvc.perform(post("/main-categories").contentType(JSON)
+                                            .content(OBJECT_MAPPER.writeValueAsString(MAINCATEGORY))
+                                            .accept(JSON))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(JSON));
   }
 
   @Test
   @DisplayName("updateMainCategory update the name of a main category when successful")
-  public void updateMainCategory_UpdateTheNameOfAMainCategory_WhenSuccessful() {
-    ResponseEntity<Void> responseEntity = mainCategoryController.updateMainCategory(1L, "category");
-
-    assertThat(responseEntity).isNotNull();
-    assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-    assertThat(responseEntity.getBody()).isNull();
+  public void updateMainCategory_UpdateTheNameOfAMainCategory_WhenSuccessful() throws Exception{
+    mockMvc.perform(put("/main-categories/1?mainCategoryName=maincategory"))
+            .andExpect(status().isNoContent());
   }
 
   @Test
   @DisplayName("deleteMainCategory delete a main category when successful")
-  public void deleteMainCategory_DelteAMainCategory_WhenSuccessful() {
-    ResponseEntity<Void> responseEntity = mainCategoryController.deleteMainCategory(1L);
-
-    assertThat(responseEntity).isNotNull();
-    assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-    assertThat(responseEntity.getBody()).isNull();
+  public void deleteMainCategory_DelteAMainCategory_WhenSuccessful() throws Exception{
+    mockMvc.perform(delete("/main-categories/1")).andExpect(status().isNoContent());
   }
 
   @Test
   @DisplayName("getMainCategoryByName return a main category when successful")
-  public void getMainCategoryByName_ResturnAMainCategory_WhenSuccesful() {
-    ResponseEntity<MainCategory> mainCategory = mainCategoryController.getMainCategoryByName("name");
-
-    assertThat(mainCategory).isNotNull();
-    assertThat(mainCategory.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(mainCategory.getBody()).isNotNull();
+  public void getMainCategoryByName_ResturnAMainCategory_WhenSuccesful() throws Exception{
+    mockMvc.perform(get("/main-categories/maincategory").accept(JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(JSON));
   }
 
   @Test
   @DisplayName("getAllMainCategory return a set of main categories names when successful")
-  public void getAllMainCategory_ReturnASetOfMainCategoriesNamesWhenSuccessful(){
-    ResponseEntity<Set<String>> names = mainCategoryController.getAllMainCategory(PageRequest.of(0, 10));
-
-    assertThat(names).isNotNull();
-    assertThat(names.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(names.getBody()).isNotNull();
-    assertThat(names.getBody().isEmpty()).isFalse();
+  public void getAllMainCategory_ReturnASetOfMainCategoriesNamesWhenSuccessful() throws Exception{
+    mockMvc.perform(get("/main-categories?page=0&size=10").accept(JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(JSON));
   }
 }
