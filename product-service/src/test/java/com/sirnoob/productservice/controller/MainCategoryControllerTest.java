@@ -93,6 +93,16 @@ class MainCategoryControllerTest {
   }
 
   @Test
+  @DisplayName("createMainCategory return 201 status code when successful")
+  public void createMainCategory_Return400StatusCode_WhenMainCategoryHasInvalidFields() throws Exception{
+    mockMvc.perform(post("/main-categories").contentType(JSON)
+                                            .content(OBJECT_MAPPER.writeValueAsString(new MainCategory()))
+                                            .accept(JSON))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(JSON));
+  }
+
+  @Test
   @DisplayName("updateMainCategory return 204 status code when successful")
   public void updateMainCategory_Return204StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(put("/main-categories/1?mainCategoryName=maincategory"))
