@@ -1,117 +1,117 @@
 package com.sirnoob.productservice.controller;
 
-import static com.sirnoob.productservice.util.RandomEntityGenerator.createMainCategoryStaticValues;
-import static com.sirnoob.productservice.util.RandomEntityGenerator.createSubCategoryResponse;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.sirnoob.productservice.util.RandomEntityGenerator.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 
-import java.util.Set;
+import java.util.List;
+import java.util.Optional;
 
-import com.sirnoob.productservice.dto.SubCategoryRequest;
-import com.sirnoob.productservice.dto.SubCategoryResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sirnoob.productservice.entity.MainCategory;
-import com.sirnoob.productservice.service.IMainCategoryService;
-import com.sirnoob.productservice.service.ISubCategoryService;
+import com.sirnoob.productservice.entity.SubCategory;
+import com.sirnoob.productservice.mapper.ProductMapperImpl;
+import com.sirnoob.productservice.mapper.SubCategoryMapperImpl;
+import com.sirnoob.productservice.repository.IMainCategoryRepository;
+import com.sirnoob.productservice.repository.IProductRepository;
+import com.sirnoob.productservice.repository.ISubCategoryRepository;
+import com.sirnoob.productservice.service.MainCategoryServiceImpl;
+import com.sirnoob.productservice.service.ProductServiceImpl;
+import com.sirnoob.productservice.service.SubCategoryServiceImpl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@ExtendWith(SpringExtension.class)
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
+@WebMvcTest
+@Import({ SubCategoryServiceImpl.class, SubCategoryMapperImpl.class, MainCategoryServiceImpl.class, ProductServiceImpl.class, ProductMapperImpl.class })
 @DisplayName("Sub Category Controller Test")
 class SubCategoryControllerTest {
 
-  @InjectMocks
-  private SubCategoryController subCategoryController;
+  @MockBean
+  private ISubCategoryRepository iSubCategoryRepository;
 
-  @Mock
-  private ISubCategoryService iSubCategoryService;
+  @MockBean
+  private IMainCategoryRepository iMainCategoryRepository;
 
-  @Mock
-  private IMainCategoryService iMainCategoryService;
+  @MockBean
+  private IProductRepository iProductRepository;
+
+  @Autowired
+  private MockMvc mockMvc;
+
+  private static final MainCategory MAIN_CATEGORY = createMainCategoryStaticValues();
+  private static final SubCategory SUB_CATEGORY = createSubCategoryForIT();
+  private static final MediaType JSON = MediaType.APPLICATION_JSON;
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   @BeforeEach
   public void setUp() {
-    MainCategory mainCategory = createMainCategoryStaticValues();
+    BDDMockito.when(iMainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.of(MAIN_CATEGORY));
 
-    SubCategoryResponse subCategory = createSubCategoryResponse();
+    BDDMockito.when(iSubCategoryRepository.save(any(SubCategory.class))).thenReturn(SUB_CATEGORY);
 
-    Set<String> subCategories = Set.of(subCategory.getSubCategoryName());
+    BDDMockito.when(iSubCategoryRepository.updateSubCategoryName(anyString(), anyLong())).thenReturn(1);
 
-    BDDMockito.when(iMainCategoryService.getMainCategoryByName(anyString())).thenReturn(mainCategory);
+    BDDMockito.when(iSubCategoryRepository.findById(anyLong())).thenReturn(Optional.of(SUB_CATEGORY));
 
-    BDDMockito.when(iSubCategoryService.createSubCategory(anyString(), any(MainCategory.class))).thenReturn(subCategory);
+    BDDMockito.doNothing().when(iSubCategoryRepository).delete(any(SubCategory.class));
 
-    BDDMockito.doNothing().when(iSubCategoryService).updateSubCategoryName(anyLong(), anyString());
+    BDDMockito.when(iSubCategoryRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(SUB_CATEGORY)));
 
-    BDDMockito.doNothing().when(iSubCategoryService).deleteSubCategory(anyLong());
-
-    BDDMockito.when(iSubCategoryService.getSubCategoryResponseByName(anyString())).thenReturn(subCategory);
-
-    BDDMockito.when(iSubCategoryService.getAllSubCategories(any(Pageable.class))).thenReturn(subCategories);
+    BDDMockito.when(iSubCategoryRepository.findBySubCategoryName(anyString())).thenReturn(Optional.of(SUB_CATEGORY));
   }
 
   @Test
   @DisplayName("createSubCategory return a sub category when successful")
-  public void createSubCategoryCategory_ReturnASubCategory_WhenSuccessful() {
-    ResponseEntity<SubCategoryResponse> subCategory = subCategoryController.createSubCategory(new SubCategoryRequest("Sub Category", "Main Category"));
-
-    assertThat(subCategory).isNotNull();
-    assertThat(subCategory.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    assertThat(subCategory.getBody()).isNotNull();
+  public void createSubCategoryCategory_ReturnASubCategory_WhenSuccessful() throws Exception{
+    mockMvc.perform(post("/sub-categories").contentType(JSON)
+                                            .accept(JSON)
+                                            .content(OBJECT_MAPPER.writeValueAsString(createSubCategoryRequest())))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(JSON));
   }
 
   @Test
   @DisplayName("updateSubCategoryNameCategory update the name of a sub category when successful")
-  public void updateSubCategoryName_UpdateTheNameOfASubCategory_WhenSuccessful() {
-    ResponseEntity<Void> responseEntity = subCategoryController.updateSubCategoryName(1L, "category");
-
-    assertThat(responseEntity).isNotNull();
-    assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-    assertThat(responseEntity.getBody()).isNull();
+  public void updateSubCategoryName_UpdateTheNameOfASubCategory_WhenSuccessful() throws Exception{
+    mockMvc.perform(put("/sub-categories/1?subCategoryName=subcategory").contentType(JSON)
+                                            .content(OBJECT_MAPPER.writeValueAsString(createSubCategoryRequest())))
+            .andExpect(status().isNoContent());
   }
 
   @Test
   @DisplayName("deleteSubCategory delete a sub category when successful")
-  public void deleteSubCategory_DelteASubCategory_WhenSuccessful() {
-    ResponseEntity<Void> responseEntity = subCategoryController.deleteSubCategory(1L);
-
-    assertThat(responseEntity).isNotNull();
-    assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-    assertThat(responseEntity.getBody()).isNull();
+  public void deleteSubCategory_DelteASubCategory_WhenSuccessful() throws Exception{
+    mockMvc.perform(delete("/sub-categories/1")).andExpect(status().isNoContent());
   }
 
   @Test
   @DisplayName("getSubCategoryResponseByNameCategoryByName return a sub category when successful")
-  public void getSubCategoryResponseByNameCategoryByName_ResturnASubCategory_WhenSuccesful() {
-    ResponseEntity<SubCategoryResponse> subCategory = subCategoryController.getSubCategoryResponseByName("name");
-
-    assertThat(subCategory).isNotNull();
-    assertThat(subCategory.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(subCategory.getBody()).isNotNull();
+  public void getSubCategoryResponseByName_ResturnASubCategory_WhenSuccesful() throws Exception{
+    mockMvc.perform(get("/sub-categories/subcategory").accept(JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(JSON));
   }
 
   @Test
   @DisplayName("getAllSubCategoriesCategory return a set of sub categories names when successful")
-  public void getAllSubCategories_ReturnASetOfSubCategoriesNamesWhenSuccessful(){
-    ResponseEntity<Set<String>> names = subCategoryController.getAllSubCategories(PageRequest.of(0, 10));
-
-    assertThat(names).isNotNull();
-    assertThat(names.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(names.getBody()).isNotNull();
-    assertThat(names.getBody().isEmpty()).isFalse();
+  public void getAllSubCategories_ReturnASetOfSubCategoriesNamesWhenSuccessful() throws Exception{
+    mockMvc.perform(get("/sub-categories?page=0&size=10").accept(JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(JSON));
   }
 }
