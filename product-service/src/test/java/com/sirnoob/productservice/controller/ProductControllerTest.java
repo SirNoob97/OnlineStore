@@ -24,6 +24,7 @@ import java.util.Optional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
 import com.sirnoob.productservice.dto.ProductListView;
+import com.sirnoob.productservice.dto.ProductRequest;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
@@ -135,6 +136,15 @@ class ProductControllerTest {
     mockMvc.perform(post("/products").contentType(JSON)
                                       .content(OBJECT_MAPPER.writeValueAsString(createProductRequest())))
             .andExpect(status().isNotFound())
+            .andExpect(content().contentType(JSON));
+  }
+
+  @Test
+  @DisplayName("createProduct return 400 status code when ProductRequest has invalid fields")
+  public void createProduct_Return400StatusCode_WhenProductRequestHasInvalidFields() throws Exception{
+    mockMvc.perform(post("/products").contentType(JSON)
+                                      .content(OBJECT_MAPPER.writeValueAsString(new ProductRequest())))
+            .andExpect(status().isBadRequest())
             .andExpect(content().contentType(JSON));
   }
 
