@@ -121,7 +121,8 @@ class ProductControllerTest {
   @DisplayName("createProduct return 201 status code when successful")
   public void createProduct_Return201StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(post("/products").contentType(JSON)
-                                      .content(OBJECT_MAPPER.writeValueAsString(createProductRequest())))
+                                      .content(OBJECT_MAPPER.writeValueAsString(createProductRequest()))
+                                      .accept(JSON))
             .andExpect(status().isCreated())
             .andExpect(content().contentType(JSON))
             .andExpect(jsonPath(PRODUCT_ID, Matchers.isA(Integer.class)))
@@ -163,7 +164,8 @@ class ProductControllerTest {
   @DisplayName("updateProduct return 200 status code when successful")
   public void updateProduct_Return200StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(put("/products/1").contentType(JSON)
-                                      .content(OBJECT_MAPPER.writeValueAsString(createProductRequest())))
+                                      .content(OBJECT_MAPPER.writeValueAsString(createProductRequest()))
+                                      .accept(JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(JSON))
             .andExpect(jsonPath(PRODUCT_ID, Matchers.isA(Integer.class)))
@@ -212,7 +214,7 @@ class ProductControllerTest {
   @Test
   @DisplayName("getProductResponse return 200 status code when successful")
   public void getProductResponse_Return200StatusCode_WhenSuccesful() throws Exception{
-    mockMvc.perform(get("/products/responses?productBarCode=1&productName=product"))
+    mockMvc.perform(get("/products/responses?productBarCode=1&productName=product").accept(JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(JSON));
   }
@@ -230,7 +232,7 @@ class ProductControllerTest {
   @Test
   @DisplayName("getProductForInvoice return 200 status code when successful")
   public void getProductForInvoice_Return200StatusCode_WhenSuccessful() throws Exception{
-    mockMvc.perform(get("/products/invoices?productBarCode=1&productName=product"))
+    mockMvc.perform(get("/products/invoices?productBarCode=1&productName=product").accept(JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(JSON));
   }
@@ -262,7 +264,7 @@ class ProductControllerTest {
   @Test
   @DisplayName("listAllProducts return 200 status code when successful")
   public void listAllProducts_Return200StatusCode_WhenSuccessful() throws Exception{
-    mockMvc.perform(get("/products?page=0&size=10"))
+    mockMvc.perform(get("/products?page=0&size=10").accept(JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(JSON));
   }
@@ -280,7 +282,7 @@ class ProductControllerTest {
   @Test
   @DisplayName("listProductsByMainCategoryId return 200 status code when successful")
   public void listProductsByMainCategoryId_Return200StatusCode_WhenSuccessful() throws Exception{
-    mockMvc.perform(get("/products/main-categories/1?page=0&size=10"))
+    mockMvc.perform(get("/products/main-categories/1?page=0&size=10").accept(JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(JSON));
   }
@@ -301,7 +303,8 @@ class ProductControllerTest {
     String[] subCategories = {"SubCategory 1", "SubCategory2"};
 
     mockMvc.perform(get("/products/sub-categories").contentType(JSON)
-                                                    .content(OBJECT_MAPPER.writeValueAsString(subCategories)))
+                                                    .content(OBJECT_MAPPER.writeValueAsString(subCategories))
+                                                    .accept(JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(JSON));
   }
@@ -322,7 +325,7 @@ class ProductControllerTest {
   @Test
   @DisplayName("getProductByProductName return 200 status code when successful")
   public void getProductByProductName_Return200StatusCode_WhenSuccessful() throws Exception{
-    mockMvc.perform(get("/products/names?productName=product"))
+    mockMvc.perform(get("/products/names?productName=product").accept(JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(JSON));
   }
@@ -340,7 +343,7 @@ class ProductControllerTest {
   @Test
   @DisplayName("listByProductNameCoincidences return 200 status code when successful")
   public void listByProductNameCoincidences_Return200StatusCode_WhenSuccessful() throws Exception{
-    mockMvc.perform(get("/products/names/search?productName=product&page=0&size=10"))
+    mockMvc.perform(get("/products/names/search?productName=product&page=0&size=10").accept(JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(JSON));
   }
