@@ -11,6 +11,7 @@ import com.sirnoob.productservice.service.ISubCategoryService;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,12 +30,14 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/sub-categories")
 public class SubCategoryController {
 
+  private static final MediaType JSON = MediaType.APPLICATION_JSON;
+
   private final IMainCategoryService iMainCategoryService;
   private final ISubCategoryService iSubCategoryService;
 
   @PostMapping
   public ResponseEntity<SubCategoryResponse> createSubCategory(@Valid @RequestBody SubCategoryRequest subCategoryRequest) {
-    return ResponseEntity.status(HttpStatus.CREATED)
+    return ResponseEntity.status(HttpStatus.CREATED).contentType(JSON)
       .body(iSubCategoryService.createSubCategory(subCategoryRequest.getSubCategoryName(),
         iMainCategoryService.getMainCategoryByName(subCategoryRequest.getMainCategoryName())));
   }
@@ -54,11 +57,11 @@ public class SubCategoryController {
 
   @GetMapping
   public ResponseEntity<Set<String>> getAllSubCategories(Pageable pageable) {
-    return ResponseEntity.ok().body(iSubCategoryService.getAllSubCategories(pageable));
+    return ResponseEntity.ok().contentType(JSON).body(iSubCategoryService.getAllSubCategories(pageable));
   }
 
   @GetMapping("/{subCategoryName}")
   public ResponseEntity<SubCategoryResponse> getSubCategoryResponseByName(@PathVariable String subCategoryName) {
-    return ResponseEntity.ok().body(iSubCategoryService.getSubCategoryResponseByName(subCategoryName));
+    return ResponseEntity.ok().contentType(JSON).body(iSubCategoryService.getSubCategoryResponseByName(subCategoryName));
   }
 }
