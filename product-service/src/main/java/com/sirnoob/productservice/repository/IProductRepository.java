@@ -39,7 +39,7 @@ public interface IProductRepository extends JpaRepository<Product, Long>{
   public List<ProductListView> findBySubCategory(@Param("subCategory") SubCategory subCategory);
 
   @Modifying(clearAutomatically = true)
-  @Query("UPDATE Product AS p SET p.productStock = :stock WHERE p.productBarCode = :productBarCode")
+  @Query("UPDATE Product AS p SET p.productStock = p.productStock + (:stock) WHERE p.productBarCode = :productBarCode")
   public int updateProductStockByProductBarCode(@Param("stock") Integer stock, @Param("productBarCode") Long productBarCode);
 
 }
