@@ -1,3 +1,7 @@
+# Product-Service
+
+Microservice for products management.
+
 # Execution Commands
 
 TEST spring and maven profile
