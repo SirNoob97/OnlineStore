@@ -10,7 +10,7 @@
 
   <artifactId>auth-service</artifactId>
   <name>auth-service</name>
-  <description>Microservice for user authorization and authentication.</description>
+  <description>Microservice in charge of user authentication/authorization and acting as a gateway.</description>
 
   <properties>
     <java.version>11</java.version>

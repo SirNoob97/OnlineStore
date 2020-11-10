@@ -1,3 +1,6 @@
+# Auth-Service
+
+Microservice in charge of user authentication/authorization and acting as a gateway.
 
 # Execution Commands
 
