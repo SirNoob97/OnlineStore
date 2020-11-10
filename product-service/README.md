@@ -61,7 +61,7 @@ POST, create a new product record, the main category and the sub categories must
           "subCategoriesNames": ["Smartphones","Smart Divices"]
       }' | jq
 
-PUT, update the stock of a product using the barcode
+PUT, increase or decrease(with negative quantity) the stock of a product using the barcode
 
      curl -v -X PUT http://localhost:8091/products/6012329632587/stock\?quantity\=100
 
