@@ -10,9 +10,13 @@ import javax.persistence.Table;
 
 import com.sirnoob.shoppingservice.model.Product;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @Builder
 @Entity
@@ -23,12 +27,12 @@ public class Item {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long itemId;
 
-  @Embedded
-  private Product product;
-
   @Column(nullable = false)
   private Integer quantity;
 
-  @Column(name = "sub_total", nullable = false)
+  @Column(name = "sub_total", insertable = false, nullable = false)
   private Double subTotal;
+
+  @Embedded
+  private Product product;
 }
