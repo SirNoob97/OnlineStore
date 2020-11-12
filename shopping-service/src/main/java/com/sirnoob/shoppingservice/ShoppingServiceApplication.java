@@ -19,10 +19,10 @@ public class ShoppingServiceApplication {
   public void test (){
     Product product = Product.builder().productName("test").productPrice(2.50).build();
     Item item = Item.builder().quantity(10).product(product).build();
-    
+
     Item newItem = itemRepository.save(item);
-    
-    product.setProductPrice(20);
+
+    product.setProductPrice(20.0);
     newItem.setQuantity(6);
     itemRepository.save(newItem);
   }
