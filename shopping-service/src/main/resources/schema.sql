@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS invoices (
   created_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   user_name character varying(60) NOT NULL,
   email character varying(60) NOT NULL,
+  total real NOT NULL,
   PRIMARY KEY (invoice_id) ,
   CONSTRAINT unique_user_name UNIQUE (user_name),
   CONSTRAINT unique_email UNIQUE (email),
