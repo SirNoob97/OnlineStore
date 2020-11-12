@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: shopping-service
   h2:
     console:
       enabled: true
@@ -11,13 +13,17 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     database-platform: org.hibernate.dialect.H2Dialect
     #properties:
       #hibernate:
         #show_sql: true
         #use_sql_comments: false
         #format_sql: false
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
 
 logging:
   level:
@@ -28,3 +34,28 @@ logging:
           descriptor:
             sql:
               BasicBinder: TRACE
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8082/eureka/
+
+Feign:
+  hystrix:
+    enabled: true
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        exclude: "*"
+
+hystrix:
+  dashboard:
+    proxy-stream-allow-list: "*"
+
+server:
+  port: 8092
+  error:
+    include-message: always
+    include-binding-errors: always
