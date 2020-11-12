@@ -18,9 +18,13 @@ import com.sirnoob.shoppingservice.model.Customer;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @Builder
 @Entity
@@ -44,4 +48,7 @@ public class Invoice {
 
   @Embedded
   private Customer customer;
+
+  @Column(nullable = false)
+  private Double total;
 }
