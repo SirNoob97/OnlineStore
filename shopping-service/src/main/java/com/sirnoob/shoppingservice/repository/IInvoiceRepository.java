@@ -11,5 +11,5 @@ public interface IInvoiceRepository extends JpaRepository<Invoice, Long> {
 
   public List<Invoice> findByCustomerUserName(String userName);
 
-  public Optional<Invoice> findByNumberInvoice(Long numberInvoice);
+  public Optional<Invoice> findByInvoiceNumber(Long invoiceNumber);
 }
