@@ -35,8 +35,8 @@ public class Invoice {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long invoiceId;
 
-  @Column(name = "number_invoice", unique = true, nullable = false)
-  private Long numberInvoice;
+  @Column(name = "invoice_number", unique = true, nullable = false)
+  private Long invoiceNumber;
 
   @CreationTimestamp
   @Column(name = "created_date", insertable = false, updatable = false)
