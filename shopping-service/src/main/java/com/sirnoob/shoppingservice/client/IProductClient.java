@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface IProductClient{
 
   @GetMapping("/products/invoices")
-  public ResponseEntity<Product> getProductForInvoice(@RequestParam(required = true) Long productBarCode, @RequestParam(required = true) String productName);
+  public ResponseEntity<Product> getProductForInvoice(@RequestParam(required = true) Long productBarCode,
+                                                       @RequestParam(required = true) String productName);
 
   @PutMapping("/products/{productBarCode}/stock")
   public ResponseEntity<Void> updateProductStock(@PathVariable Long productBarCode, @RequestParam(required = true) Integer quantity);
