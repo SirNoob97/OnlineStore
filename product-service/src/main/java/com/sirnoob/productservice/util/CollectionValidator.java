@@ -16,5 +16,5 @@ public class CollectionValidator {
 	public static <T> Page<T> throwExceptionIfPageIsEmpty(Page<T> page, String message){
 		if(!page.isEmpty()) return page;
 		throw new ResourceNotFoundException(message);
-	}	
+	}
 }
