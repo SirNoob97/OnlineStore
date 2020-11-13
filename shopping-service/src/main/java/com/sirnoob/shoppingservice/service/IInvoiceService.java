@@ -3,15 +3,16 @@ package com.sirnoob.shoppingservice.service;
 import com.sirnoob.shoppingservice.dto.InvoiceRequest;
 import com.sirnoob.shoppingservice.entity.Invoice;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface IInvoiceService {
 
-  public Invoice createInvoice(InvoiceRequest invoiceRequest);
-
-  public void updateInvoice(InvoiceRequest invoiceRequest);
+  public Invoice persistInvoice(InvoiceRequest invoiceRequest);
 
   public void deleteInvoice(Long invoiceId);
 
-  public Invoice getInvoiceByUserName(String userName);
+  public Page<Invoice> getInvoiceByUserName(String userName, Pageable pageable);
 
   public Invoice getInvoiceByInvoiceNumber(Long invoiceNumber);
 }
