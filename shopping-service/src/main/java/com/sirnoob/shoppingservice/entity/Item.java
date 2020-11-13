@@ -30,7 +30,7 @@ public class Item {
   @Column(nullable = false)
   private Integer quantity;
 
-  @Column(name = "sub_total", insertable = false, nullable = false)
+  @Column(name = "sub_total", nullable = false)
   private Double subTotal;
 
   @Embedded
