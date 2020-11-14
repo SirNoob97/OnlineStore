@@ -13,4 +13,6 @@ public interface IInvoiceRepository extends JpaRepository<Invoice, Long> {
   public Page<Invoice> findByCustomerUserName(String userName, Pageable pageable);
 
   public Optional<Invoice> findByInvoiceNumber(Long invoiceNumber);
+
+  public Page<Invoice> findByItemsProductBarCode(Long productBarCode, Pageable pageable);
 }
