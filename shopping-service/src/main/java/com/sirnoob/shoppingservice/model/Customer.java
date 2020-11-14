@@ -5,21 +5,21 @@ import javax.persistence.Embeddable;
 
 import lombok.Builder;
 
-@Builder
 @Embeddable
+@Builder
 public class Customer {
 
-  @Column(name = "user_name", unique = true, nullable = false, length = 60)
+  @Column(name = "user_name", length = 60, nullable = false)
   private String userName;
 
-  @Column(name = "email", unique = true, nullable = false, length = 60)
-  private String email;
+  @Column(name = "user_email", length = 60, nullable = false)
+  private String userEmail;
 
   public Customer (){}
 
-  public Customer (String userName, String email){
+  public Customer (String userName, String userEmail){
     this.userName = userName;
-    this.email = email;
+    this.userEmail = userEmail;
   }
 
   public String getUserName() {
@@ -30,11 +30,11 @@ public class Customer {
     this.userName = userName;
   }
 
-  public String getEmail() {
-    return email;
+  public String getUserEmail() {
+    return userEmail;
   }
 
-  public void setEmail(String email) {
-    this.email = email;
+  public void setUserEmail(String email) {
+    this.userEmail = email;
   }
 }
