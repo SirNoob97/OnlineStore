@@ -30,9 +30,12 @@ public class Item {
   @Column(nullable = false)
   private Integer quantity;
 
-  @Column(name = "sub_total", nullable = false)
-  private Double subTotal;
+  @Column(name = "product_bar_code", nullable = false)
+  private Long productBarCode;
 
   @Embedded
   private Product product;
+
+  @Column(name = "sub_total", nullable = false)
+  private Double subTotal;
 }
