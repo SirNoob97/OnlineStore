@@ -8,11 +8,13 @@ import org.springframework.data.domain.Pageable;
 
 public interface IInvoiceService {
 
-  public Invoice persistInvoice(InvoiceRequest invoiceRequest);
+  public Invoice createInvoice(InvoiceRequest invoiceRequest);
 
   public void deleteInvoice(Long invoiceId);
 
   public Page<Invoice> getInvoiceByUserName(String userName, Pageable pageable);
 
   public Invoice getInvoiceByInvoiceNumber(Long invoiceNumber);
+
+  public Page<Invoice> getInvoiceByProductBarCode(Long productBarCode, Pageable pageable);
 }
