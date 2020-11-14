@@ -5,18 +5,17 @@ import javax.persistence.Embeddable;
 
 import lombok.Builder;
 
-@Builder
 @Embeddable
+@Builder
 public class Product {
 
-  @Column(name = "product_name", unique = true, nullable = false, length = 130)
+  @Column(name = "product_name", length = 130, nullable = false)
   private String productName;
 
   @Column(name = "product_price", nullable = false)
   private Double productPrice;
 
-  public Product() {
-  }
+  public Product() {}
 
   public Product(String productName, Double productPrice) {
     this.productName = productName;
@@ -38,5 +37,4 @@ public class Product {
   public void setProductPrice(Double productPrice) {
     this.productPrice = productPrice;
   }
-
 }
