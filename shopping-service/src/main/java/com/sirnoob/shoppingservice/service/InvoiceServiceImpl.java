@@ -1,10 +1,12 @@
 package com.sirnoob.shoppingservice.service;
 
+import java.text.DecimalFormat;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.sirnoob.shoppingservice.client.IProductClient;
 import com.sirnoob.shoppingservice.dto.InvoiceRequest;
+import com.sirnoob.shoppingservice.dto.ProductDto;
 import com.sirnoob.shoppingservice.entity.Invoice;
 import com.sirnoob.shoppingservice.entity.Item;
 import com.sirnoob.shoppingservice.model.Product;
@@ -29,14 +31,10 @@ public class InvoiceServiceImpl implements IInvoiceService{
   private final IProductClient iProductClient;
 
   @Override
-  public Invoice persistInvoice(InvoiceRequest invoiceRequest) {
+  public Invoice createInvoice(InvoiceRequest invoiceRequest) {
     Set<Item> items = invoiceRequest.getProducts()
                                     .stream()
-                                    .map(productDto -> {
-                                      Product product = iProductClient.getProductForInvoice(productDto.getProductBarCode(), productDto.getProductName()).getBody();
-                                      iProductClient.updateProductStock(productDto.getProductBarCode(), (productDto.getQuantity() * -1));
-                                      return buildItem(product, productDto.getQuantity());
-                                    })
+                                    .map(productDto -> buildItem(getProductAndUpdateStock(productDto), productDto))
                                     .collect(Collectors.toSet());
 
     return iInvoiceRepository.save(buildInvoice(invoiceRequest, items));
@@ -59,13 +57,28 @@ public class InvoiceServiceImpl implements IInvoiceService{
     return iInvoiceRepository.findByInvoiceNumber(invoiceNumber).orElseThrow(() -> getResponseStatusException(INVOICE_NOT_FOUND));
   }
 
+  @Override
+  public Page<Invoice> getInvoiceByProductBarCode(Long productBarCode, Pageable pageable){
+    Page<Invoice> invoices = iInvoiceRepository.findByItemsProductBarCode(productBarCode, pageable);
+    return throwExceptionIfPageIsEmpty(invoices, THE_USER_HAS_NO_INVOICES);
+  }
 
 
-  private Item buildItem(Product product, Integer quantity){
+
+  private Product getProductAndUpdateStock(ProductDto productDto){
+    Product product = iProductClient.getProductForInvoice(productDto.getProductBarCode(), productDto.getProductName()).getBody();
+    iProductClient.updateProductStock(productDto.getProductBarCode(), (productDto.getQuantity() * -1));
+    return product;
+  }
+
+
+
+  private Item buildItem(Product product, ProductDto productDto){
     return Item.builder()
                 .product(product)
-                .quantity(quantity)
-                .subTotal(quantity * product.getProductPrice()).build();
+                .quantity(productDto.getQuantity())
+                .productBarCode(productDto.getProductBarCode())
+                .subTotal(productDto.getQuantity() * product.getProductPrice()).build();
   }
 
   private Invoice buildInvoice(InvoiceRequest invoiceRequest, Set<Item> items){
@@ -73,12 +86,14 @@ public class InvoiceServiceImpl implements IInvoiceService{
                         .map(Item::getSubTotal)
                         .reduce(0.0, (a, b) -> a + b);
 
+    DecimalFormat dec = new DecimalFormat("#.00");
+
     return Invoice.builder()
                   .invoiceId(invoiceRequest.getInvoiceId())
                   .invoiceNumber(invoiceRequest.getInvoiceNumber())
                   .customer(invoiceRequest.getCustomer())
                   .items(items)
-                  .total(total).build();
+                  .total(Double.valueOf(dec.format(total))).build();
   }
 
   private ResponseStatusException getResponseStatusException(String message){
@@ -86,9 +101,7 @@ public class InvoiceServiceImpl implements IInvoiceService{
   }
 
   private <T> Page<T> throwExceptionIfPageIsEmpty(Page<T> page, String message) {
-    if (!page.isEmpty())
-      return page;
+    if (!page.isEmpty()) return page;
     throw getResponseStatusException(message);
   }
-
 }
