@@ -43,7 +43,7 @@ public class Invoice {
   private LocalDate createdDate;
 
   @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "fk_invoices")
+  @JoinColumn(name = "fk_invoice_id")
   private Set<Item> items;
 
   @Embedded
