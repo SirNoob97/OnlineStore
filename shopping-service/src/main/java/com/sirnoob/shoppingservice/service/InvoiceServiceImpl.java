@@ -16,6 +16,7 @@ import com.sirnoob.shoppingservice.repository.IInvoiceRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +31,7 @@ public class InvoiceServiceImpl implements IInvoiceService{
   private final IInvoiceRepository iInvoiceRepository;
   private final IProductClient iProductClient;
 
+  @Transactional
   @Override
   public Invoice createInvoice(InvoiceRequest invoiceRequest) {
     Set<Item> items = invoiceRequest.getProducts()
@@ -40,6 +42,7 @@ public class InvoiceServiceImpl implements IInvoiceService{
     return iInvoiceRepository.save(buildInvoice(invoiceRequest, items));
   }
 
+  @Transactional
   @Override
   public void deleteInvoice(Long invoiceId) {
     Invoice invoice = iInvoiceRepository.findById(invoiceId).orElseThrow(() -> getResourceNotFoundException(INVOICE_NOT_FOUND));
