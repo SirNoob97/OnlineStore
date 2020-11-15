@@ -1,16 +1,16 @@
-spring:
-  application:
-    name: shopping-service
-  #cloud:
-    #loadbalancer:
-      #ribbon:
-        #enabled: false
-    config:
-      uri: http://localhost:8081
-      username: root
-      password: root
-
 server:
   error:
     include-message: always
     include-binding-errors: always
+
+spring:
+  application:
+    name: shopping-service
+  cloud:
+    config:
+      uri: http://localhost:8081
+      username: root
+      password: root
+    loadbalancer:
+      ribbon:
+        enabled: false
