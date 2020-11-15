@@ -1,0 +1,46 @@
+spring:
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+
+server:
+  port: 8092
+
+logging:
+  pattern:
+    console: "%clr(%d{yy-MM-dd E HH:mm:ss.SSS}){blue} %clr(|%-5p|) %clr(${PID}){magenta} %clr(---){faint} %clr([%8.15t]){cyan} %clr(%-40.40logger{0}){blue} %clr(:){red} %clr(%m){faint}%n"
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8082/eureka/
+
+Feign:
+  hystrix:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        exclude: "*"
+
+hystrix:
+  dashboard:
+    proxy-stream-allow-list: "*"
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3000
+    circuitBreaker:
+      requestVolumeThreshold: 10
+      errorThresholdPercentage: 80
+      sleepWindowInMilliseconds: 6000
+  threadpool:
+    default:
+      coreSize: 15
+      mazQueueSize: 5
