@@ -1,11 +1,11 @@
-spring:
-  cloud:
-    loadbalancer:
-      ribbon:
-        enabled: false
-
 server:
   port: 8092
+
+#spring:
+  #cloud:
+    #loadbalancer:
+      #ribbon:
+        #enabled: false
 
 logging:
   pattern:
@@ -23,7 +23,7 @@ Feign:
 management:
   endpoints:
     web:
-      base-path: /
+      #base-path: /
       exposure:
         exclude: "*"
 
