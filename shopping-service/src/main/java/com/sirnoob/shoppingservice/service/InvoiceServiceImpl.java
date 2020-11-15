@@ -9,14 +9,13 @@ import com.sirnoob.shoppingservice.dto.InvoiceRequest;
 import com.sirnoob.shoppingservice.dto.ProductDto;
 import com.sirnoob.shoppingservice.entity.Invoice;
 import com.sirnoob.shoppingservice.entity.Item;
+import com.sirnoob.shoppingservice.exception.ResourceNotFoundException;
 import com.sirnoob.shoppingservice.model.Product;
 import com.sirnoob.shoppingservice.repository.IInvoiceRepository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +25,7 @@ public class InvoiceServiceImpl implements IInvoiceService{
 
   private static final String INVOICE_NOT_FOUND = "Invoice Not Found!!";
   private static final String THE_USER_HAS_NO_INVOICES = "The User Has No Invoices!!";
+  private static final String NO_INVOICE_ARE_RELATED_WHITH_THATH_PRODUCT = "No Invoice Are Related With That Product!!";
 
   private final IInvoiceRepository iInvoiceRepository;
   private final IProductClient iProductClient;
@@ -42,7 +42,7 @@ public class InvoiceServiceImpl implements IInvoiceService{
 
   @Override
   public void deleteInvoice(Long invoiceId) {
-    Invoice invoice = iInvoiceRepository.findById(invoiceId).orElseThrow(() -> getResponseStatusException(INVOICE_NOT_FOUND));
+    Invoice invoice = iInvoiceRepository.findById(invoiceId).orElseThrow(() -> getResourceNotFoundException(INVOICE_NOT_FOUND));
     iInvoiceRepository.delete(invoice);
   }
 
@@ -54,13 +54,13 @@ public class InvoiceServiceImpl implements IInvoiceService{
 
   @Override
   public Invoice getInvoiceByInvoiceNumber(Long invoiceNumber) {
-    return iInvoiceRepository.findByInvoiceNumber(invoiceNumber).orElseThrow(() -> getResponseStatusException(INVOICE_NOT_FOUND));
+    return iInvoiceRepository.findByInvoiceNumber(invoiceNumber).orElseThrow(() -> getResourceNotFoundException(INVOICE_NOT_FOUND));
   }
 
   @Override
   public Page<Invoice> getInvoiceByProductBarCode(Long productBarCode, Pageable pageable){
     Page<Invoice> invoices = iInvoiceRepository.findByItemsProductBarCode(productBarCode, pageable);
-    return throwExceptionIfPageIsEmpty(invoices, THE_USER_HAS_NO_INVOICES);
+    return throwExceptionIfPageIsEmpty(invoices, NO_INVOICE_ARE_RELATED_WHITH_THATH_PRODUCT);
   }
 
 
@@ -96,12 +96,12 @@ public class InvoiceServiceImpl implements IInvoiceService{
                   .total(Double.valueOf(dec.format(total))).build();
   }
 
-  private ResponseStatusException getResponseStatusException(String message){
-    return new ResponseStatusException(HttpStatus.NOT_FOUND, message);
+  private ResourceNotFoundException getResourceNotFoundException(String message){
+    return new ResourceNotFoundException(message);
   }
 
   private <T> Page<T> throwExceptionIfPageIsEmpty(Page<T> page, String message) {
     if (!page.isEmpty()) return page;
-    throw getResponseStatusException(message);
+    throw getResourceNotFoundException(message);
   }
 }
