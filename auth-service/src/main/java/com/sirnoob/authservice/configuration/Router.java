@@ -36,6 +36,9 @@ public class Router {
                               .route(route -> route.path("/products/**", "/main-categories/**", "/sub-categories/**")
                                                     .uri("lb://product-service")
                                                     .id("product-service"))
+                              .route(route -> route.path("/invoices/**")
+                                                    .uri("lb://shopping-service")
+                                                    .id("shopping-service"))
                               .build();
   }
 
