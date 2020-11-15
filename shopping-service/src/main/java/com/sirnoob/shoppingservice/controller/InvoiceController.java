@@ -28,11 +28,12 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/invoices")
 public class InvoiceController {
 
+  private static final String JSON_VALUE = MediaType.APPLICATION_JSON_VALUE;
   private static final MediaType JSON = MediaType.APPLICATION_JSON;
 
   private final IInvoiceService iInvoiceService;
 
-  @PostMapping
+  @PostMapping(consumes = JSON_VALUE)
   public ResponseEntity<Invoice> createInvoice(@Valid @RequestBody InvoiceRequest invoiceRequest){
     return ResponseEntity.status(HttpStatus.CREATED).contentType(JSON).body(iInvoiceService.createInvoice(invoiceRequest));
   }
