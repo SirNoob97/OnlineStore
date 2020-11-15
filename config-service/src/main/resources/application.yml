@@ -12,7 +12,6 @@ spring:
           search-paths: config-files
           username: ${GIT_USER}
           password: ${GIT_PASSWORD}
-
   security:
     user:
       name: root
