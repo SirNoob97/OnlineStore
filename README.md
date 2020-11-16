@@ -15,6 +15,7 @@ My goal whit this project is to use all knowledge that i have acquired over the 
   * Codecentric Admin Starter Client and Server.
 
 ### Microservices:
+
   * **Product-Service** microservice in charge of products management. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
   * **Auth-Service** microservice in charge of user authentication and authorization, as well as acting as the application gateway. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/auth-service/README.md)
   * **Shopping-Service** microservice in charge of invoice management, to generate invoices it is necessary for this microservice to make requests to products-services, so it is also a client. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/shopping-service/README.md)
@@ -28,8 +29,18 @@ Hystrix's will be used for monitoring thaks to Actuator and Admin Starter, which
 
 Cloud Gateway to have a single acces endpoint.
 
-Spring Security and JWT for the authentication and authorization of the app.
+Spring Security and JWT for the users authentication and authorization.
+
+### TODO
+
+  * ***Add Unit and Integration Test for shopping-service***
+  * ***Add security to each microservice***
+  * Create a mini library to verify JWTs in each microservice and thus avoid, in addition to repeated code, that all microservices have a copy of my JKS file that I use to obtain the keys with which the JWTs are decrypted.
+  * Implement Customer-Service, auth-service client microservice and with which customers can add/edit more information to their account.
+  * Implement Admin-Service
+  * Decrease repeating code as much as possible.
+  * Add application sequence diagram.
 
 ---
-
+Due to the performance that this application requires, I am forced to suspend its development
 ---
