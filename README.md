@@ -14,10 +14,10 @@ My goal whit this project is to use all knowledge that i have acquired over the 
   * Lombok
   * Codecentric Admin Starter Client and Server.
 
-The project will consists of three microservices connected from the consumer thaks to Openfeign:
-  * Customers
-  * Products
-  * Invoices(Consumer)
+### Microservices:
+  * **Product-Service** [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
+  * **Auth-Service** [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/auth-service/README.md)
+  * **Shopping-Service**(client of product-service) [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/shopping-service/README.md)
 
 
 These will obtain their configuration from this repository through a centralized configuration service that will use the Spring Cloud Config Server dependency.
@@ -29,12 +29,3 @@ Hystrix's will be used for monitoring thaks to Actuator and Admin Starter, which
 Cloud Gateway to have a single acces endpoint.
 
 Spring Security and JWT for the authentication and authorization of the app.
-
-#### Product-Service [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
-#### Auth-Service [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/auth-service/README.md)
----
-This project will only be to demonstrate the knowledge that I have acquired so far this year.
-
-Once the security is finished, I'll finish the development of the app, because the Gateway greatly affects the performance of my laptop so I'll not be able to fully test the app.
-
-I could omit this service but i don't whant that, my idea is try to create an application(even if it's small) realistic or at least as i think it is a real application ready for a business environment.
