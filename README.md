@@ -4,7 +4,7 @@ This project consists of the REST api for an online store using microservices ar
 
 My goal whit this project is to use all knowledge that i have acquired over the course of 8 months in a self-taught way to create a rest-full amateur application for an online store.
 
-### Dependencies to use
+### Dependencies
 
   * Spring Boot Starter Web, Web Flux, JPA, R2DBC, Validation, Actuator, Security.
   * Spring Cloud Starter Config, Netflix Eureka Client and Server, Sleuth, Config Server, Gateway, Openfeign, Netflix Hystrix and Dashboard.
@@ -15,9 +15,9 @@ My goal whit this project is to use all knowledge that i have acquired over the 
   * Codecentric Admin Starter Client and Server.
 
 ### Microservices:
-  * **Product-Service** [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
-  * **Auth-Service** [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/auth-service/README.md)
-  * **Shopping-Service**(client of product-service) [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/shopping-service/README.md)
+  * **Product-Service** microservice in charge of products management. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
+  * **Auth-Service** microservice in charge of user authentication and authorization, as well as acting as the application gateway. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/auth-service/README.md)
+  * **Shopping-Service** microservice in charge of invoice management, to generate invoices it is necessary for this microservice to make requests to products-services, so it is also a client. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/shopping-service/README.md)
 
 
 These will obtain their configuration from this repository through a centralized configuration service that will use the Spring Cloud Config Server dependency.
@@ -29,3 +29,7 @@ Hystrix's will be used for monitoring thaks to Actuator and Admin Starter, which
 Cloud Gateway to have a single acces endpoint.
 
 Spring Security and JWT for the authentication and authorization of the app.
+
+---
+
+---
