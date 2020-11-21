@@ -9,4 +9,6 @@ eureka:
     fetchRegistry: false
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
-
+  server:
+    maxThreadsForPeerReplication: 0
+    eviction-interval-timer-in-ms: 1000
