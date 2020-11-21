@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  product-service:
+    environment:
+      - PROFILE
+    container_name: product-service
+    build:
+        context: .
+        dockerfile: ./product-service/Dockerfile
+    image: product-service:latest
+    ports:
+      - 8091:8091
+    networks:
+      - store-network
+    links:
+      - registry-server:registry-server
+    depends_on:
+      - registry-server
+
+networks:
+  store-network:
+    driver: bridge
+
