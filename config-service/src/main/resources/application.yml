@@ -12,6 +12,9 @@ spring:
           search-paths: config-files
           username: ${GIT_USER}
           password: ${GIT_PASSWORD}
+      discovery:
+        enabled: true
+        service-id: ${spring.application.name}
   security:
     user:
       name: root
