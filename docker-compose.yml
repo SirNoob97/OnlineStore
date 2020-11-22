@@ -2,7 +2,7 @@ version: "3.8"
 services:
   product-service:
     environment:
-      - PROFILE
+      - PRODUCT_PROFILE
     container_name: product-service
     build:
         context: .
@@ -13,9 +13,43 @@ services:
     networks:
       - store-network
     links:
-      - registry-server:registry-server
+      - config-service:config-service
+      - registry-service:registry-service
     depends_on:
-      - registry-server
+      - config-service
+      - registry-service
+
+  registry-service:
+    container_name: registry-service
+    build:
+      context: .
+      dockerfile: ./registry-service/Dockerfile
+    image: registry-service:latest
+    hostname: registry-service
+    expose:
+      - 8082
+    ports:
+      - 8082:8082
+    networks:
+      - store-network
+    links:
+      - config-service:config-service
+    depends_on:
+      - config-service
+
+  config-service:
+    container_name: config-service
+    build:
+      context: .
+      dockerfile: ./config-service/Dockerfile
+    image: config-service:latest
+    hostname: config-service
+    expose:
+      - 8081
+    ports:
+      - 8081:8081
+    networks:
+      - store-network
 
 networks:
   store-network:
