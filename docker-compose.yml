@@ -8,6 +8,7 @@ services:
         context: .
         dockerfile: ./product-service/Dockerfile
     image: product-service:latest
+    hostname: product-service
     expose:
       - 8091
     ports:
@@ -56,4 +57,3 @@ services:
 networks:
   store-network:
     driver: bridge
-
