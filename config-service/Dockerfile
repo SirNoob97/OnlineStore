@@ -14,6 +14,6 @@ RUN mvn -e -B package -DskipTests
 
 
 FROM azul/zulu-openjdk-alpine:11-jre
-EXPOSE 8091
+EXPOSE 8081
 COPY --from=builder ./opt/online-store/config-service/target/config-service-0.0.1-SNAPSHOT.jar /
 ENTRYPOINT ["java", "-jar", "/config-service-0.0.1-SNAPSHOT.jar"]
