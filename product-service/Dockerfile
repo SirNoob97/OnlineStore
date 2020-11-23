@@ -16,6 +16,5 @@ RUN mvn -e -B -P$PRODUCT_PROFILE package -DskipTests
 
 
 FROM azul/zulu-openjdk-alpine:11-jre
-EXPOSE 8091
 COPY --from=builder ./opt/online-store/product-service/target/product-service-0.0.1-SNAPSHOT.jar /
 ENTRYPOINT ["java", "-Dspring.profiles.active=${PRODUCT_PROFILE},docker", "-jar", "/product-service-0.0.1-SNAPSHOT.jar"]

@@ -14,6 +14,5 @@ RUN mvn -e -B package -DskipTests
 
 
 FROM azul/zulu-openjdk-alpine:11-jre
-EXPOSE 8081
 COPY --from=builder ./opt/online-store/registry-service/target/registry-service-0.0.1-SNAPSHOT.jar /
 ENTRYPOINT ["java", "-Dspring.profiles.active=docker", "-jar", "/registry-service-0.0.1-SNAPSHOT.jar"]
