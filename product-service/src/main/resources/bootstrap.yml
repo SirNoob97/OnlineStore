@@ -11,10 +11,3 @@ spring:
       uri: http://localhost:8081
       username: root
       password: root
-    bus:
-      enabled: true
-    stream:
-      kafka:
-        binder:
-          zkNodes: ${spring.application.name}:2181
-          brokers: ${spring.application.name}:9092

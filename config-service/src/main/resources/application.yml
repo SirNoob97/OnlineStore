@@ -15,14 +15,6 @@ spring:
       discovery:
         enabled: true
         service-id: ${spring.application.name}
-    bus:
-      enabled: true
-      id: ${spring.application.name}
-    stream:
-      kafka:
-        binder:
-          zkNodes: ${spring.application.name}:2181
-          brokers: ${spring.application.name}:9092
   security:
     user:
       name: root
