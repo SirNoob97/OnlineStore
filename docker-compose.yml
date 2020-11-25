@@ -1,19 +1,17 @@
 version: "3.8"
 services:
-  product-service:
-    environment:
-      - PRODUCT_PROFILE
-    container_name: product-service
+  config-service:
+    container_name: config-service
     build:
-        context: .
-        dockerfile: ./product-service/Dockerfile
-    image: product-service:latest
-    hostname: product-service
+      context: .
+      dockerfile: ./config-service/Dockerfile
+    image: config-service:latest
+    hostname: config-service
     ports:
-      - 8091:8091
+      - 8081:8081
     networks:
       online-store:
-        ipv4_address: 192.168.0.21
+        ipv4_address: 192.168.0.2
 
   registry-service:
     container_name: registry-service
@@ -28,18 +26,35 @@ services:
       online-store:
         ipv4_address: 192.168.0.3
 
-  config-service:
-    container_name: config-service
+  auth-service:
+    environment:
+      - AUTH_PROFILE
+    container_name: auth-service
     build:
-      context: .
-      dockerfile: ./config-service/Dockerfile
-    image: config-service:latest
-    hostname: config-service
+        context: .
+        dockerfile: ./auth-service/Dockerfile
+    image: auth-service:latest
+    hostname: auth-service
     ports:
-      - 8081:8081
+      - 8090:8090
     networks:
       online-store:
-        ipv4_address: 192.168.0.2
+        ipv4_address: 192.168.0.11
+
+  product-service:
+    environment:
+      - PRODUCT_PROFILE
+    container_name: product-service
+    build:
+        context: .
+        dockerfile: ./product-service/Dockerfile
+    image: product-service:latest
+    hostname: product-service
+    ports:
+      - 8091:8091
+    networks:
+      online-store:
+        ipv4_address: 192.168.0.12
 
 networks:
   online-store:
