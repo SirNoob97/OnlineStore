@@ -56,6 +56,21 @@ services:
       online-store:
         ipv4_address: 192.168.0.12
 
+  shopping-service:
+    environment:
+      - SHOPPING_PROFILE
+    container_name: shopping-service
+    build:
+        context: .
+        dockerfile: ./shopping-service/Dockerfile
+    image: shopping-service:latest
+    hostname: shopping-service
+    ports:
+      - 8092:8092
+    networks:
+      online-store:
+        ipv4_address: 192.168.0.13
+
 networks:
   online-store:
     driver: bridge
