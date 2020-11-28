@@ -33,10 +33,9 @@ Spring Security and JWT for the users authentication and authorization.
 
 ### TODO
 
-  * ***Use docker to containerize microservices and postgresql***
-  * ***Add Unit and Integration Test for shopping-service***
   * ***Add security to each microservice***
-  * Create a mini library to verify JWTs in each microservice and thus avoid, in addition to repeated code, that all microservices have a copy of my JKS file that I use to obtain the keys with which the JWTs are decrypted.
+  * ***Create a mini library to verify JWTs in each microservice and thus avoid, in addition to repeated code, that all microservices have a copy of my JKS file that I use to obtain the keys with which the JWTs are decrypted.***
+  * ***Add Unit and Integration Test for shopping-service***
   * Implement Customer-Service, auth-service client microservice and with which customers can add/edit more information to their account.
   * Implement Admin-Service
   * Decrease repeating code as much as possible.
