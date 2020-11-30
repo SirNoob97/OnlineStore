@@ -4,22 +4,11 @@ This project consists of the REST api for an online store using microservices ar
 
 My goal whit this project is to use all knowledge that i have acquired over the course of 8 months in a self-taught way to create a rest-full amateur application for an online store.
 
-### Dependencies
+## Microservices
 
-  * Spring Boot Starter Web, Web Flux, JPA, R2DBC, Validation, Actuator, Security.
-  * Spring Cloud Starter Config, Netflix Eureka Client and Server, Sleuth, Config Server, Gateway, Openfeign, Netflix Hystrix and Dashboard.
-  * JWT
-  * H2.
-  * PostgreSQL
-  * Lombok
-  * Codecentric Admin Starter Client and Server.
-
-### Microservices:
-
-  * **Product-Service** microservice in charge of products management. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
-  * **Auth-Service** microservice in charge of user authentication and authorization, as well as acting as the application gateway. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/auth-service/README.md)
-  * **Shopping-Service** microservice in charge of invoice management, to generate invoices it is necessary for this microservice to make requests to products-services, so it is also a client. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/shopping-service/README.md)
-
+* **Product-Service** microservice in charge of products management. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
+* **Auth-Service** microservice in charge of user authentication and authorization, as well as acting as the application gateway. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/auth-service/README.md)
+* **Shopping-Service** microservice in charge of invoice management, to generate invoices it is necessary for this microservice to make requests to products-services, so it is also a client. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/shopping-service/README.md)
 
 These will obtain their configuration from this repository through a centralized configuration service that will use the Spring Cloud Config Server dependency.
 
@@ -31,17 +20,25 @@ Cloud Gateway to have a single acces endpoint.
 
 Spring Security and JWT for the users authentication and authorization.
 
+### Dependencies
+
+* Spring Boot Starter Web, Web Flux, JPA, R2DBC, Validation, Actuator, Security.
+* Spring Cloud Starter Config, Netflix Eureka Client and Server, Sleuth, Config Server, Gateway, Openfeign, Netflix Hystrix and Dashboard.
+* JWT
+* H2.
+* PostgreSQL
+* Lombok
+* Codecentric Admin Starter Client and Server.
+
 ### TODO
 
-  * ***Use docker to containerize microservices and postgresql***
-  * ***Add Unit and Integration Test for shopping-service***
-  * ***Add security to each microservice***
-  * Create a mini library to verify JWTs in each microservice and thus avoid, in addition to repeated code, that all microservices have a copy of my JKS file that I use to obtain the keys with which the JWTs are decrypted.
-  * Implement Customer-Service, auth-service client microservice and with which customers can add/edit more information to their account.
-  * Implement Admin-Service
-  * Decrease repeating code as much as possible.
-  * Add application sequence diagram.
+* ***Add security to each microservice***
+* ***Create a mini library to verify JWTs in each microservice and thus avoid, in addition to repeated code, that all microservices have a copy of my JKS file that I use to obtain the keys with which the JWTs are decrypted.***
+* ***Add Unit and Integration Test for shopping-service***
+* Implement Customer-Service, auth-service client microservice and with which customers can add/edit more information to their account.
+* Implement Admin-Service
+* Decrease repeating code as much as possible.
+* Add application sequence diagram.
 
 ---
-Due to the performance that this application requires, I am forced to suspend its development
----
+***Due to the performance that this application requires, I am forced to suspend its development***

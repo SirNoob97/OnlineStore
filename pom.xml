@@ -18,7 +18,6 @@
   <modules>
     <module>auth-service</module>
     <module>product-service</module>
-    <module>gateway-service</module>
     <module>config-service</module>
     <module>registry-service</module>
     <module>shopping-service</module>
