@@ -1,5 +1,23 @@
 version: "3.8"
 services:
+  postgresql:
+    container_name: postgresql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    build:
+      context: .
+      dockerfile: ./postgresql/Dockerfile
+    image: postgresql:latest
+    hostname: postgresql
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgresql/data:/var/lib/postgresql/data:rw
+    networks:
+      online-store:
+        ipv4_address: 192.168.0.21
+
   config-service:
     container_name: config-service
     build:
