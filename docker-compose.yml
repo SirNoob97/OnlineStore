@@ -5,15 +5,14 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    build:
-      context: .
-      dockerfile: ./postgresql/Dockerfile
-    image: postgresql:latest
+      - POSTGRES_DB=online_store
+    image: postgres:12.5-alpine
     hostname: postgresql
     ports:
       - 5432:5432
     volumes:
-      - ./postgresql/data:/var/lib/postgresql/data:rw
+      - ./postgresql/data:/var/lib/postgresql/data
+      - ./postgresql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
     networks:
       online-store:
         ipv4_address: 192.168.0.21
