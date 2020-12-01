@@ -1,5 +1,8 @@
 #!/bin/bash
 
+sudo docker-compose run -d postgresql
+echo "Initializing postgresql database..."
+
 sudo docker-compose run -d config-service
 echo "Initializing config-service..."
 
@@ -30,7 +33,7 @@ while [ $# -gt 0 ]; do
     fi
 
   else
-    echo "invalid format"; exit 1
+    echo "Invalid format"; exit 1
   fi
 done
 
