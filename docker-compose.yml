@@ -2,10 +2,7 @@ version: "3.8"
 services:
   postgresql:
     container_name: postgresql
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=online_store
+    env_file: ./env/postgresql.env
     image: postgres:12.5-alpine
     hostname: postgresql
     ports:
@@ -19,6 +16,7 @@ services:
 
   config-service:
     container_name: config-service
+    env_file: ./env/postgresql.env
     build:
       context: .
       dockerfile: ./config-service/Dockerfile
