@@ -13,6 +13,7 @@ import com.sirnoob.shoppingservice.exception.ResourceNotFoundException;
 import com.sirnoob.shoppingservice.model.Product;
 import com.sirnoob.shoppingservice.repository.IInvoiceRepository;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,10 @@ public class InvoiceServiceImpl implements IInvoiceService{
   @Transactional
   @Override
   public Invoice createInvoice(InvoiceRequest invoiceRequest) {
+    if (getInvoiceByInvoiceNumber(invoiceRequest.getInvoiceNumber()) != null) {
+      throw new DataIntegrityViolationException("Invoice Number Must Be Unique!!");
+    }
+
     Set<Item> items = invoiceRequest.getProducts()
                                     .stream()
                                     .map(productDto -> buildItem(getProductAndUpdateStock(productDto), productDto))
