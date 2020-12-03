@@ -2,7 +2,7 @@
 
 Microservice for products management.
 
-# Execution Commands
+## Execution Commands
 
 TEST spring and maven profile
 
@@ -12,10 +12,9 @@ POSTGRESQL spring and maven profile
 
     mvn spring-boot:run -Dspring-boot.run.profiles=postgresql -P postgresql
 
+## Endpoints
 
-# Endpoints
-
-## Products
+### Products
 
 GET a page with 10 elements of the ProductListView type, discount to avoid sending information to users who do not need to know
 
@@ -83,10 +82,7 @@ DELETE a product using the ID
 
     curl -v -X DELETE http://localhost:8091/products/11
 
-
-
-## Main Categories
-
+### Main Categories
 
 GET a page of main category names
 
@@ -112,8 +108,7 @@ DELETE a main category using the ID
 
      curl -v -X DELETE http://localhost:8091/main-categories/2
 
-
-## Sub Categories
+### Sub Categories
 
 GET a page of sub category names
 
