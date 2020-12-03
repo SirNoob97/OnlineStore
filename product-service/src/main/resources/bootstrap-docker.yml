@@ -1,6 +1,8 @@
 spring:
   cloud:
     config:
+      label: docker
       uri: http://config-service:8081
       username: root
       password: root
+    fail-fast: true
