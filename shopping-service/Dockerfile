@@ -17,4 +17,4 @@ RUN mvn -e -B -P$SHOPPING_PROFILE package -DskipTests
 
 FROM azul/zulu-openjdk-alpine:11-jre
 COPY --from=builder ./opt/online-store/shopping-service/target/shopping-service-0.0.1-SNAPSHOT.jar /
-ENTRYPOINT ["java", "-Dspring.profiles.active=${SHOPPING_PROFILE},docker", "-jar", "/shopping-service-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=${SHOPPING_PROFILE}", "-jar", "/shopping-service-0.0.1-SNAPSHOT.jar"]

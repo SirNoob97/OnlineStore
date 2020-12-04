@@ -17,4 +17,4 @@ RUN mvn -e -B -P$AUTH_PROFILE package -DskipTests
 
 FROM azul/zulu-openjdk-alpine:11-jre
 COPY --from=builder ./opt/online-store/auth-service/target/auth-service-0.0.1-SNAPSHOT.jar /
-ENTRYPOINT ["java", "-Dspring.profiles.active=${AUTH_PROFILE},docker", "-jar", "/auth-service-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=${AUTH_PROFILE}", "-jar", "/auth-service-0.0.1-SNAPSHOT.jar"]
