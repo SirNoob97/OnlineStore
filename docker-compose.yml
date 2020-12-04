@@ -16,7 +16,9 @@ services:
 
   config-service:
     container_name: config-service
-    env_file: ./env/postgresql.env
+    env_file:
+      - ./env/postgresql.env
+      - ./env/config-service.env
     build:
       context: .
       dockerfile: ./config-service/Dockerfile
@@ -30,6 +32,9 @@ services:
 
   registry-service:
     container_name: registry-service
+    env_file:
+      - ./env/registry-service.env
+      - ./env/config-service.env
     build:
       context: .
       dockerfile: ./registry-service/Dockerfile
@@ -42,7 +47,11 @@ services:
         ipv4_address: 192.168.0.3
 
   auth-service:
-    env_file: ./env/postgresql.env
+    env_file:
+      - ./env/postgresql.env
+      - ./env/auth-service.env
+      - ./env/config-service.env
+      - ./env/registry-service.env
     environment:
       - AUTH_PROFILE
     container_name: auth-service
@@ -58,7 +67,11 @@ services:
         ipv4_address: 192.168.0.11
 
   product-service:
-    env_file: ./env/postgresql.env
+    env_file:
+      - ./env/postgresql.env
+      - ./env/product-service.env
+      - ./env/config-service.env
+      - ./env/registry-service.env
     environment:
       - PRODUCT_PROFILE
     container_name: product-service
@@ -74,7 +87,11 @@ services:
         ipv4_address: 192.168.0.12
 
   shopping-service:
-    env_file: ./env/postgresql.env
+    env_file:
+      - ./env/postgresql.env
+      - ./env/shopping-service.env
+      - ./env/config-service.env
+      - ./env/registry-service.env
     environment:
       - SHOPPING_PROFILE
     container_name: shopping-service
