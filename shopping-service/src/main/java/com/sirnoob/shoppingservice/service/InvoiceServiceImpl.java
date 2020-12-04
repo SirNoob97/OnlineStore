@@ -1,5 +1,6 @@
 package com.sirnoob.shoppingservice.service;
 
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import com.sirnoob.shoppingservice.exception.ResourceNotFoundException;
 import com.sirnoob.shoppingservice.model.Product;
 import com.sirnoob.shoppingservice.repository.IInvoiceRepository;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,15 +31,17 @@ public class InvoiceServiceImpl implements IInvoiceService{
   private static final String THE_USER_HAS_NO_INVOICES = "The User Has No Invoices!!";
   private static final String NO_INVOICE_ARE_RELATED_WHITH_THATH_PRODUCT = "No Invoice Are Related With That Product!!";
 
+  private static final String INVOICE_NUMBER_MUST_BE_UNIQUE = "Invoice Number Must Be Unique!!";
+  private static final String INVOICE_NUMBER_UNIQUE_VIOLATION_TITLE = "Unique index violation: INVOICE.INVOICE_NUMBER";
+  private static final String INVOICE_COULD_NOT_EXECUTE_OPERATION = "could not execute operation, " + INVOICE_NUMBER_MUST_BE_UNIQUE;
+
   private final IInvoiceRepository iInvoiceRepository;
   private final IProductClient iProductClient;
 
   @Transactional
   @Override
   public Invoice createInvoice(InvoiceRequest invoiceRequest) {
-    if (getInvoiceByInvoiceNumber(invoiceRequest.getInvoiceNumber()) != null) {
-      throw new DataIntegrityViolationException("Invoice Number Must Be Unique!!");
-    }
+    if(iInvoiceRepository.existsByInvoiceNumber(invoiceRequest.getInvoiceNumber())) getDataIntegrityViolationException();
 
     Set<Item> items = invoiceRequest.getProducts()
                                     .stream()
@@ -111,5 +115,11 @@ public class InvoiceServiceImpl implements IInvoiceService{
   private <T> Page<T> throwExceptionIfPageIsEmpty(Page<T> page, String message) {
     if (!page.isEmpty()) return page;
     throw getResourceNotFoundException(message);
+  }
+
+  private void getDataIntegrityViolationException(){
+    throw new DataIntegrityViolationException(INVOICE_COULD_NOT_EXECUTE_OPERATION,
+                new ConstraintViolationException(INVOICE_NUMBER_MUST_BE_UNIQUE,
+                    new SQLException(INVOICE_NUMBER_UNIQUE_VIOLATION_TITLE), INVOICE_NUMBER_MUST_BE_UNIQUE));
   }
 }
