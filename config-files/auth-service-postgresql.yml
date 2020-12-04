@@ -4,8 +4,8 @@ jwt:
 
 envs:
   postgres:
-    hostname: ${POSTGRES_HOSTNAME:-localhost}
-    port: ${POSTGRES_PORT:-5432}
-    database: ${POSTGRES_DB:-store}
-    user: ${POSTGRES_USER:-postgres}
-    password: ${POSTGRES_PASSWORD:-postgres}
+    hostname: ${POSTGRES_HOSTNAME:localhost}
+    port: ${POSTGRES_PORT:5432}
+    database: ${POSTGRES_DB:store}
+    user: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}

@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRES_HOSTNAME:-localhost}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-store}
-    username: ${POSTGRES_USER:-postgres}
-    password: ${POSTGRES_PASSWORD:-postgres}
+    url: jdbc:postgresql://${POSTGRES_HOSTNAME:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:store}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
   jpa:
     #show-sql: true
     hibernate:
