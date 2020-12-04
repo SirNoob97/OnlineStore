@@ -1,16 +1,16 @@
 server:
-  port: 8081
+  port: ${CONFIG_SERVICE_PORT:8081}
 
 spring:
   application:
-    name: config-service
+    name: ${CONFIG_SERVICE_NAME:config-service}
   cloud:
     config:
       label: docker
       server:
         git:
           uri: https://github.com/SirNoob97/OnlineStore.git
-          search-paths: config-files
+          search-paths: ${SEARCH_PATH:config-files}
           username: ${GIT_USER}
           password: ${GIT_PASSWORD}
       discovery:
@@ -18,5 +18,5 @@ spring:
         service-id: ${spring.application.name}
   security:
     user:
-      name: root
-      password: root
+      name: ${CONFIG_SERVICE_USER:root}
+      password: ${CONFIG_SERVICE_PASSWORD:root}
