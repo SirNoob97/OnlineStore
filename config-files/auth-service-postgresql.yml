@@ -1,6 +1,6 @@
 jwt:
   expiration:
-    time: 1200000 #20 min
+    time: ${JWT_EXPIRATION:1200000} #20 min
 
 envs:
   postgres:
