@@ -15,4 +15,6 @@ public interface IInvoiceRepository extends JpaRepository<Invoice, Long> {
   public Optional<Invoice> findByInvoiceNumber(Long invoiceNumber);
 
   public Page<Invoice> findByItemsProductBarCode(Long productBarCode, Pageable pageable);
+
+  public boolean existsByInvoiceNumber(Long invoiceNumber);
 }
