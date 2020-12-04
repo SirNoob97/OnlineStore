@@ -1,5 +1,5 @@
 server:
-  port: 8091
+  port: ${PRODUCT_SERVICE_PORT:-8091}
 
 logging:
   pattern:
@@ -8,7 +8,7 @@ logging:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8082/eureka/
+      defaultZone: http://${REGISTRY_SERVICE_NAME:-localhost}:${REGISTRY_SERVICE_PORT:-8082}/eureka/
 
 management:
   endpoints:
