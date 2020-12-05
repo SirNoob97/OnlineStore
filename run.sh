@@ -1,13 +1,8 @@
 #!/bin/bash
 
 sudo docker-compose run -d postgresql
-echo "Initializing postgresql database..."
-
 sudo docker-compose run -d config-service
-echo "Initializing config-service..."
-
 sudo docker-compose run -d registry-service
-echo "Initializing registry-service..."
 
 while [ $# -gt 0 ]; do
   if [[ $1 =~ ^((-{1})([p|P]$|[a|A]$|[s|S]$)) ]]; then
@@ -38,16 +33,11 @@ while [ $# -gt 0 ]; do
 done
 
 if [[ $PRODUCT_P == "" || $AUTH_P == "" || $SHOPPING_P == "" ]]; then
-  echo "arguments are required" >&2
+  echo "Arguments are required!!" >&2
   exit 1
 else
   echo "Execution of Online Store."
-  #echo $PRODUCT_P
-  #echo $SHOPPING_P
-  #echo $AUTH_P
   sudo docker-compose run -d  -e AUTH_PROFILE=$AUTH_P auth-service
-  echo "Initializing registry-service..."
-
   sudo docker-compose run -d  -e PRODUCT_PROFILE=$PRODUCT_P product-service
   sudo docker-compose run -d  -e SHOPPING_PROFILE=$SHOPPING_P shopping-service
 fi
