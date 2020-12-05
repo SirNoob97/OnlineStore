@@ -8,10 +8,11 @@ spring:
     name: ${SHOPPING_SERVICE_NAME:shopping-service}
   cloud:
     config:
-      label: docker
+      #label: docker
       uri: http://${CONFIG_SERVICE_NAME:localhost}:${CONFIG_SERVICE_PORT:8081}
       username: ${CONFIG_SERVICE_USER:root}
       password: ${CONFIG_SERVICE_PASSWORD:root}
+    fail-fast: true
     loadbalancer:
       ribbon:
         enabled: false
