@@ -39,6 +39,3 @@ Spring Security and JWT for the users authentication and authorization.
 * Implement Admin-Service
 * Decrease repeating code as much as possible.
 * Add application sequence diagram.
-
----
-***Due to the performance that this application requires, I am forced to suspend its development***
