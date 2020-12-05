@@ -1,4 +1,0 @@
-spring:
-  cloud:
-    config:
-      uri: http://config-service:8081
