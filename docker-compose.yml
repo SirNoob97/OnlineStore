@@ -29,6 +29,12 @@ services:
     networks:
       online-store:
         ipv4_address: 192.168.0.2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 50s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   registry-service:
     container_name: registry-service
