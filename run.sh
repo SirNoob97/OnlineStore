@@ -5,7 +5,7 @@ show_help() {
   echo "$1"
 
   echo -e "\nUSAGE
-  ./run.sh [OPTION] [PROFILE]"
+  ./run.sh OPTION PROFILE OPTION PROFILE OPTION PROFILE"
 
   echo -e "\nPROFILES
   test          Run the microservice to implement changes using an in-memory database
@@ -15,6 +15,25 @@ show_help() {
   -a, -A    Specify auht-service microservice
   -p, -P    Specify product-service microservice
   -s, -S    Specify shopping-service microservice"
+}
+
+validate_status(){
+  HEALTHY=\"healthy\"
+  UNHEALTHY=\"unhealthy\"
+  cont_status=
+
+  while  [[ $cont_status != $HEALTHY ]]; do
+    cont_status=$(sudo docker inspect --format "{{json .State.Health.Status }}" $1)
+
+    if [[ $cont_status == $UNHEALTHY ]]; then
+      echo "The $2 container cannot be run."
+      sudo docker stop $1
+      sudo docker rm $1
+      exit 1
+    elif [[ $cont_status == $HEALTHY ]]; then
+      echo "$2 container is ready."
+    fi
+  done
 }
 
 validate_profile(){
@@ -75,18 +94,18 @@ main(){
   done
 
     if [[ $arguments[@] =~ $POSTGRESQL ]]; then
-      #echo "postgresql"
       sudo docker-compose run -d postgresql
+      validate_status $(sudo docker ps -aqf "name=$POSTGRESQL") $POSTGRESQL
     fi
-    #echo "config"
+
     sudo docker-compose run -d config-service
-    #echo "registry"
+    validate_status $(sudo docker ps -aqf "name=config-service") "config-service"
+
     sudo docker-compose run -d registry-service
-    #echo "auth $AUTH_P"
+    validate_status $(sudo docker ps -aqf "name=registry-service") "registry-service"
+
     sudo docker-compose run -d  -e AUTH_PROFILE=$AUTH_P auth-service
-    #echo "product $PRODUCT_P"
     sudo docker-compose run -d  -e PRODUCT_PROFILE=$PRODUCT_P product-service
-    #echo "shopping $SHOPPING_P"
     sudo docker-compose run -d  -e SHOPPING_PROFILE=$SHOPPING_P shopping-service
 exit 0
 }
