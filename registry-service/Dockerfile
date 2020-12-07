@@ -14,5 +14,6 @@ RUN mvn -e -B package -DskipTests
 
 
 FROM azul/zulu-openjdk-alpine:11-jre
+RUN apk --no-cache add curl
 COPY --from=builder ./opt/online-store/registry-service/target/registry-service-0.0.1-SNAPSHOT.jar /
 ENTRYPOINT ["java", "-jar", "/registry-service-0.0.1-SNAPSHOT.jar"]
