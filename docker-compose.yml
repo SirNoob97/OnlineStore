@@ -30,7 +30,7 @@ services:
       online-store:
         ipv4_address: 192.168.0.2
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
       interval: 50s
       timeout: 10s
       retries: 3
