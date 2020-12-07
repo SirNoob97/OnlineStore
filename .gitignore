@@ -18,3 +18,5 @@ target/
 *.iws
 *.iml
 *.ipr
+
+postgresql/data
