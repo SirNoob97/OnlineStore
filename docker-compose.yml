@@ -13,6 +13,12 @@ services:
     networks:
       online-store:
         ipv4_address: 192.168.0.21
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 20s
+      timeout: 5s
+      retries: 2
+      start_period: 15s
 
   config-service:
     container_name: config-service
@@ -31,10 +37,10 @@ services:
         ipv4_address: 192.168.0.2
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
-      interval: 50s
+      interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 30s
 
   registry-service:
     container_name: registry-service
@@ -51,6 +57,12 @@ services:
     networks:
       online-store:
         ipv4_address: 192.168.0.3
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   auth-service:
     env_file:
