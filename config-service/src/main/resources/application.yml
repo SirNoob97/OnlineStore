@@ -13,6 +13,7 @@ spring:
           search-paths: ${SEARCH_PATH:config-files}
           username: ${GIT_USER}
           password: ${GIT_PASSWORD}
+          deleteUntrackedBranches: true
       discovery:
         enabled: true
         service-id: ${spring.application.name}
