@@ -17,7 +17,7 @@ spring:
       discovery:
         enabled: true
         service-id: ${spring.application.name}
-  security:
-    user:
-      name: ${CONFIG_SERVICE_USER:root}
-      password: ${CONFIG_SERVICE_PASSWORD:root}
+  #security:
+    #user:
+      #name: ${CONFIG_SERVICE_USER:root}
+      #password: ${CONFIG_SERVICE_PASSWORD:root}
