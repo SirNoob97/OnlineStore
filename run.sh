@@ -1,20 +1,22 @@
 #!/bin/bash
-#set -u
-
 show_help() {
   echo "$1"
 
   echo -e "\nUSAGE
-  ./run.sh OPTION PROFILE OPTION PROFILE OPTION PROFILE"
+  ./run.sh [ACTION] [OPTION] [PROFILE]"
+
+  echo -e "\nACTION
+  build                         Build or rebuild services
+  run                           Run services"
 
   echo -e "\nPROFILES
-  test          Run the microservice to implement changes using an in-memory database
-  postgresql    Run the microservice with a postgresql database connection"
+  test                          Run the microservice to implement changes using an in-memory database
+  postgresql                    Run the microservice with a postgresql database connection"
 
   echo -e "\nOPTIONS
-  -a, -A    Specify auht-service microservice
-  -p, -P    Specify product-service microservice
-  -s, -S    Specify shopping-service microservice"
+  -a, -A, --auth-service        Specify auht-service microservice
+  -p, -P, --product-service     Specify product-service microservice
+  -s, -S, --shopping-service    Specify shopping-service microservice"
 }
 
 validate_status(){
@@ -55,13 +57,20 @@ main(){
     exit 1
   fi
 
-  arguments=$@
+  if [[ $1 == "build" || $1 == "run" ]]; then
+    local action=$1
+    shift
+  else
+    show_help "Invalid Action!!"; exit 1
+  fi
+
+  local arguments=$@
+
   local AUTH_P=""
   local PRODUCT_P=""
   local SHOPPING_P=""
 
-  local OPS=":a:A:p:P:s:S:-:"
-
+  local OPS=":a:A:p:P:s:S:hH-:"
   while getopts $OPS options; do
     case $options in
       a|A) validate_profile AUTH_P $OPTARG
@@ -72,6 +81,8 @@ main(){
             ;;
       s|S) validate_profile SHOPPING_P $OPTARG
             echo "shopping-service will use \"$SHOPPING_P\" profile"
+            ;;
+      h|H) show_help "Online Store."; exit 0
             ;;
       -) case $OPTARG in
           auth-service) validate_profile AUTH_P ${!OPTIND}
@@ -86,6 +97,8 @@ main(){
                             OPTIND=$(( $OPTIND + 1 ))
                             echo "shopping-service will use \"$SHOPPING_P\" profile"
                             ;;
+          help) show_help "Online Store."; exit 0
+                ;;
           *) show_help "Invalid option \"-$OPTARG\""; exit 1;;
         esac;;
       :) show_help "Option \"-$OPTARG\" needs a profile"; exit 1;;
@@ -93,21 +106,31 @@ main(){
     esac
   done
 
-    if [[ $arguments[@] =~ $POSTGRESQL ]]; then
-      sudo docker-compose run -d postgresql
-      validate_status $(sudo docker ps -aqf "name=$POSTGRESQL") $POSTGRESQL
-    fi
+  if [[ $action == "build" ]]; then
+    sudo docker-compose build --force-rm config-service
+    sudo docker-compose build --force-rm registry-service
+    sudo docker-compose build --force-rm --build-arg AUTH_PROFILE=$AUTH_P auth-service
+    sudo docker-compose build --force-rm --build-arg PRODUCT_PROFILE=$PRODUCT_P product-service
+    sudo docker-compose build --force-rm --build-arg SHOPPING_PROFILE=$SHOPPING_P shopping-service
+    exit 0
+  fi
 
-    sudo docker-compose run -d config-service
-    validate_status $(sudo docker ps -aqf "name=config-service") "config-service"
+  if [[ $arguments[@] =~ $POSTGRESQL ]]; then
+    sudo docker-compose $action -d postgresql
+    validate_status $(sudo docker ps -aqf "name=$POSTGRESQL") $POSTGRESQL
+  fi
 
-    sudo docker-compose run -d registry-service
-    validate_status $(sudo docker ps -aqf "name=registry-service") "registry-service"
+  sudo docker-compose $action -d config-service
+  validate_status $(sudo docker ps -aqf "name=config-service") "config-service"
 
-    sudo docker-compose run -d  -e AUTH_PROFILE=$AUTH_P auth-service
-    sudo docker-compose run -d  -e PRODUCT_PROFILE=$PRODUCT_P product-service
-    sudo docker-compose run -d  -e SHOPPING_PROFILE=$SHOPPING_P shopping-service
-exit 0
+  sudo docker-compose $action -d registry-service
+  validate_status $(sudo docker ps -aqf "name=registry-service") "registry-service"
+
+  sudo docker-compose $action -d  -e AUTH_PROFILE=$AUTH_P auth-service
+  sudo docker-compose $action -d  -e PRODUCT_PROFILE=$PRODUCT_P product-service
+  sudo docker-compose $action -d  -e SHOPPING_PROFILE=$SHOPPING_P shopping-service
+
+  exit 0
 }
 
 TEST="test"
