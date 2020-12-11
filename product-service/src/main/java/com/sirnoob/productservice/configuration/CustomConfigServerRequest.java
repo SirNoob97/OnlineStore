@@ -5,8 +5,6 @@ import java.util.Map;
 
 import com.sirnoob.productservice.security.JwtProvider;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.config.client.ConfigClientProperties;
 import org.springframework.cloud.config.client.ConfigServicePropertySourceLocator;
@@ -25,8 +23,6 @@ public class CustomConfigServerRequest {
   private ConfigClientProperties configClientProperties;
   @Autowired
   private JwtProvider jwtProvider;
-
-  Logger log = LoggerFactory.getLogger(CustomConfigServerRequest.class);
 
   public ConfigClientProperties configClientProperties() {
     return configClientProperties;
