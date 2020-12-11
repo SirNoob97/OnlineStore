@@ -10,6 +10,8 @@ spring:
     config:
       #label: docker
       uri: http://${CONFIG_SERVICE_NAME:localhost}:${CONFIG_SERVICE_PORT:8081}
-      username: ${CONFIG_SERVICE_USER:root}
-      password: ${CONFIG_SERVICE_PASSWORD:root}
+      #username: ${CONFIG_SERVICE_USER:product-service}
+      #password: ${CONFIG_SERVICE_PASSWORD:root}
+      #headers:
+        #authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJyb2xlIjpbInByb2R1Y3Qtc2VydmljZSJdLCJzdWIiOiJwcm9kdWN0LXNlcnZpY2UiLCJpYXQiOjE2MDc2OTg2MDJ9.M1fSVgqRxs7pdj_iO-xutjYFzwWqSAiV3ryQhZOBgo-g63Tk3k1aDI2dWw4CaaZ7BsJQdYdouhXRXG1Qwll8dg_AVHvQs1BdJSCLmk65ihZvijQc0FyCnNj3-hvo11tqKa-VRXoqS5v7f1HVWLJIEbf7LCU7IEQbuol3nXCxZTcZTuPSFWZvpC37_nu5HzYaoL98OvYqmFK1qRK_W3VW-xvrCeRwIUjKDNbkXZEICYKKFtf0Grr0gFq65ULZvg4XskEwLtO0DAHnhiCzlQkT7uL9pEU4u67PNtTRKhTkbdwPindRqVOHgLPl1h40azrDtDr48QeGbAEVMPj9nEJYNg
     fail-fast: true
