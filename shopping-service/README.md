@@ -2,20 +2,23 @@
 
 Microservice in charge of sales management.
 
-# Execution Commands
+## Execution Commands
 
 TEST spring and maven profile
 
-    mvn spring-boot:run -Dspring-boot.run.profiles=test -P test
+    mvn clean compile spring-boot:run -Dspring-boot.run.profiles=test -P test
 
 POSTGRESQL spring and maven profile
 
-    mvn spring-boot:run -Dspring-boot.run.profiles=postgresql -P postgresql
+    mvn clean compile spring-boot:run -Dspring-boot.run.profiles=postgresql -P postgresql
 
+## Endpoints
 
-# Endpoints
+If you are using docker you should use the respective IP of this microservice instead of "localhost"
 
-## Invoices
+    192.168.0.13
+
+### Invoices
 
 POST, create a new invoice, this functionality is what communicates with product-service to obtain the name and price of the products
 

@@ -2,20 +2,23 @@
 
 Microservice in charge of user authentication/authorization and acting as a gateway.
 
-# Execution Commands
+## Execution Commands
 
 TEST spring and maven profile
 
-    mvn spring-boot:run -Dspring-boot.run.profiles=test -P test
+    mvn clean compile spring-boot:run -Dspring-boot.run.profiles=test -P test
 
 POSTGRESQL spring and maven profile
 
-    mvn spring-boot:run -Dspring-boot.run.profiles=postgresql -P postgresql
+    mvn clean compile spring-boot:run -Dspring-boot.run.profiles=postgresql -P postgresql
 
+## Endpoints
 
-# Endpoints
+If you are using docker you should use the respective IP of this microservice instead of "localhost"
 
-## Auth-Service
+    192.168.0.11
+
+### Auth
 
 POST register a new CUSTOMER account
 
@@ -41,7 +44,6 @@ POST refresh the session and avoid losing the authentication in the app
       "token": "the refresh-token is provided in the login response",
       "userName": "userName"}' | jq
 
-
 POST logout(this endpoint removes the refresh-token of the current session from the database and the front end should get rid of the user's jwt, a simple way to execute this function)
 
     curl -v -X POST http://localhost:8090/auth/logout \
@@ -54,7 +56,7 @@ GET obtain the current user, this is necessary since it is the only way that I a
 
     curl -v -X GET http://localhost:8090/users -H 'Authorization: Bearer valid-token' -H 'Accept: application/json' | jq
 
-## Account-Service
+### Accounts
 
 POST register a new account of any role(admin only)
 

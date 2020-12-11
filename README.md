@@ -20,6 +20,36 @@ Cloud Gateway to have a single acces endpoint.
 
 Spring Security and JWT for the users authentication and authorization.
 
+## Prerequisites
+
+* [Java 11](https://openjdk.java.net/).
+* [Maven](https://maven.apache.org/).
+* [Docker](https://www.docker.com/).
+
+## Gettin Started
+
+To run config-service and registration-service, you just need to use this command:
+
+    mvn clean compile spring-boot: run
+
+The other microservices have their own README file that contains the commands to run the microservice using the spring-boot maven plugin.
+
+To run the application with Docker, use the run.sh script as the example below, you can use -h option to see the availables profiles and options
+
+    ./run.sh build -a test -P test --shopping-service postgresql
+    ./run.sh run -a test -P test --shopping-service postgresql
+
+This will take a couple of minutes because the script ensures the execution order by checking the services status
+
+If you use this method you should use the respective ips of the microservices instead of "localhost"
+
+* PostgreSQL: 192.168.0.21
+* Config-Service: 192.168.0.2
+* Resgistry-Service: 192.168.0.3
+* Auth-Service: 192.168.0.11
+* Product-Service: 192.168.0.12
+* Shopping-Service: 192.168.0.13
+
 ### Dependencies
 
 * Spring Boot Starter Web, Web Flux, JPA, R2DBC, Validation, Actuator, Security.
@@ -33,8 +63,7 @@ Spring Security and JWT for the users authentication and authorization.
 ### TODO
 
 * ***Add security to each microservice***
-* ***Create a mini library to verify JWTs in each microservice and thus avoid, in addition to repeated code, that all microservices have a copy of my JKS file that I use to obtain the keys with which the JWTs are decrypted.***
-* ***Add Unit and Integration Test for shopping-service***
+* Add Unit and Integration Test for shopping-service
 * Implement Customer-Service, auth-service client microservice and with which customers can add/edit more information to their account.
 * Implement Admin-Service
 * Decrease repeating code as much as possible.
