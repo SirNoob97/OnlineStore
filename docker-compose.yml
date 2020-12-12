@@ -72,6 +72,8 @@ services:
         dockerfile: ./auth-service/Dockerfile
     image: auth-service:latest
     hostname: auth-service
+    ports:
+      - "8090:8090"
     networks:
       online-store:
         ipv4_address: 192.168.0.11
