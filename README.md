@@ -34,14 +34,14 @@ To run config-service and registration-service, you just need to use this comman
 
 The other microservices have their own README file that contains the commands to run the microservice using the spring-boot maven plugin.
 
-To run the application with Docker, use the run.sh script as the example below, you can use -h option to see the availables profiles and options
+To run the application with Docker, use the run.sh script as the example below, you can use -h option to see the availables profiles and options.
 
     ./run.sh build -a test -P test --shopping-service postgresql
     ./run.sh run -a test -P test --shopping-service postgresql
 
-This will take a couple of minutes because the script ensures the execution order by checking the services status
+This will take a couple of minutes because the script ensures the execution order by checking the services status.
 
-If you use this method you should use the respective ips of the microservices instead of "localhost"
+If you use this method you should use the respective ips of the microservices instead of "localhost".
 
 * PostgreSQL: 192.168.0.21
 * Config-Service: 192.168.0.2
@@ -50,21 +50,23 @@ If you use this method you should use the respective ips of the microservices in
 * Product-Service: 192.168.0.12
 * Shopping-Service: 192.168.0.13
 
+Ideally, only the auth-service ip should be set, as it also acts as the application gateway. In this way, with all the services with fixed ip, I can test the application in a more friendly way for my pc (without having to use the gateway to test the other services).
+
 ### Dependencies
 
 * Spring Boot Starter Web, Web Flux, JPA, R2DBC, Validation, Actuator, Security.
 * Spring Cloud Starter Config, Netflix Eureka Client and Server, Sleuth, Config Server, Gateway, Openfeign, Netflix Hystrix and Dashboard.
-* JWT
+* JWT.
 * H2.
 * PostgreSQL
-* Lombok
+* Lombok.
 * Codecentric Admin Starter Client and Server.
 
 ### TODO
 
 * ***Add security to each microservice***
-* Add Unit and Integration Test for shopping-service
+* Add Unit and Integration Test for shopping-service.
 * Implement Customer-Service, auth-service client microservice and with which customers can add/edit more information to their account.
-* Implement Admin-Service
+* Implement Admin-Service.
 * Decrease repeating code as much as possible.
 * Add application sequence diagram.
