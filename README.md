@@ -50,7 +50,8 @@ If you use this method you should use the respective ips of the microservices in
 * Product-Service: 192.168.0.12
 * Shopping-Service: 192.168.0.13
 
-Ideally, only the auth-service ip should be set, as it also acts as the application gateway.  In this way, with all the services with fixed ip, I can test the application in a faster way for me and more friendly for my pc (without having to use the gateway to test the other services).
+Ideally, only the auth-service ip should be set as it also acts as the application gateway (this is the reason why only this service exposes its port to one of my host).
+In this way, with all the services with fixed ip, I can test the application in a faster way for me and more friendly for my pc (without having to use the gateway to test the other services).
 
 ### Dependencies
 
