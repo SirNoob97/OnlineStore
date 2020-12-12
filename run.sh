@@ -22,8 +22,8 @@ show_help() {
 validate_status(){
   HEALTHY=\"healthy\"
   UNHEALTHY=\"unhealthy\"
-  cont_status=
-
+  local cont_status=
+  local count=0
   while  [[ $cont_status != $HEALTHY ]]; do
     cont_status=$(sudo docker inspect --format "{{json .State.Health.Status }}" $1)
 
@@ -34,6 +34,13 @@ validate_status(){
       exit 1
     elif [[ $cont_status == $HEALTHY ]]; then
       echo "$2 container is ready."
+    fi
+
+    ((count++))
+
+    if [[ $count -eq 120000 ]]; then
+      show_help "$2 cannot initialize container"
+      exit 1
     fi
   done
 }
