@@ -13,3 +13,6 @@ spring:
       username: ${CONFIG_SERVICE_USER:root}
       password: ${CONFIG_SERVICE_PASSWORD:root}
     fail-fast: true
+    loadbalancer:
+      ribbon:
+        enabled: false
