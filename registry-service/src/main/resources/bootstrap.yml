@@ -11,6 +11,9 @@ spring:
     loadbalancer:
       ribbon:
         enabled: false
+    circuitbreaker:
+      hystrix:
+        enabled: false
 
 server:
   error:
