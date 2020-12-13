@@ -5,8 +5,6 @@ services:
     env_file: ./env/postgresql.env
     image: postgres:12.5-alpine
     hostname: postgresql
-    ports:
-      - 5432:5432
     volumes:
       - ./postgresql/data:/var/lib/postgresql/data
       - ./postgresql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
@@ -22,16 +20,12 @@ services:
 
   config-service:
     container_name: config-service
-    env_file:
-      - ./env/postgresql.env
-      - ./env/config-service.env
+    env_file: ./env/config-service.env
     build:
       context: .
       dockerfile: ./config-service/Dockerfile
     image: config-service:latest
     hostname: config-service
-    ports:
-      - 8081:8081
     networks:
       online-store:
         ipv4_address: 192.168.0.2
@@ -52,8 +46,6 @@ services:
       dockerfile: ./registry-service/Dockerfile
     image: registry-service:latest
     hostname: registry-service
-    ports:
-      - 8082:8082
     networks:
       online-store:
         ipv4_address: 192.168.0.3
@@ -70,8 +62,6 @@ services:
       - ./env/auth-service.env
       - ./env/config-service.env
       - ./env/registry-service.env
-    environment:
-      - AUTH_PROFILE
     container_name: auth-service
     build:
         context: .
@@ -79,7 +69,7 @@ services:
     image: auth-service:latest
     hostname: auth-service
     ports:
-      - 8090:8090
+      - "8090:8090"
     networks:
       online-store:
         ipv4_address: 192.168.0.11
@@ -90,16 +80,12 @@ services:
       - ./env/product-service.env
       - ./env/config-service.env
       - ./env/registry-service.env
-    environment:
-      - PRODUCT_PROFILE
     container_name: product-service
     build:
         context: .
         dockerfile: ./product-service/Dockerfile
     image: product-service:latest
     hostname: product-service
-    ports:
-      - 8091:8091
     networks:
       online-store:
         ipv4_address: 192.168.0.12
@@ -110,16 +96,12 @@ services:
       - ./env/shopping-service.env
       - ./env/config-service.env
       - ./env/registry-service.env
-    environment:
-      - SHOPPING_PROFILE
     container_name: shopping-service
     build:
         context: .
         dockerfile: ./shopping-service/Dockerfile
     image: shopping-service:latest
     hostname: shopping-service
-    ports:
-      - 8092:8092
     networks:
       online-store:
         ipv4_address: 192.168.0.13
