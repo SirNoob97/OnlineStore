@@ -20,9 +20,7 @@ services:
 
   config-service:
     container_name: config-service
-    env_file:
-      - ./env/postgresql.env
-      - ./env/config-service.env
+    env_file: ./env/config-service.env
     build:
       context: .
       dockerfile: ./config-service/Dockerfile
@@ -64,8 +62,6 @@ services:
       - ./env/auth-service.env
       - ./env/config-service.env
       - ./env/registry-service.env
-    environment:
-      - AUTH_PROFILE
     container_name: auth-service
     build:
         context: .
@@ -84,8 +80,6 @@ services:
       - ./env/product-service.env
       - ./env/config-service.env
       - ./env/registry-service.env
-    environment:
-      - PRODUCT_PROFILE
     container_name: product-service
     build:
         context: .
@@ -102,8 +96,6 @@ services:
       - ./env/shopping-service.env
       - ./env/config-service.env
       - ./env/registry-service.env
-    environment:
-      - SHOPPING_PROFILE
     container_name: shopping-service
     build:
         context: .
