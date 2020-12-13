@@ -28,25 +28,30 @@ Spring Security and JWT for the users authentication and authorization.
 
 ## Gettin Started
 
+### Spring-boot Maven Plugin
+
 To run config-service and registration-service, you just need to use this command:
 
     mvn clean compile spring-boot: run
 
 The other microservices have their own README file that contains the commands to run the microservice using the spring-boot maven plugin.
 
-To run the application with Docker, use the run.sh script as the example below, you can use -h option to see the availables profiles and options.
+### Docker
 
-    ./run.sh build -a test -P test --shopping-service postgresql
-    ./run.sh run -a test -P test --shopping-service postgresql
+To run the application with Docker, use the run.sh.
 
-This will take a couple of minutes because the script ensures the execution order by checking the services status.
+This script runs the application to be used with a Postgres database.
+
+Using the "depends_on" option of docker-compose does not ensure that the microservice or the database is ready to receive requests, so I have created this little script to ensure the order of execution and thus avoid conflicts.
+
+    ./run.sh
 
 If you use this method you should use the respective ips of the microservices instead of "localhost".
 
 * PostgreSQL: 192.168.0.21
 * Config-Service: 192.168.0.2
 * Resgistry-Service: 192.168.0.3
-* Auth-Service: 192.168.0.11
+* Auth-Service: 192.168.0.11 (Gateway)
 * Product-Service: 192.168.0.12
 * Shopping-Service: 192.168.0.13
 
