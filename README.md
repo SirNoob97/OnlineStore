@@ -60,13 +60,29 @@ In this way, with all the services with fixed ip, I can test the application in 
 
 ### Dependencies
 
-* Spring Boot Starter Web, Web Flux, JPA, R2DBC, Validation, Actuator, Security.
-* Spring Cloud Starter Config, Netflix Eureka Client and Server, Sleuth, Config Server, Gateway, Openfeign, Netflix Hystrix and Dashboard.
-* JWT.
-* H2.
-* PostgreSQL
-* Lombok.
-* Codecentric Admin Starter Client and Server.
+* Spring Boot
+  * Web MVC [docs](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#spring-web)
+  * Web Flux [docs](https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html#spring-webflux)
+  * Junit, Mockito [docs](https://docs.spring.io/spring-framework/docs/current/reference/html/testing.html#testing)
+  * JPA [docs](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#reference)
+  * R2DBC [ref](https://r2dbc.io/) [spring docs](https://docs.spring.io/spring-data/r2dbc/docs/current/reference/html/#reference) [repo](https://github.com/r2dbc)
+  * Security [docs](https://docs.spring.io/spring-security/site/docs/current/reference/html5/)
+  * Actuator [docs](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#production-ready)
+  * Codecentric Spring Boot Admin [docs](https://codecentric.github.io/spring-boot-admin/current/)
+
+* Spring Cloud
+  * Config [docs](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/)
+  * Gateway [docs](https://docs.spring.io/spring-cloud-gateway/docs/current/reference/html/)
+  * Sleuth [docs](https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/)
+  * Openfeign [docs](https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/)
+  * Netflix Eureka Server [docs](https://docs.spring.io/spring-cloud-netflix/docs/current/reference/html/)
+  * Netflix Hystrix [repo](https://github.com/Netflix/Hystrix)
+  * Netflix Hystrix Dashboard [repo](https://github.com/Netflix-Skunkworks/hystrix-dashboard)
+
+* JWT [repo](https://github.com/jwtk/jjwt)
+* H2 [ref](https://www.h2database.com/html/main.html) [repo](https://github.com/h2database/h2database)
+* PostgreSQL [postgres docs](https://www.postgresql.org/docs/13/index.html)
+* Lombok [ref](https://projectlombok.org/)
 
 ### TODO
 
