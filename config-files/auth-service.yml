@@ -18,6 +18,23 @@ spring:
       discovery:
         locator:
           lower-case-service-id: true
+  sleuth:
+    circuitbreaker:
+      enabled: false
+    feign:
+      enabled: false
+    hystrix:
+      strategy:
+        enabled: false
+    messaging:
+      kafka:
+        enabled: false
+      rabbit:
+        enabled: false
+    reactor:
+      decorate-on-each: false
+    zuul:
+      enabled: false
 
 management:
   endpoints:

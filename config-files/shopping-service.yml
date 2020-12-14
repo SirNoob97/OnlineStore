@@ -38,3 +38,19 @@ hystrix:
     default:
       coreSize: 15
       mazQueueSize: 5
+
+spring:
+  sleuth:
+    messaging:
+      kafka:
+        enabled: false
+      rabbit:
+        enabled: false
+    reactor:
+      enabled: false
+    rxjava:
+      schedulers:
+        hook:
+          enabled: false
+    zuul:
+      enabled: false
