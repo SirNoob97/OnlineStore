@@ -73,22 +73,26 @@ In this way, with all the services with fixed ip, I can test the application in 
 * Spring Cloud
   * Config [docs](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/)
   * Gateway [docs](https://docs.spring.io/spring-cloud-gateway/docs/current/reference/html/)
-  * Sleuth [docs](https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/)
   * Openfeign [docs](https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/)
   * Netflix Eureka Server [docs](https://docs.spring.io/spring-cloud-netflix/docs/current/reference/html/)
   * Netflix Hystrix [repo](https://github.com/Netflix/Hystrix)
   * Netflix Hystrix Dashboard [repo](https://github.com/Netflix-Skunkworks/hystrix-dashboard)
+  * Sleuth [docs](https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/)
 
+* Zipkin [docs](https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/) [repo](https://github.com/openzipkin/zipkin)
 * JWT [repo](https://github.com/jwtk/jjwt)
 * H2 [ref](https://www.h2database.com/html/main.html) [repo](https://github.com/h2database/h2database)
 * PostgreSQL [postgres docs](https://www.postgresql.org/docs/13/index.html)
 * Lombok [ref](https://projectlombok.org/)
 
+Due to the performance required by the application, the admin-server and zipkin-server will be omitted from the application :c
+
 ### TODO
 
-* ***Add security to each microservice***
+* ***Add security to each microservice.***
 * Add Unit and Integration Test for shopping-service.
 * Implement Customer-Service, auth-service client microservice and with which customers can add/edit more information to their account.
-* Implement Admin-Service.
 * Decrease repeating code as much as possible.
 * Add application sequence diagram.
+* Implement Admin-Service.
+* Add Zipkin server.
