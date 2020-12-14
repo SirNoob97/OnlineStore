@@ -85,8 +85,6 @@ In this way, with all the services with fixed ip, I can test the application in 
 * PostgreSQL [postgres docs](https://www.postgresql.org/docs/13/index.html)
 * Lombok [ref](https://projectlombok.org/)
 
-Due to the performance required by the application, the admin-server and zipkin-server will be omitted from the application :c
-
 ### TODO
 
 * ***Add security to each microservice.***
@@ -96,3 +94,6 @@ Due to the performance required by the application, the admin-server and zipkin-
 * Add application sequence diagram.
 * Implement Admin-Service.
 * Add Zipkin server.
+
+---
+Due to the performance required by the application, the admin-server and zipkin-server will be omitted from the application :c
