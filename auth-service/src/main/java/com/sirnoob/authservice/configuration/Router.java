@@ -13,6 +13,9 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.handler.ResponseStatusExceptionHandler;
 
+import static org.springframework.cloud.gateway.support.RouteMetadataUtils.CONNECT_TIMEOUT_ATTR;
+import static org.springframework.cloud.gateway.support.RouteMetadataUtils.RESPONSE_TIMEOUT_ATTR;
+
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RequestPredicates.PUT;
@@ -35,10 +38,14 @@ public class Router {
     return routeLocatorBuilder.routes()
                               .route(route -> route.path("/products/**", "/main-categories/**", "/sub-categories/**")
                                                     .uri("lb://product-service")
-                                                    .id("product-service"))
+                                                    .id("product-service")
+                                                    .metadata(RESPONSE_TIMEOUT_ATTR, 10000)
+                                                    .metadata(CONNECT_TIMEOUT_ATTR, 1000))
                               .route(route -> route.path("/invoices/**")
                                                     .uri("lb://shopping-service")
-                                                    .id("shopping-service"))
+                                                    .id("shopping-service")
+                                                    .metadata(RESPONSE_TIMEOUT_ATTR, 5000)
+                                                    .metadata(CONNECT_TIMEOUT_ATTR, 1000))
                               .build();
   }
 
