@@ -6,6 +6,11 @@ logging:
           r2dbc: DEBUG
         transaction: TRACE
 
+spring:
+  cloud:
+    gateway:
+      httpserver:
+        wiretap: true
 
 jwt:
   expiration:
