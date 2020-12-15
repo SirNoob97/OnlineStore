@@ -3,12 +3,25 @@ server:
 
 eureka:
   instance:
+    instanceId: ${spring.application.name}:${vcap.application.instance_id}:${spring.application.instance_id}
     hostname: ${REGISTRY_SERVICE_NAME:localhost}
+    statusPageUrl: http://${eureka.instance.hostname}/info
+    healthCheckUrl: http://${eureka.instance.hostname}/health
+    homePageUrl: http://${eureka.instance.hostname}/
   client:
     registerWithEureka: false
     fetchRegistry: false
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+    tls:
+      enabled: true
+      key-store: registry-service.jks
+      key-store-type: PKCS12
+      key-store-password: registry-service
+      key-password: registry-service
+      trust-store: registry-service-key.key
+      trust-store-type: PKCS12
+      trust-store-password: registry-service
   server:
     maxThreadsForPeerReplication: 0
     eviction-interval-timer-in-ms: 1000
