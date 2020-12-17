@@ -9,11 +9,14 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://${REGISTRY_SERVICE_NAME:localhost}:${REGISTRY_SERVICE_PORT:8082}/eureka/
-      statusPageUrlPath: /actuator/info
-      healthCheckUrlPath: /actuator/health
   instance:
-    instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id}}
-    leaseRenewalIntervalInSeconds: 15
+    lease-renewal-interval-in-seconds: 2
+    lease-expiration-duration-in-seconds: 5
+    homePageUrl: https://${vcap.application.uris[0]:localhost}/
+    statusPageUrl: https://${vcap.application.uris[0]:localhost}/actuator/info
+    healthCheckUrl: https://${vcap.application.uris[0]:localhost}/actuator/health
+    secureHealthCheckUrl: https://${vcap.application.uris[0]:localhost}/actuator/health
+    hostname: ${vcap.application.uris[0]:localhost}
 
 spring:
   sleuth:
@@ -36,3 +39,7 @@ management:
     web:
       exposure:
         include: "*"
+  endpoint:
+    health:
+      show-details: always
+
