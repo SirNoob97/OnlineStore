@@ -1,5 +1,6 @@
 server:
   port: ${PRODUCT_SERVICE_PORT:8091}
+  servletPath: /${spring.application.name}
 
 logging:
   pattern:
@@ -9,7 +10,10 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://${REGISTRY_SERVICE_NAME:localhost}:${REGISTRY_SERVICE_PORT:8082}/eureka/
+      statusPageUrlPath: ${server.servletPath}/info
+      healthCheckUrlPath: ${server.servletPath}/health
   instance:
+    instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id}}
     leaseRenewalIntervalInSeconds: 15s
 
 spring:
