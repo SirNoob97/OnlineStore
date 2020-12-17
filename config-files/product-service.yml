@@ -10,13 +10,8 @@ eureka:
     serviceUrl:
       defaultZone: http://${REGISTRY_SERVICE_NAME:localhost}:${REGISTRY_SERVICE_PORT:8082}/eureka/
   instance:
-    lease-renewal-interval-in-seconds: 2
-    lease-expiration-duration-in-seconds: 5
-    #homePageUrl: https://${vcap.application.uris[0]:localhost}/
-    #statusPageUrl: https://${vcap.application.uris[0]:localhost}/actuator/info
-    #healthCheckUrl: https://${vcap.application.uris[0]:localhost}/actuator/health
-    #secureHealthCheckUrl: https://${vcap.application.uris[0]:localhost}/actuator/health
-    #hostname: ${PRODUCT_SERVICE_NAME:localhost}
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 20
 
 spring:
   sleuth:
