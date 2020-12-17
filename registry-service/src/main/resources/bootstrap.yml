@@ -3,7 +3,7 @@ spring:
     name: ${REGISTRY_SERVICE_NAME:registry-service}
   cloud:
     config:
-      #label: docker
+      label: registry-service
       uri: http://${CONFIG_SERVICE_NAME:localhost}:${CONFIG_SERVICE_PORT:8081}
       username: ${CONFIG_SERVICE_USER:root}
       password: ${CONFIG_SERVICE_USER:root}
