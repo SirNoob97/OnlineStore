@@ -1,33 +1,33 @@
 server:
   port: ${REGISTRY_SERVICE_PORT:8082}
 
-#eureka:
-  #instance:
-    #hostname: ${vcap.application.uris[0]:${REGISTRY_SERVICE_NAME:localhost}}
-  #client:
-    #registerWithEureka: false
-    #fetchRegistry: false
-    #serviceUrl:
-      #defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
-  #server:
-    #maxThreadsForPeerReplication: 0
-    #enable-self-preservation: false
-    #expected-client-renewal-interval-seconds: 3
-    #eviction-interval-timer-in-ms: 2000
-    #renewal-threshold-update-interval-ms: 2000
-    #renewal-percent-threshold: 0.5
+eureka:
+  instance:
+    hostname: ${vcap.application.uris[0]:${REGISTRY_SERVICE_NAME:localhost}}
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    maxThreadsForPeerReplication: 0
+    enable-self-preservation: false
+    expected-client-renewal-interval-seconds: 3
+    eviction-interval-timer-in-ms: 2000
+    renewal-threshold-update-interval-ms: 2000
+    renewal-percent-threshold: 0.5
 
-#management:
-  #endpoints:
-    #web:
-      #exposure:
-        #include: "*"
-  #endpoint:
-    #refresh:
-      #enabled: true
-    #health:
-      #show-details: always
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    refresh:
+      enabled: true
+    health:
+      show-details: always
 
-#logging:
-  #level:
-    #com.netflix: warn
+logging:
+  level:
+    com.netflix: warn
