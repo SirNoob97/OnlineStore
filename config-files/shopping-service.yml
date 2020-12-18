@@ -17,13 +17,6 @@ Feign:
   hystrix:
     enabled: true
 
-management:
-  endpoints:
-    web:
-      base-path: /
-      exposure:
-        exclude: "*"
-
 hystrix:
   dashboard:
     proxy-stream-allow-list: "*"
