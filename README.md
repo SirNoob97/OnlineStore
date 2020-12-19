@@ -83,7 +83,7 @@ In this way, with all the services with fixed ip, I can test the application in 
 * JWT [repo](https://github.com/jwtk/jjwt)
 * H2 [ref](https://www.h2database.com/html/main.html) [repo](https://github.com/h2database/h2database)
 * PostgreSQL [postgres docs](https://www.postgresql.org/docs/13/index.html)
-* Lombok [ref](https://projectlombok.org/) [repo] (https://github.com/rzwitserloot/lombok)
+* Lombok [ref](https://projectlombok.org/) [repo](https://github.com/rzwitserloot/lombok)
 
 ### TODO
 
