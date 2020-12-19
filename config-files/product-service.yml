@@ -35,6 +35,8 @@ management:
       exposure:
         include: "*"
   endpoint:
+    logfile:
+      enabled: true
     health:
       show-details: always
 
