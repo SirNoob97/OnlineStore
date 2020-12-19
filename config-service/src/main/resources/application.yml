@@ -21,3 +21,12 @@ spring:
     user:
       name: ${CONFIG_SERVICE_USER:root}
       password: ${CONFIG_SERVICE_PASSWORD:root}
+
+logging:
+  file:
+    path: /var/log/online-store/${spring.application.name}
+
+management:
+  endpoint:
+    health:
+      show-details: when-authorized
