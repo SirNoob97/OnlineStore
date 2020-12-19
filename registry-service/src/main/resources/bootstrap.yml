@@ -19,3 +19,7 @@ server:
   error:
     include-message: always
     include-binding-errors: always
+
+logging:
+  file:
+    path: /var/log/online-store/${spring.application.name}

@@ -1,10 +1,6 @@
 server:
   port: ${REGISTRY_SERVICE_PORT:8082}
 
-logging:
-  file:
-    path: /var/log/online-store/${spring.application.name}
-
 spring:
   security:
     user:

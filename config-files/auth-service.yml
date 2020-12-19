@@ -4,8 +4,6 @@ server:
 logging:
   pattern:
     console: "%clr(%d{yy-MM-dd E HH:mm:ss.SSS}){blue} %clr(|${LOG_LEVEL_PATTERN:-%5p}|) %clr(${PID}){magenta} %clr(---){faint} %clr([%8.15t]){cyan} %clr(%-40.40logger{0}){blue} %clr(:){red} %clr(%m){faint}%n"
-  file:
-    path: /var/log/online-store/${spring.application.name}
 
 eureka:
   client:

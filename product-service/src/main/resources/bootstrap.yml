@@ -16,3 +16,7 @@ spring:
     loadbalancer:
       ribbon:
         enabled: false
+
+logging:
+  file:
+    path: /var/log/online-store/${spring.application.name}
