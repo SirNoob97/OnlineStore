@@ -36,12 +36,12 @@ public class Router {
   @Bean
   public RouteLocator routeLocator(RouteLocatorBuilder routeLocatorBuilder) {
     return routeLocatorBuilder.routes()
-                              .route(route -> route.path("/products/**", "/main-categories/**", "/sub-categories/**")
+                              .route(route -> route.path("/products/**", "/main-categories/**", "/sub-categories/**", "/product-service/**")
                                                     .uri("lb://product-service")
                                                     .id("product-service")
                                                     .metadata(RESPONSE_TIMEOUT_ATTR, 10000)
                                                     .metadata(CONNECT_TIMEOUT_ATTR, 1000))
-                              .route(route -> route.path("/invoices/**")
+                              .route(route -> route.path("/invoices/**", "/shopping-service/**")
                                                     .uri("lb://shopping-service")
                                                     .id("shopping-service")
                                                     .metadata(RESPONSE_TIMEOUT_ATTR, 5000)
