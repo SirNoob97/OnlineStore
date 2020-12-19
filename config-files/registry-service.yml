@@ -39,6 +39,8 @@ management:
       exposure:
         exclude: "*"
   endpoint:
+    logfile:
+      enabled: true
     health:
       show-details: when-authorized
       status:
