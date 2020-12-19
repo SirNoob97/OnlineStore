@@ -75,6 +75,14 @@
           <groupId>com.sun.jersey.contribs</groupId>
           <artifactId>jersey-apache-client4</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.springframework.cloud</groupId>
+          <artifactId>spring-cloud-starter-ribbon</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.netflix.ribbon</groupId>
+          <artifactId>ribbon-eureka</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
