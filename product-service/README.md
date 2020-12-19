@@ -138,3 +138,9 @@ POST create a sub category
 DELETE a sub category through ID
 
     curl -v -X DELETE http://localhost:8091/sub-categories/13
+
+### Actuator
+
+The following endpoints are excluded: env,beans,heapdump,flyway,threaddump,liquidbase,prometheus
+
+    curl -v -X GET http://localhost:8090/product-service/actuator/**

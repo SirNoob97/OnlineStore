@@ -59,3 +59,9 @@ GET invoices by product barcode
 GET invoices by invoice number
 
     curl -v -X GET http://localhost:8092/invoices/456023 -H 'Accept: application/json' | jq
+
+### Actuator
+
+The following endpoints are excluded: env,beans,heapdump,flyway,threaddump,liquidbase,prometheus
+
+    curl -v -X GET http://localhost:8090/shopping-service/actuator/**

@@ -97,3 +97,9 @@ PUT edit the password of the account (like the account edit function, the user m
 DELETE delete the account(user must only be authenticated)
 
     curl -v -X DELETE http://localhost:8090/accounts/1 -H 'Authorization: Bearer valid-token'
+
+### Actuator
+
+The following endpoints are excluded: env,beans,heapdump,flyway,threaddump,liquidbase,prometheus
+
+    curl -v -X GET http://localhost:8090/actuator/**
