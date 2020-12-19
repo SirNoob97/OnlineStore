@@ -24,12 +24,18 @@ eureka:
     renewal-percent-threshold: 0.5
 
 management:
+  cloudfoundry:
+    enable: false
   endpoints:
     web:
       exposure:
         include: "*"
+        exclude: "env,beans,heapdump.flyway,threaddump,liquidbase,prometheus"
+    jmx:
+      exposure:
+        exclude: "*"
   endpoint:
-    refresh:
-      enabled: true
     health:
-      show-details: always
+      show-details: when-authorized
+      status:
+        order: "fatal,down,out-of-service,unknown,up"
