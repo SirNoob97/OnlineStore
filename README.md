@@ -26,7 +26,7 @@ Spring Security and JWT for the users authentication and authorization.
 
 * [Java 11](https://openjdk.java.net/).
 * [Maven](https://maven.apache.org/).
-* [Docker](https://www.docker.com/).
+* [Docker and Docker Compose](https://www.docker.com/).
 
 ## Gettin Started
 
