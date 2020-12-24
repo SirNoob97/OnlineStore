@@ -4,6 +4,8 @@ This project consists of the REST api for an online store using microservices ar
 
 My goal whit this project is to use all knowledge that i have acquired over the course of 8 months in a self-taught way to create a rest-full amateur application for an online store.
 
+![app-diagram](diagram.png)
+
 ## Microservices
 
 * **Product-Service** microservice in charge of products management. [Commands and Endpoints](https://github.com/SirNoob97/OnlineStore/blob/master/product-service/README.md)
