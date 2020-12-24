@@ -60,6 +60,16 @@ GET invoices by invoice number
 
     curl -v -X GET http://localhost:8092/invoices/456023 -H 'Accept: application/json' | jq
 
+### Hystrix
+
+Hystrix dashboard access
+
+    curl -v -X GET http://localhost:8092/hystrix
+
+URL for microservice monitoring(if you use Docker you can use the hostname)
+
+    http://localhost:8092/shopping-service/actuator/hystrix.stream
+
 ### Actuator
 
 The following endpoints are excluded: env,beans,heapdump,flyway,threaddump,liquidbase,prometheus
