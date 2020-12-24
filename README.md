@@ -93,7 +93,6 @@ In this way, with all the services with fixed ip, I can test the application in 
 * Add Unit and Integration Test for shopping-service.
 * Implement Customer-Service, auth-service client microservice and with which customers can add/edit more information to their account.
 * Decrease repeating code as much as possible.
-* Add application sequence diagram.
 * Implement Admin-Service.
 * Add Zipkin server.
 
