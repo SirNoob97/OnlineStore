@@ -34,7 +34,7 @@ Spring Security and JWT for the users authentication and authorization.
 
 To run config-service and registration-service, you just need to use this command:
 
-    mvn clean compile spring-boot: run
+    mvn clean compile spring-boot:run
 
 The other microservices have their own README file that contains the commands to run the microservice using the spring-boot maven plugin.
 
