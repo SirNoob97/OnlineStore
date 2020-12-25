@@ -13,7 +13,13 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-
+import org.springframework.security.web.server.authentication.logout.DelegatingServerLogoutHandler;
+import org.springframework.security.web.server.authentication.logout.HeaderWriterServerLogoutHandler;
+import org.springframework.security.web.server.authentication.logout.SecurityContextServerLogoutHandler;
+import org.springframework.security.web.server.authentication.logout.ServerLogoutHandler;
+import org.springframework.security.web.server.header.ClearSiteDataServerHttpHeadersWriter;
+import org.springframework.security.web.server.header.ClearSiteDataServerHttpHeadersWriter.Directive;
+import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -31,6 +37,11 @@ public class SecurityConfig {
 
   @Bean
   public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity serverHttpSecurity){
+
+    //ServerLogoutHandler securityContext = new SecurityContextServerLogoutHandler();
+    //ClearSiteDataServerHttpHeadersWriter writer = new ClearSiteDataServerHttpHeadersWriter(Directive.ALL);
+    //ServerLogoutHandler clearSiteData = new HeaderWriterServerLogoutHandler(writer);
+    //DelegatingServerLogoutHandler logoutHandler = new DelegatingServerLogoutHandler(securityContext, clearSiteData);
     //@formatter:off
     return serverHttpSecurity.csrf().disable()
                               .formLogin().disable()
@@ -63,6 +74,10 @@ public class SecurityConfig {
                               .pathMatchers(DELETE, "/invoices/**").hasAnyAuthority(ADMIN, EMPLOYEE)
                               .anyExchange().permitAll()
                               .and()
+                              .headers(headers -> headers.referrerPolicy(reffer -> reffer.policy(ReferrerPolicy.SAME_ORIGIN)))
+                              //.logout().logoutHandler(logoutHandler)
+                                        //.logoutUrl("/auth/logout")
+                              //.and()
                               .build();
     //@formatter:on
   }
