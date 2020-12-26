@@ -45,5 +45,4 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
   private <T> Mono<T> tokenNotFound(){
     return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, TOKEN_NOT_FOUND));
   }
-
 }
