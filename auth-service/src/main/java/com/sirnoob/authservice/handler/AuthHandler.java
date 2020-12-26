@@ -22,6 +22,8 @@ import reactor.core.publisher.Mono;
 public class AuthHandler {
 
   private static final MediaType JSON = MediaType.APPLICATION_JSON;
+  private static final String CLEAR_SITE_DATA = "Clear-Site-Data";
+  private static final String CLEAR_SITE_DATA_VALUES = "\"cache\", \"cookies\", \"storage\", \"executionContexts\"";
 
   private final IRefreshTokenService iRefreshTokenService;
   private final IAuthService iAuthService;
@@ -55,7 +57,7 @@ public class AuthHandler {
     return getRefreshTokenRequestAndValidate(serverRequest)
                         .map(RefreshTokenRequest::getToken)
                         .flatMap(token -> iRefreshTokenService.deleteRefreshToken(token))
-                        .then(ServerResponse.noContent().build());
+                        .then(ServerResponse.noContent().header(CLEAR_SITE_DATA, CLEAR_SITE_DATA_VALUES).build());
   }
 
 

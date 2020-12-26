@@ -1,11 +1,15 @@
 package com.sirnoob.authservice.configuration;
 
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
+
 import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.security.AuthenticationManager;
 import com.sirnoob.authservice.security.SecurityContextRepository;
 
 import org.springframework.context.annotation.Bean;
-import static org.springframework.http.HttpMethod.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -13,12 +17,6 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.logout.DelegatingServerLogoutHandler;
-import org.springframework.security.web.server.authentication.logout.HeaderWriterServerLogoutHandler;
-import org.springframework.security.web.server.authentication.logout.SecurityContextServerLogoutHandler;
-import org.springframework.security.web.server.authentication.logout.ServerLogoutHandler;
-import org.springframework.security.web.server.header.ClearSiteDataServerHttpHeadersWriter;
-import org.springframework.security.web.server.header.ClearSiteDataServerHttpHeadersWriter.Directive;
 import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy;
 
 import lombok.RequiredArgsConstructor;
@@ -37,11 +35,6 @@ public class SecurityConfig {
 
   @Bean
   public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity serverHttpSecurity){
-
-    //ServerLogoutHandler securityContext = new SecurityContextServerLogoutHandler();
-    //ClearSiteDataServerHttpHeadersWriter writer = new ClearSiteDataServerHttpHeadersWriter(Directive.ALL);
-    //ServerLogoutHandler clearSiteData = new HeaderWriterServerLogoutHandler(writer);
-    //DelegatingServerLogoutHandler logoutHandler = new DelegatingServerLogoutHandler(securityContext, clearSiteData);
     //@formatter:off
     return serverHttpSecurity.csrf().disable()
                               .formLogin().disable()
@@ -75,9 +68,6 @@ public class SecurityConfig {
                               .anyExchange().permitAll()
                               .and()
                               .headers(headers -> headers.referrerPolicy(reffer -> reffer.policy(ReferrerPolicy.SAME_ORIGIN)))
-                              //.logout().logoutHandler(logoutHandler)
-                                        //.logoutUrl("/auth/logout")
-                              //.and()
                               .build();
     //@formatter:on
   }
