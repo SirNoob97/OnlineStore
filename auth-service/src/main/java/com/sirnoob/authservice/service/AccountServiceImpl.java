@@ -56,8 +56,6 @@ public class AccountServiceImpl implements IAccountService {
   }
 
   private <T> Mono<T> verifyOperation(Integer num){
-    //if (num < 0) throw new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND);
-    //return Mono.just(num);
     return num > 0 ? Mono.empty() : Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
   }
 }
