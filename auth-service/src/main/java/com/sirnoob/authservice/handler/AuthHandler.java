@@ -1,6 +1,7 @@
 package com.sirnoob.authservice.handler;
 
 import com.sirnoob.authservice.dto.AccountView;
+import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
@@ -10,6 +11,7 @@ import com.sirnoob.authservice.validator.ConstraintValidator;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -31,16 +33,16 @@ public class AuthHandler {
 
   public Mono<ServerResponse> signup(ServerRequest serverRequest){
     return serverRequest.bodyToMono(SignUpRequest.class)
-                        .doOnNext(constraintValidator::validateRequest)
-                        .flatMap(iAuthService::signup)
-                        .flatMap(data -> getServerResponse(HttpStatus.CREATED, data));
+           .doOnNext(constraintValidator::validateRequest)
+           .flatMap(iAuthService::signup)
+           .flatMap(data -> buildServerResponse(HttpStatus.CREATED, data));
   }
 
   public Mono<ServerResponse> login(ServerRequest serverRequest){
     return serverRequest.bodyToMono(LoginRequest.class)
-                        .doOnNext(constraintValidator::validateRequest)
-                        .flatMap(iAuthService::login)
-                        .flatMap(data -> getServerResponse(HttpStatus.OK, data));
+           .doOnNext(constraintValidator::validateRequest)
+           .flatMap(iAuthService::login)
+           .flatMap(data -> buildServerResponse(HttpStatus.OK, data));
   }
 
   public Mono<ServerResponse> getCurrentUser(ServerRequest serverRequest){
@@ -49,23 +51,30 @@ public class AuthHandler {
 
   public Mono<ServerResponse> refreshToken(ServerRequest serverRequest){
     return getRefreshTokenRequestAndValidate(serverRequest)
-                        .flatMap(iAuthService::refreshToken)
-                        .flatMap(data -> getServerResponse(HttpStatus.OK, data));
+           .flatMap(iAuthService::refreshToken)
+           .flatMap(data -> buildServerResponse(HttpStatus.OK, data));
   }
 
   public Mono<ServerResponse> logout(ServerRequest serverRequest){
     return getRefreshTokenRequestAndValidate(serverRequest)
-                        .map(RefreshTokenRequest::getToken)
-                        .flatMap(token -> iRefreshTokenService.deleteRefreshToken(token))
-                        .then(ServerResponse.noContent().header(CLEAR_SITE_DATA, CLEAR_SITE_DATA_VALUES).build());
+           .map(RefreshTokenRequest::getToken)
+           .flatMap(token -> iRefreshTokenService.deleteRefreshToken(token))
+           .then(ServerResponse.noContent().header(CLEAR_SITE_DATA, CLEAR_SITE_DATA_VALUES).build());
   }
 
 
-  private <T> Mono<ServerResponse> getServerResponse(HttpStatus status, T data){
-    return ServerResponse.status(status).contentType(JSON).bodyValue(data);
+  private Mono<ServerResponse> buildServerResponse(HttpStatus status, AuthResponse data){
+    return ServerResponse.status(status)
+          .cookie(buildCookie("JWT", data.getAuthToken()))
+          .cookie(buildCookie("RT", data.getRefreshToken()))
+          .build();
   }
 
   private Mono<RefreshTokenRequest> getRefreshTokenRequestAndValidate(ServerRequest serverRequest){
     return serverRequest.bodyToMono(RefreshTokenRequest.class).doOnNext(constraintValidator::validateRequest);
+  }
+
+  private ResponseCookie buildCookie(String name, String value) {
+    return ResponseCookie.from(name, value).httpOnly(true).secure(true).sameSite("Strict").build();
   }
 }
