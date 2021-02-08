@@ -51,8 +51,8 @@ public class AccountServiceImpl implements IAccountService {
   @Override
   public Flux<AccountView> getAllAccounts(){
     return iUserRepository.findAll()
-                          .switchIfEmpty(Flux.error(new ResponseStatusException(HttpStatus.NOT_FOUND, NO_USERS_FOUND)))
-                          .map(user -> iUserMapper.maptUserToAccountView(user));
+           .switchIfEmpty(Flux.error(new ResponseStatusException(HttpStatus.NOT_FOUND, NO_USERS_FOUND)))
+           .map(user -> iUserMapper.maptUserToAccountView(user));
   }
 
   private <T> Mono<T> verifyOperation(Integer num){

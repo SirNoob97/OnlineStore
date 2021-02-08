@@ -16,13 +16,13 @@ public class CustomAttributes extends DefaultErrorAttributes{
   public Map<String, Object> getErrorAttributes(ServerRequest request, ErrorAttributeOptions options) {
     String query = request.uri().getQuery();
     options = isTraceEnabled(query) ? ErrorAttributeOptions.of(Include.STACK_TRACE)
-                                                          : ErrorAttributeOptions.defaults();
+                                    : ErrorAttributeOptions.defaults();
 
     Map<String, Object> errorAttributes = super.getErrorAttributes(request, options);
     Throwable throwable = getError(request);
 
     if(throwable instanceof DataIntegrityViolationException){
-      DataIntegrityViolationException dve = (DataIntegrityViolationException) throwable;
+      var dve = (DataIntegrityViolationException) throwable;
       errorAttributes.put("message", dve.getMostSpecificCause().getMessage());
       return errorAttributes;
     }

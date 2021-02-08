@@ -38,16 +38,16 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
   @Override
   public Mono<UserDetails> findByUsername(String username) {
     return iUserRepository.findByUserName(username)
-                          .switchIfEmpty(getMonoError(HttpStatus.NOT_FOUND, USER_NOT_FOUND))
-                          .cast(UserDetails.class);
+           .switchIfEmpty(getMonoError(HttpStatus.NOT_FOUND, USER_NOT_FOUND))
+           .cast(UserDetails.class);
   }
 
   @Transactional
   @Override
   public Mono<AuthResponse> signup(SignUpRequest signUpRequest) {
     return iUserRepository.save(iUserMapper.mapSignUpRequestToUser(signUpRequest))
-                          .flatMap(userDb -> iRefreshTokenService.generateRefreshToken()
-                                                                  .flatMap(refreshToken -> createAuthResponse(userDb, refreshToken)));
+           .flatMap(userDb -> iRefreshTokenService.generateRefreshToken()
+           .flatMap(refreshToken -> createAuthResponse(userDb, refreshToken)));
   }
 
   @Override
@@ -55,31 +55,31 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
     String password = loginRequest.getPassword();
 
     return findByUsername(loginRequest.getUserName()).cast(User.class)
-                                                      .flatMap(user -> verifyPassword(user, password).flatMap(result -> iRefreshTokenService.generateRefreshToken()
-                                                                                                      .flatMap(refreshToken -> createAuthResponse(user, refreshToken))));
+           .flatMap(user -> verifyPassword(user, password).flatMap(result -> iRefreshTokenService.generateRefreshToken()
+           .flatMap(refreshToken -> createAuthResponse(user, refreshToken))));
   }
 
   @Override
   public Mono<AccountView> getCurrentUser() {
     return ReactiveSecurityContextHolder.getContext().map(sc -> sc.getAuthentication().getName())
-                                                    .flatMap(name -> findByUsername(name))
-                                                    .cast(User.class)
-                                                    .map(user -> iUserMapper.maptUserToAccountView(user));
+           .flatMap(name -> findByUsername(name))
+           .cast(User.class)
+           .map(user -> iUserMapper.maptUserToAccountView(user));
   }
 
   @Override
   public Mono<AuthResponse> refreshToken(RefreshTokenRequest refreshTokenRequest) {
     return iRefreshTokenService.validateRefreshToken(refreshTokenRequest.getToken())
-                                .flatMap(result -> findByUsername(refreshTokenRequest.getUserName())
-                                .cast(User.class)
-                                .flatMap(userDb -> createAuthResponse(userDb, result)));
+           .flatMap(result -> findByUsername(refreshTokenRequest.getUserName())
+           .cast(User.class)
+           .flatMap(userDb -> createAuthResponse(userDb, result)));
   }
 
   private Mono<AuthResponse> createAuthResponse(User user, String refreshToken) {
     return Mono.just(AuthResponse.builder().userName(user.getUsername())
-                                            .authToken(jwtProvider.generateToken(user))
-                                            .refreshToken(refreshToken)
-                                            .expiresAt(jwtProvider.getJwtExpirationTime()).build());
+           .authToken(jwtProvider.generateToken(user))
+           .refreshToken(refreshToken)
+           .expiresAt(jwtProvider.getJwtExpirationTime()).build());
   }
 
   private Mono<Boolean> verifyPassword(User user, String password) {

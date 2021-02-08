@@ -20,18 +20,18 @@ public class UserMapperImpl implements IUserMapper {
   @Override
   public User mapAccountPayloadToUser(AccountPayload accountPayload) {
     return User.builder().userId(accountPayload.getUserId())
-                          .userName(accountPayload.getUserName())
-                          .password(passwordEncoder.encode(accountPayload.getPassword()))
-                          .email(accountPayload.getEmail())
-                          .role(Role.valueOf(accountPayload.getRole())).build();
+           .userName(accountPayload.getUserName())
+           .password(passwordEncoder.encode(accountPayload.getPassword()))
+           .email(accountPayload.getEmail())
+           .role(Role.valueOf(accountPayload.getRole())).build();
   }
 
   @Override
   public User mapSignUpRequestToUser(SignUpRequest signUpRequest) {
     return User.builder().userName(signUpRequest.getUserName())
-                          .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                          .email(signUpRequest.getEmail())
-                          .role(Role.CUSTOMER).build();
+           .password(passwordEncoder.encode(signUpRequest.getPassword()))
+           .email(signUpRequest.getEmail())
+           .role(Role.CUSTOMER).build();
   }
 
   @Override

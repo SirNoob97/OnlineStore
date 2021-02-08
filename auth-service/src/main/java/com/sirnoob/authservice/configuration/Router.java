@@ -36,35 +36,35 @@ public class Router {
   @Bean
   public RouteLocator routeLocator(RouteLocatorBuilder routeLocatorBuilder) {
     return routeLocatorBuilder.routes()
-                              .route(route -> route.path("/products/**", "/main-categories/**", "/sub-categories/**", "/product-service/**")
-                                                    .uri("lb://product-service")
-                                                    .id("product-service")
-                                                    .metadata(RESPONSE_TIMEOUT_ATTR, 10000)
-                                                    .metadata(CONNECT_TIMEOUT_ATTR, 1000))
-                              .route(route -> route.path("/invoices/**", "/shopping-service/**")
-                                                    .uri("lb://shopping-service")
-                                                    .id("shopping-service")
-                                                    .metadata(RESPONSE_TIMEOUT_ATTR, 5000)
-                                                    .metadata(CONNECT_TIMEOUT_ATTR, 1000))
-                              .build();
+           .route(route -> route.path("/products/**", "/main-categories/**", "/sub-categories/**", "/product-service/**")
+                                 .uri("lb://product-service")
+                                 .id("product-service")
+                                 .metadata(RESPONSE_TIMEOUT_ATTR, 10000)
+                                 .metadata(CONNECT_TIMEOUT_ATTR, 1000))
+           .route(route -> route.path("/invoices/**", "/shopping-service/**")
+                                 .uri("lb://shopping-service")
+                                 .id("shopping-service")
+                                 .metadata(RESPONSE_TIMEOUT_ATTR, 5000)
+                                 .metadata(CONNECT_TIMEOUT_ATTR, 1000))
+           .build();
   }
 
   @Bean
   public RouterFunction<ServerResponse> authEndPoints (AuthHandler authHandler){
     return RouterFunctions.route(POST("/auth/signup").and(accept(JSON)).and(contentType(JSON)), authHandler::signup)
-                          .andRoute(POST("/auth/login").and(accept(JSON)).and(contentType(JSON)), authHandler::login)
-                          .andRoute(GET("/auth/users").and(accept(JSON)), authHandler::getCurrentUser)
-                          .andRoute(POST("/auth/logout").and(accept(JSON)), authHandler::logout)
-                          .andRoute(POST("/auth/refresh-token").and(accept(JSON)).and(contentType(JSON)), authHandler::refreshToken);
+           .andRoute(POST("/auth/login").and(accept(JSON)).and(contentType(JSON)), authHandler::login)
+           .andRoute(GET("/auth/users").and(accept(JSON)), authHandler::getCurrentUser)
+           .andRoute(POST("/auth/logout").and(accept(JSON)), authHandler::logout)
+           .andRoute(POST("/auth/refresh-token").and(accept(JSON)).and(contentType(JSON)), authHandler::refreshToken);
   }
 
   @Bean
   public RouterFunction<ServerResponse> accountEndPoints (AccountHandler accountHandler){
     return RouterFunctions.route(POST("/accounts").and(accept(JSON)).and(contentType(JSON)), accountHandler::createAccount)
-                          .andRoute(PUT("/accounts").and(accept(JSON)).and(contentType(JSON)), accountHandler::updateAccount)
-                          .andRoute(PUT("/accounts/passwords").and(contentType(JSON)), accountHandler::updatePassword)
-                          .andRoute(DELETE("/accounts/{userId}"), accountHandler::deleteAccountById)
-                          .andRoute(GET("/accounts").and(accept(JSON)), accountHandler::getAllAccounts);
+           .andRoute(PUT("/accounts").and(accept(JSON)).and(contentType(JSON)), accountHandler::updateAccount)
+           .andRoute(PUT("/accounts/passwords").and(contentType(JSON)), accountHandler::updatePassword)
+           .andRoute(DELETE("/accounts/{userId}"), accountHandler::deleteAccountById)
+           .andRoute(GET("/accounts").and(accept(JSON)), accountHandler::getAllAccounts);
   }
 
 }

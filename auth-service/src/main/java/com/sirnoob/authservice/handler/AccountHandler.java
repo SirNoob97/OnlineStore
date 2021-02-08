@@ -34,9 +34,9 @@ public class AccountHandler {
 
   public Mono<ServerResponse> updatePassword(ServerRequest serverRequest){
     return serverRequest.bodyToMono(PasswordUpdateDto.class)
-                        .doOnNext(validator::validateRequest)
-                        .flatMap(dto -> iAccountService.updatePassword(dto))
-                        .then(ServerResponse.noContent().build());
+           .doOnNext(validator::validateRequest)
+           .flatMap(dto -> iAccountService.updatePassword(dto))
+           .then(ServerResponse.noContent().build());
   }
 
   public Mono<ServerResponse> deleteAccountById(ServerRequest serverRequest) {
@@ -53,7 +53,7 @@ public class AccountHandler {
 
   private Mono<String> persistUser(ServerRequest serverRequest){
     return serverRequest.bodyToMono(AccountPayload.class)
-                        .doOnNext(validator::validateRequest)
-                        .flatMap(iAccountService::persistAccount);
+           .doOnNext(validator::validateRequest)
+           .flatMap(iAccountService::persistAccount);
   }
 }

@@ -25,21 +25,21 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
     @Override
     public Mono<String> generateRefreshToken() {
       return iRefreshTokenRepository.save(RefreshToken.builder().token(UUID.randomUUID().toString()).build())
-                                    .map(RefreshToken::getToken);
+             .map(RefreshToken::getToken);
     }
 
     @Override
     public Mono<String> validateRefreshToken(String token) {
       return iRefreshTokenRepository.findByToken(token)
-                                    .switchIfEmpty(tokenNotFound())
-                                    .map(RefreshToken::getToken);
+             .switchIfEmpty(tokenNotFound())
+             .map(RefreshToken::getToken);
     }
 
     @Transactional
     @Override
     public Mono<Void> deleteRefreshToken(String token) {
       return iRefreshTokenRepository.deleteByToken(token)
-                                    .flatMap(num -> num > 0 ? Mono.empty() : tokenNotFound());
+             .flatMap(num -> num > 0 ? Mono.empty() : tokenNotFound());
   }
 
   private <T> Mono<T> tokenNotFound(){

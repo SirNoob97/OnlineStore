@@ -33,10 +33,10 @@ public class H2Config extends AbstractR2dbcConfiguration{
 
   @Bean
   public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory){
-    ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
+    var initializer = new ConnectionFactoryInitializer();
     initializer.setConnectionFactory(connectionFactory);
 
-    CompositeDatabasePopulator populator = new CompositeDatabasePopulator();
+    var populator = new CompositeDatabasePopulator();
     populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("schema.sql")));
     populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("data.sql")));
 
