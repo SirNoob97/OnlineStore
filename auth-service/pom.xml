@@ -2,16 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.sirnoob</groupId>
-    <artifactId>online-store</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.3.3.RELEASE</version>
   </parent>
 
   <artifactId>auth-service</artifactId>
   <name>auth-service</name>
   <description>Microservice in charge of user authentication/authorization and acting as a gateway.</description>
-
+  <version>0.0.1-SNAPSHOT</version>
+  
   <properties>
     <java.version>11</java.version>
     <spring-boot-admin.version>2.3.0</spring-boot-admin.version>
