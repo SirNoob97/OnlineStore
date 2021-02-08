@@ -1,6 +1,5 @@
 package com.sirnoob.authservice.security;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -13,7 +12,9 @@ import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
 @Component
-public class SecurityContextRepository implements ServerSecurityContextRepository{
+public class SecurityContextRepository implements ServerSecurityContextRepository {
+
+  private final String JWT_COOKIE_NAME = "JWT";
 
   private final AuthenticationManager authenticationManager;
 
@@ -24,11 +25,11 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
   @Override
   public Mono<SecurityContext> load(ServerWebExchange exchange) {
-    String header = exchange.getRequest().getHeaders().getFirst(HttpHeaders.COOKIE);
+    var cookies = exchange.getRequest().getCookies();
 
-    if (header != null && !header.isEmpty()){
-      UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(header,
-          header);
+    if (cookies != null && cookies.getFirst(JWT_COOKIE_NAME) != null) {
+      var token = cookies.getFirst(JWT_COOKIE_NAME).getValue();
+      var authentication = new UsernamePasswordAuthenticationToken(token, token);
 
       return authenticationManager.authenticate(authentication).map(SecurityContextImpl::new);
     }
