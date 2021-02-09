@@ -1,9 +1,7 @@
 package com.sirnoob.authservice.service;
 
-import java.util.UUID;
-
-import com.sirnoob.authservice.domain.RefreshToken;
-import com.sirnoob.authservice.repository.IRefreshTokenRepository;
+import com.sirnoob.authservice.domain.Token;
+import com.sirnoob.authservice.repository.ITokenRepository;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,30 +13,30 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @Service
-public class RefreshTokenServiceImpl implements IRefreshTokenService {
+public class TokenServiceImpl implements ITokenService {
 
     private static final String TOKEN_NOT_FOUND = "Token Not Found!!";
 
-    private final IRefreshTokenRepository iRefreshTokenRepository;
+    private final ITokenRepository iRefreshTokenRepository;
 
     @Transactional
     @Override
-    public Mono<String> generateRefreshToken() {
-      return iRefreshTokenRepository.save(RefreshToken.builder().token(UUID.randomUUID().toString()).build())
-             .map(RefreshToken::getToken);
+    public Mono<String> persistToken(Token token) {
+      return iRefreshTokenRepository.save(token)
+             .map(Token::getRefreshToken);
     }
 
     @Override
     public Mono<String> validateRefreshToken(String token) {
-      return iRefreshTokenRepository.findByToken(token)
+      return iRefreshTokenRepository.findByRefreshToken(token)
              .switchIfEmpty(tokenNotFound())
-             .map(RefreshToken::getToken);
+             .map(Token::getRefreshToken);
     }
 
     @Transactional
     @Override
-    public Mono<Void> deleteRefreshToken(String token) {
-      return iRefreshTokenRepository.deleteByToken(token)
+    public Mono<Void> deleteToken(String token) {
+      return iRefreshTokenRepository.deleteByRefreshToken(token)
              .flatMap(num -> num > 0 ? Mono.empty() : tokenNotFound());
   }
 
