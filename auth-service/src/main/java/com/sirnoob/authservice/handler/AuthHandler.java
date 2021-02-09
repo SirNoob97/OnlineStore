@@ -1,12 +1,11 @@
 package com.sirnoob.authservice.handler;
 
 import com.sirnoob.authservice.dto.AccountView;
-import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
 import com.sirnoob.authservice.service.IAuthService;
-import com.sirnoob.authservice.service.IRefreshTokenService;
+import com.sirnoob.authservice.service.ITokenService;
 import com.sirnoob.authservice.validator.ConstraintValidator;
 
 import org.springframework.http.HttpStatus;
@@ -27,7 +26,7 @@ public class AuthHandler {
   private static final String CLEAR_SITE_DATA = "Clear-Site-Data";
   private static final String CLEAR_SITE_DATA_VALUES = "\"cache\", \"cookies\", \"storage\", \"executionContexts\"";
 
-  private final IRefreshTokenService iRefreshTokenService;
+  private final ITokenService iRefreshTokenService;
   private final IAuthService iAuthService;
   private final ConstraintValidator constraintValidator;
 
@@ -58,15 +57,14 @@ public class AuthHandler {
   public Mono<ServerResponse> logout(ServerRequest serverRequest){
     return getRefreshTokenRequestAndValidate(serverRequest)
            .map(RefreshTokenRequest::getToken)
-           .flatMap(token -> iRefreshTokenService.deleteRefreshToken(token))
+           .flatMap(token -> iRefreshTokenService.deleteToken(token))
            .then(ServerResponse.noContent().header(CLEAR_SITE_DATA, CLEAR_SITE_DATA_VALUES).build());
   }
 
 
-  private Mono<ServerResponse> buildServerResponse(HttpStatus status, AuthResponse data){
+  private Mono<ServerResponse> buildServerResponse(HttpStatus status, String data){
     return ServerResponse.status(status)
-          .cookie(buildCookie("JWT", data.getAuthToken()))
-          .cookie(buildCookie("RT", data.getRefreshToken()))
+          .cookie(buildCookie("RT", data))
           .build();
   }
 
