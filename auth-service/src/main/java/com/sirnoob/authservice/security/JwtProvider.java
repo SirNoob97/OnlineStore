@@ -11,9 +11,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -24,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -46,13 +45,27 @@ public class JwtProvider {
     }
   }
 
+  public String generateAccessToken(User user, String issuer) {
+    return Jwts.builder()
+          .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+          .claim("role", List.of(user.getRole()))
+          .setSubject(user.getUsername())
+          .setIssuedAt(new Date())
+          .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
+          .signWith(getPrivateKey(), SignatureAlgorithm.RS256)
+          .compact();
+  }
 
-
-  public String generateToken(User user) {
-    Map<String, Object> claims = new HashMap<>();
-    claims.put("role", List.of(user.getRole()));
-    return Jwts.builder().setClaims(claims).setSubject(user.getUsername()).setIssuedAt(new Date())
-        .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis))).signWith(getPrivateKey(), SignatureAlgorithm.RS256).compact();
+  public String generateRefreshToken(String userName, String issuer) {
+    return Jwts.builder()
+            .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+            .setHeaderParam("act", "ref")
+            .setSubject(userName)
+            .setIssuer(issuer)
+            .setIssuedAt(new Date())
+            .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
+            .signWith(getPrivateKey(), SignatureAlgorithm.RS256)
+            .compact();
   }
 
   public String getUsernameFromJwt(String token) {
@@ -63,11 +76,9 @@ public class JwtProvider {
     return getClaims(token).getExpiration().after(new Date());
   }
 
-  public Claims getClaims(String token){
+  public Claims getClaims(String token) {
     return Jwts.parserBuilder().setSigningKey(getPublicKey()).build().parseClaimsJws(token).getBody();
   }
-
-
 
   private PrivateKey getPrivateKey() {
     try {
