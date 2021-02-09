@@ -9,8 +9,10 @@ CREATE TABLE IF NOT EXISTS users (
       CONSTRAINT unique_email UNIQUE (email),
       check (role in ('CUSTOMER', 'EMPLOYEE', 'ADMIN')));
 
-CREATE TABLE IF NOT EXISTS refresh_tokens (
+CREATE TABLE IF NOT EXISTS tokens (
       id bigint NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1 INCREMENT 1),
-      token character varying(60) NOT NULL,
+      refresh-token character varying(512) NOT NULL,
+      access-token character varying(512) NOT NULL,
       PRIMARY KEY(id),
-      CONSTRAINT unique_token UNIQUE (token));
+      CONSTRAINT unique_rtoken UNIQUE (refresh-token),
+      CONSTRAINT unique_atoken UNIQUE (access-token));
