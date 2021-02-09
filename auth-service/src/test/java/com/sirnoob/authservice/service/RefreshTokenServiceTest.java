@@ -3,8 +3,8 @@ package com.sirnoob.authservice.service;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static com.sirnoob.authservice.util.Provider.generateRefreshToken;
-import com.sirnoob.authservice.domain.RefreshToken;
-import com.sirnoob.authservice.repository.IRefreshTokenRepository;
+import com.sirnoob.authservice.domain.Token;
+import com.sirnoob.authservice.repository.ITokenRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,23 +21,23 @@ import reactor.test.StepVerifier;
 class RefreshTokenServiceTest {
 
     @Mock
-    private IRefreshTokenRepository iRefreshTokenRepository;
+    private ITokenRepository iRefreshTokenRepository;
 
-    private IRefreshTokenService iRefreshTokenService;
+    private ITokenService iRefreshTokenService;
 
-    private static RefreshToken staticRefreshToken = generateRefreshToken();
+    private static Token staticRefreshToken = generateRefreshToken();
 
     @BeforeEach
     public void setUp (){
-      iRefreshTokenService = new RefreshTokenServiceImpl(iRefreshTokenRepository);
+      iRefreshTokenService = new TokenServiceImpl(iRefreshTokenRepository);
 
-      Mono<RefreshToken> refreshToken = Mono.just(staticRefreshToken);
+      Mono<Token> refreshToken = Mono.just(staticRefreshToken);
 
-      BDDMockito.when(iRefreshTokenRepository.save(any(RefreshToken.class))).thenReturn(refreshToken);
+      BDDMockito.when(iRefreshTokenRepository.save(any(Token.class))).thenReturn(refreshToken);
 
-      BDDMockito.when(iRefreshTokenRepository.findByToken(anyString())).thenReturn(refreshToken);
+      BDDMockito.when(iRefreshTokenRepository.findByRefreshToken(anyString())).thenReturn(refreshToken);
 
-      BDDMockito.when(iRefreshTokenRepository.deleteByToken(anyString())).thenReturn(Mono.just(1));
+      BDDMockito.when(iRefreshTokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(1));
     }
 
     @Test
@@ -61,7 +61,7 @@ class RefreshTokenServiceTest {
     @Test
     @DisplayName("validateRefreshToken throw ResponseStatusException when the token was not found")
     public void validateRefreshToken_ReturnAMonoErrorResponseStatusException_WhenTheRepositoryReturnsAnMonoEmpty(){
-      BDDMockito.when(iRefreshTokenRepository.findByToken(anyString())).thenReturn(Mono.empty());
+      BDDMockito.when(iRefreshTokenRepository.findByRefreshToken(anyString())).thenReturn(Mono.empty());
 
       StepVerifier.create(iRefreshTokenService.validateRefreshToken(""))
                   .expectError(ResponseStatusException.class)
@@ -71,7 +71,7 @@ class RefreshTokenServiceTest {
     @Test
     @DisplayName("deleteRefreshToken return a mono void when successful")
     public void deleteRefreshToken_ReturnAMonoVoid_WhenSuccessful(){
-      StepVerifier.create(iRefreshTokenService.deleteRefreshToken(staticRefreshToken.getToken()))
+      StepVerifier.create(iRefreshTokenService.deleteToken(staticRefreshToken.getToken()))
                   .expectSubscription()
                   .verifyComplete();
     }
@@ -79,9 +79,9 @@ class RefreshTokenServiceTest {
     @Test
     @DisplayName("deleteRefreshToken throw ResponseStatusException when the query operation returns 0")
     public void deleteRefreshToken_ReturnAMonoErrorResponseStatusException_WhenTheQueryOperationReturnsZero() {
-      BDDMockito.when(iRefreshTokenRepository.deleteByToken(anyString())).thenReturn(Mono.just(0));
+      BDDMockito.when(iRefreshTokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(0));
 
-      StepVerifier.create(iRefreshTokenService.deleteRefreshToken(""))
+      StepVerifier.create(iRefreshTokenService.deleteToken(""))
                   .expectSubscription()
                   .expectError(ResponseStatusException.class)
                   .verify();

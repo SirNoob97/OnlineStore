@@ -1,6 +1,6 @@
 package com.sirnoob.authservice.repository;
 
-import com.sirnoob.authservice.domain.RefreshToken;
+import com.sirnoob.authservice.domain.Token;
 
 import static com.sirnoob.authservice.util.Provider.generateRefreshToken;
 import static com.sirnoob.authservice.util.Provider.getDefaultRefreshToken;
@@ -21,12 +21,12 @@ import reactor.test.StepVerifier;
 class RefreshTokenRepositoryTest {
 
   @Autowired
-  private IRefreshTokenRepository iRefreshTokenRepository;
+  private ITokenRepository iRefreshTokenRepository;
 
   @Autowired
   private DatabaseClient databaseClient;
 
-  private static final RefreshToken staticRefreshToken = generateRefreshToken();
+  private static final Token staticRefreshToken = generateRefreshToken();
   @BeforeEach
   private void setUp(){
     final String dropSql = "DROP TABLE IF EXISTS refresh_tokens";
@@ -45,7 +45,7 @@ class RefreshTokenRepositoryTest {
                 .verifyComplete();
 
     StepVerifier.create(databaseClient.insert()
-                                      .into(RefreshToken.class)
+                                      .into(Token.class)
                                       .using(staticRefreshToken)
                                       .then())
                 .expectSubscription()
@@ -55,7 +55,7 @@ class RefreshTokenRepositoryTest {
   @Test
   @DisplayName("save save/persist and return a new refresh token where successful")
   public void save_SavePersistAndReturnANewRefreshToken_WhereSuccessful(){
-    RefreshToken refreshToken = generateRefreshToken();
+    Token refreshToken = generateRefreshToken();
     String token = refreshToken.getToken();
 
     StepVerifier.create(iRefreshTokenRepository.save(refreshToken))
@@ -77,7 +77,7 @@ class RefreshTokenRepositoryTest {
   @Test
   @DisplayName("save throw DataIntegrityViolationException when refresh token is empty")
   public void save_ThrowDataIntegrityViolationException_WhenRefreshTokenIsEmpty(){
-    StepVerifier.create(iRefreshTokenRepository.save(RefreshToken.builder().build()))
+    StepVerifier.create(iRefreshTokenRepository.save(Token.builder().build()))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
   }
@@ -95,7 +95,7 @@ class RefreshTokenRepositoryTest {
   public void findByToken_ReturnARefreshTokenLog_WhenSuccessful(){
     String token = staticRefreshToken.getToken();
 
-    StepVerifier.create(iRefreshTokenRepository.findByToken(token))
+    StepVerifier.create(iRefreshTokenRepository.findByRefreshToken(token))
                 .expectSubscription()
                 .assertNext(refreshTokenDb -> {
                     assertThat(refreshTokenDb).isNotNull();
@@ -108,7 +108,7 @@ class RefreshTokenRepositoryTest {
   @Test
   @DisplayName("findByToken does not throw exception when token parameter is null")
   public void findByToken_DoesNotThrowException_WhenTokenParameterIsNull(){
-    StepVerifier.create(iRefreshTokenRepository.findByToken(null))
+    StepVerifier.create(iRefreshTokenRepository.findByRefreshToken(null))
                 .expectSubscription()
                 .expectComplete()
                 .verify();
@@ -118,13 +118,13 @@ class RefreshTokenRepositoryTest {
   @DisplayName("findByToken return a mono void when there is no refresh tokens in the registry")
   public void findByToken_ReturnAMonoVoid_WhenThereIsNoRefreshTokensInTheRegistry(){
     String token = staticRefreshToken.getToken();
-    RefreshToken defaultToken = getDefaultRefreshToken();
+    Token defaultToken = getDefaultRefreshToken();
 
     StepVerifier.create(iRefreshTokenRepository.deleteAll())
                 .expectSubscription()
                 .verifyComplete();
 
-    StepVerifier.create(iRefreshTokenRepository.findByToken(token).defaultIfEmpty(defaultToken))
+    StepVerifier.create(iRefreshTokenRepository.findByRefreshToken(token).defaultIfEmpty(defaultToken))
                 .expectSubscription()
                 .assertNext(defaultT -> {
                     assertThat(defaultT).isEqualTo(defaultToken);
@@ -138,7 +138,7 @@ class RefreshTokenRepositoryTest {
   public void deleteByToken_DeleteRemoveAnRefreshTokenLog_WhenSuccessful(){
     String token = staticRefreshToken.getToken();
 
-    StepVerifier.create(iRefreshTokenRepository.deleteByToken(token))
+    StepVerifier.create(iRefreshTokenRepository.deleteByRefreshToken(token))
                 .expectNextMatches(num -> num.equals(1))
                 .expectComplete()
                 .verify();
@@ -147,7 +147,7 @@ class RefreshTokenRepositoryTest {
   @Test
   @DisplayName("deleteByToken does not throw exception when token parameter is null")
   public void deleteByToken_ReturnZeroAndDoesNotThrowException_WhenTokenParameterIsNull(){
-    StepVerifier.create(iRefreshTokenRepository.deleteByToken(null))
+    StepVerifier.create(iRefreshTokenRepository.deleteByRefreshToken(null))
                 .expectSubscription()
                 .assertNext(num -> assertThat(num).isGreaterThan(-1))
                 .verifyComplete();
@@ -160,7 +160,7 @@ class RefreshTokenRepositoryTest {
                 .expectSubscription()
                 .verifyComplete();
 
-    StepVerifier.create(iRefreshTokenRepository.deleteByToken(staticRefreshToken.getToken()))
+    StepVerifier.create(iRefreshTokenRepository.deleteByRefreshToken(staticRefreshToken.getToken()))
                 .expectSubscription()
                 .expectNextMatches(num -> num.equals(0))
                 .verifyComplete();

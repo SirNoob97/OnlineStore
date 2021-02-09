@@ -12,14 +12,14 @@ import com.sirnoob.authservice.dto.AccountPayload;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
 import com.sirnoob.authservice.mapper.IUserMapper;
-import com.sirnoob.authservice.repository.IRefreshTokenRepository;
+import com.sirnoob.authservice.repository.ITokenRepository;
 import com.sirnoob.authservice.repository.IUserRepository;
 import com.sirnoob.authservice.security.AuthenticationManager;
 import com.sirnoob.authservice.security.JwtProvider;
 import com.sirnoob.authservice.security.SecurityContextRepository;
 import com.sirnoob.authservice.service.AccountServiceImpl;
 import com.sirnoob.authservice.service.AuthServiceImpl;
-import com.sirnoob.authservice.service.RefreshTokenServiceImpl;
+import com.sirnoob.authservice.service.TokenServiceImpl;
 import com.sirnoob.authservice.validator.ConstraintValidator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -42,13 +42,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @WebFluxTest
-@Import({ AuthServiceImpl.class, AccountServiceImpl.class, RefreshTokenServiceImpl.class, JwtProvider.class, ConstraintValidator.class })
+@Import({ AuthServiceImpl.class, AccountServiceImpl.class, TokenServiceImpl.class, JwtProvider.class, ConstraintValidator.class })
 @ContextConfiguration(classes = { SecurityConfig.class, AuthenticationManager.class, SecurityContextRepository.class,
                                   Router.class, RouteLocatorBuilder.class, PathRoutePredicateFactory.class, AuthHandler.class, AccountHandler.class })
 class AccountHandlerIntegrationTest{
 
   @MockBean
-  private IRefreshTokenRepository iRefreshTokenRepository;
+  private ITokenRepository iRefreshTokenRepository;
 
   @MockBean
   private IUserRepository iUserRepository;

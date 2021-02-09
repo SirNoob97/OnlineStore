@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
-import com.sirnoob.authservice.domain.RefreshToken;
+import com.sirnoob.authservice.domain.Token;
 import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
@@ -40,7 +40,7 @@ import reactor.test.StepVerifier;
 class AuthServiceTest {
 
   @Mock
-  private IRefreshTokenService iRefreshTokenService;
+  private ITokenService iRefreshTokenService;
 
   @Mock
   private IUserRepository iUserRepository;
@@ -58,7 +58,7 @@ class AuthServiceTest {
 
 
   private static final User staticUser = generateUserForSignUpTest();
-  private static final RefreshToken staticRefreshToken = generateRefreshToken();
+  private static final Token staticRefreshToken = generateRefreshToken();
   private static final LoginRequest staticLoginRequest = generateLoginRequest();
   private static final SignUpRequest staticSignUpRequest = generateSignUpRequest();
   private static final RefreshTokenRequest staticRefreshTokenRequest = generateRefreshTokenRequest();
@@ -80,7 +80,7 @@ class AuthServiceTest {
 
     BDDMockito.when(iRefreshTokenService.generateRefreshToken()).thenReturn(token);
 
-    BDDMockito.when(jwtProvider.generateToken(any(User.class))).thenReturn(TOKEN);
+    BDDMockito.when(jwtProvider.generateAccessToken(any(User.class))).thenReturn(TOKEN);
 
     BDDMockito.when(jwtProvider.getJwtExpirationTime()).thenReturn(getJwtExpirationTime());
 

@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.Random;
 import java.util.UUID;
 
-import com.sirnoob.authservice.domain.RefreshToken;
+import com.sirnoob.authservice.domain.Token;
 import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountPayload;
@@ -79,21 +79,21 @@ public class Provider{
                           .build();
   }
 
-  public static RefreshToken generateRefreshToken(){
-    return RefreshToken.builder()
+  public static Token generateRefreshToken(){
+    return Token.builder()
                         .token(getRandomString())
                         .build();
   }
 
-  public static RefreshToken getDefaultRefreshToken(){
-    return RefreshToken.builder()
+  public static Token getDefaultRefreshToken(){
+    return Token.builder()
                         .id(0L)
                         .token(DEFAULT)
                         .build();
   }
 
-  public static RefreshToken generateRefreshTokenForIT(){
-    return RefreshToken.builder()
+  public static Token generateRefreshTokenForIT(){
+    return Token.builder()
                         .id(new Random().nextLong())
                         .token(getRandomString())
                         .build();

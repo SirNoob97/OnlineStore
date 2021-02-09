@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 
 import com.sirnoob.authservice.configuration.Router;
 import com.sirnoob.authservice.configuration.SecurityConfig;
-import com.sirnoob.authservice.domain.RefreshToken;
+import com.sirnoob.authservice.domain.Token;
 import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.AuthResponse;
@@ -26,14 +26,14 @@ import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
 import com.sirnoob.authservice.mapper.IUserMapper;
-import com.sirnoob.authservice.repository.IRefreshTokenRepository;
+import com.sirnoob.authservice.repository.ITokenRepository;
 import com.sirnoob.authservice.repository.IUserRepository;
 import com.sirnoob.authservice.security.AuthenticationManager;
 import com.sirnoob.authservice.security.JwtProvider;
 import com.sirnoob.authservice.security.SecurityContextRepository;
 import com.sirnoob.authservice.service.AccountServiceImpl;
 import com.sirnoob.authservice.service.AuthServiceImpl;
-import com.sirnoob.authservice.service.RefreshTokenServiceImpl;
+import com.sirnoob.authservice.service.TokenServiceImpl;
 import com.sirnoob.authservice.validator.ConstraintValidator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +55,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 @WebFluxTest
-@Import({ AuthServiceImpl.class, AccountServiceImpl.class, RefreshTokenServiceImpl.class, JwtProvider.class, ConstraintValidator.class })
+@Import({ AuthServiceImpl.class, AccountServiceImpl.class, TokenServiceImpl.class, JwtProvider.class, ConstraintValidator.class })
 @ContextConfiguration(classes = { SecurityConfig.class, AuthenticationManager.class, SecurityContextRepository.class,
                                   Router.class, RouteLocatorBuilder.class, PathRoutePredicateFactory.class, AuthHandler.class, AccountHandler.class })
 class AuthHandlerIntegrationTest {
@@ -67,7 +67,7 @@ class AuthHandlerIntegrationTest {
   private IUserMapper iUserMapper;
 
   @MockBean
-  private IRefreshTokenRepository iRefreshTokenRepository;
+  private ITokenRepository iRefreshTokenRepository;
 
   @MockBean
   private PasswordEncoder passwordEncoder;
@@ -88,13 +88,13 @@ class AuthHandlerIntegrationTest {
 
     Mono<User> user = Mono.just(staticUser);
 
-    Mono<RefreshToken> refreshToken = Mono.just(generateRefreshTokenForIT());
+    Mono<Token> refreshToken = Mono.just(generateRefreshTokenForIT());
 
     BDDMockito.when(iUserMapper.mapSignUpRequestToUser(any(SignUpRequest.class))).thenReturn(staticUser);
 
     BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(user);
 
-    BDDMockito.when(iRefreshTokenRepository.save(any(RefreshToken.class))).thenReturn(refreshToken);
+    BDDMockito.when(iRefreshTokenRepository.save(any(Token.class))).thenReturn(refreshToken);
 
     BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
 
@@ -104,9 +104,9 @@ class AuthHandlerIntegrationTest {
 
     BDDMockito.when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
-    BDDMockito.when(iRefreshTokenRepository.findByToken(anyString())).thenReturn(refreshToken);
+    BDDMockito.when(iRefreshTokenRepository.findByRefreshToken(anyString())).thenReturn(refreshToken);
 
-    BDDMockito.when(iRefreshTokenRepository.deleteByToken(anyString())).thenReturn(Mono.just(1));
+    BDDMockito.when(iRefreshTokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(1));
   }
 
   @Test
@@ -131,7 +131,7 @@ class AuthHandlerIntegrationTest {
                   });
 
     verify(iUserRepository, times(1)).save(any(User.class));
-    verify(iRefreshTokenRepository, times(1)).save(any(RefreshToken.class));
+    verify(iRefreshTokenRepository, times(1)).save(any(Token.class));
     verify(iUserMapper, times(1)).mapSignUpRequestToUser(any(SignUpRequest.class));
   }
 
@@ -151,7 +151,7 @@ class AuthHandlerIntegrationTest {
                   .expectBody(Void.class);
 
     verify(iUserRepository, times(0)).save(any(User.class));
-    verify(iRefreshTokenRepository, times(0)).save(any(RefreshToken.class));
+    verify(iRefreshTokenRepository, times(0)).save(any(Token.class));
     verify(passwordEncoder, times(0)).encode(anyString());
   }
 
@@ -174,7 +174,7 @@ class AuthHandlerIntegrationTest {
                     assertThat(authResponse.getUserName()).isEqualTo(staticUser.getUsername());
                   });
 
-    verify(iRefreshTokenRepository, times(1)).save(any(RefreshToken.class));
+    verify(iRefreshTokenRepository, times(1)).save(any(Token.class));
     verify(iUserRepository, times(1)).findByUserName(anyString());
     verify(passwordEncoder, times(1)).matches(anyString(), anyString());
   }
@@ -195,7 +195,7 @@ class AuthHandlerIntegrationTest {
                   .expectBody(Void.class);
 
     verify(iUserRepository, times(1)).findByUserName(anyString());
-    verify(iRefreshTokenRepository, times(0)).save(any(RefreshToken.class));
+    verify(iRefreshTokenRepository, times(0)).save(any(Token.class));
     verify(passwordEncoder, times(0)).matches(anyString(), anyString());
   }
 
@@ -216,7 +216,7 @@ class AuthHandlerIntegrationTest {
 
     verify(iUserRepository, times(1)).findByUserName(anyString());
     verify(passwordEncoder, times(1)).matches(anyString(), anyString());
-    verify(iRefreshTokenRepository, times(0)).save(any(RefreshToken.class));
+    verify(iRefreshTokenRepository, times(0)).save(any(Token.class));
   }
 
   @Test
@@ -235,7 +235,7 @@ class AuthHandlerIntegrationTest {
 
     verify(iUserRepository, times(0)).findByUserName(anyString());
     verify(passwordEncoder, times(0)).matches(anyString(), anyString());
-    verify(iRefreshTokenRepository, times(0)).save(any(RefreshToken.class));
+    verify(iRefreshTokenRepository, times(0)).save(any(Token.class));
   }
 
   @Test
@@ -290,7 +290,7 @@ class AuthHandlerIntegrationTest {
                     assertThat(authR.getAuthToken()).isNotNull();
                   });
 
-    verify(iRefreshTokenRepository, times(1)).findByToken(anyString());
+    verify(iRefreshTokenRepository, times(1)).findByRefreshToken(anyString());
     verify(iUserRepository, times(1)).findByUserName(anyString());
   }
 
@@ -306,8 +306,8 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isForbidden()
                   .expectBody(Void.class);
 
-    verify(iRefreshTokenRepository, times(0)).save(any(RefreshToken.class));
-    verify(iRefreshTokenRepository, times(0)).findByToken(anyString());
+    verify(iRefreshTokenRepository, times(0)).save(any(Token.class));
+    verify(iRefreshTokenRepository, times(0)).findByRefreshToken(anyString());
     verify(iUserRepository, times(0)).findByUserName(anyString());
     verify(passwordEncoder, times(0)).matches(anyString(), anyString());
   }
@@ -326,7 +326,7 @@ class AuthHandlerIntegrationTest {
                   .expectHeader().contentType(JSON)
                   .expectBody(Void.class);
 
-    verify(iRefreshTokenRepository, times(0)).findByToken(anyString());
+    verify(iRefreshTokenRepository, times(0)).findByRefreshToken(anyString());
     verify(iUserRepository, times(0)).findByUserName(anyString());
   }
 
@@ -343,14 +343,14 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isNoContent()
                   .expectBody(Void.class);
 
-    verify(iRefreshTokenRepository, times(1)).deleteByToken(anyString());
+    verify(iRefreshTokenRepository, times(1)).deleteByRefreshToken(anyString());
   }
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
   @DisplayName("logout return 404 status code when refresh token was not found")
   public void logout_Return404StatusCode_WhenRefreshTokenWasNotFound() {
-    BDDMockito.when(iRefreshTokenRepository.deleteByToken(anyString())).thenReturn(Mono.just(0));
+    BDDMockito.when(iRefreshTokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(0));
 
     webTestClient.post()
                   .uri("/auth/logout")
@@ -362,7 +362,7 @@ class AuthHandlerIntegrationTest {
                   .expectHeader().contentType(JSON)
                   .expectBody(Void.class);
 
-    verify(iRefreshTokenRepository, times(1)).deleteByToken(anyString());
+    verify(iRefreshTokenRepository, times(1)).deleteByRefreshToken(anyString());
   }
 
   @Test
@@ -377,6 +377,6 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isForbidden()
                   .expectBody(Void.class);
 
-    verify(iRefreshTokenRepository, times(0)).deleteByToken(anyString());
+    verify(iRefreshTokenRepository, times(0)).deleteByRefreshToken(anyString());
   }
 }
