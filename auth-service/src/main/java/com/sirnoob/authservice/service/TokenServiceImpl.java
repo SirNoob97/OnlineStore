@@ -21,16 +21,14 @@ public class TokenServiceImpl implements ITokenService {
 
     @Transactional
     @Override
-    public Mono<String> persistToken(Token token) {
-      return iRefreshTokenRepository.save(token)
-             .map(Token::getRefreshToken);
+    public Mono<Token> persistToken(Token token) {
+      return iRefreshTokenRepository.save(token);
     }
 
     @Override
-    public Mono<String> validateRefreshToken(String token) {
+    public Mono<Token> getTokensByRefreshToken(String token) {
       return iRefreshTokenRepository.findByRefreshToken(token)
-             .switchIfEmpty(tokenNotFound())
-             .map(Token::getRefreshToken);
+             .switchIfEmpty(tokenNotFound());
     }
 
     @Transactional

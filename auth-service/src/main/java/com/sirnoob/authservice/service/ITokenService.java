@@ -6,9 +6,9 @@ import reactor.core.publisher.Mono;
 
 public interface ITokenService {
 
-  public Mono<String> persistToken(Token token);
+  public Mono<Token> persistToken(Token token);
 
-  public Mono<String> validateRefreshToken(String token);
+  public Mono<Token> getTokensByRefreshToken(String token);
 
   public Mono<Void> deleteToken(String token);
 }
