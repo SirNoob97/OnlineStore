@@ -62,10 +62,11 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
 
   @Override
   public Mono<AccountView> getCurrentUser() {
-    return ReactiveSecurityContextHolder.getContext().map(sc -> sc.getAuthentication().getName())
-           .flatMap(name -> findByUsername(name))
-           .cast(User.class)
-           .map(user -> iUserMapper.maptUserToAccountView(user));
+    return ReactiveSecurityContextHolder.getContext()
+          .map(sc -> sc.getAuthentication().getName())
+          .flatMap(name -> findByUsername(name))
+          .cast(User.class)
+          .map(user -> iUserMapper.maptUserToAccountView(user));
   }
 
   @Override
