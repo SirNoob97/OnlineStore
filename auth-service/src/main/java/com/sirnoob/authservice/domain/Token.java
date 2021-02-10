@@ -6,7 +6,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import lombok.Builder;
 
 @Builder
-@Table(value = "refresh_tokens")
+@Table(value = "tokens")
 public class Token {
 
   @Id
