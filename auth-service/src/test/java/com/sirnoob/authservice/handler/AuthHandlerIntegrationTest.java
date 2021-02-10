@@ -7,7 +7,6 @@ import static com.sirnoob.authservice.util.Provider.TEST;
 import static com.sirnoob.authservice.util.Provider.TEST_EMAIL;
 import static com.sirnoob.authservice.util.Provider.TOKEN;
 import static com.sirnoob.authservice.util.Provider.generateLoginRequest;
-import static com.sirnoob.authservice.util.Provider.generateRefreshTokenForIT;
 import static com.sirnoob.authservice.util.Provider.generateSignUpRequest;
 import static com.sirnoob.authservice.util.Provider.generateUserStaticValuesForIT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,13 +87,13 @@ class AuthHandlerIntegrationTest {
 
     Mono<User> user = Mono.just(staticUser);
 
-    Mono<Token> refreshToken = Mono.just(generateRefreshTokenForIT());
+    //Mono<Token> refreshToken = Mono.just(generateRefreshTokenForIT());
 
     BDDMockito.when(iUserMapper.mapSignUpRequestToUser(any(SignUpRequest.class))).thenReturn(staticUser);
 
     BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(user);
 
-    BDDMockito.when(iRefreshTokenRepository.save(any(Token.class))).thenReturn(refreshToken);
+    //BDDMockito.when(iRefreshTokenRepository.save(any(Token.class))).thenReturn(refreshToken);
 
     BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
 
@@ -104,7 +103,7 @@ class AuthHandlerIntegrationTest {
 
     BDDMockito.when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
-    BDDMockito.when(iRefreshTokenRepository.findByRefreshToken(anyString())).thenReturn(refreshToken);
+    //BDDMockito.when(iRefreshTokenRepository.findByRefreshToken(anyString())).thenReturn(refreshToken);
 
     BDDMockito.when(iRefreshTokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(1));
   }

@@ -79,25 +79,25 @@ public class Provider{
                           .build();
   }
 
-  public static Token generateRefreshToken(){
-    return Token.builder()
-                        .token(getRandomString())
-                        .build();
-  }
+  //public static Token generateRefreshToken(){
+    //return Token.builder()
+                        //.token(getRandomString())
+                        //.build();
+  //}
 
-  public static Token getDefaultRefreshToken(){
-    return Token.builder()
-                        .id(0L)
-                        .token(DEFAULT)
-                        .build();
-  }
+  //public static Token getDefaultRefreshToken(){
+    //return Token.builder()
+                        //.id(0L)
+                        //.token(DEFAULT)
+                        //.build();
+  //}
 
-  public static Token generateRefreshTokenForIT(){
-    return Token.builder()
-                        .id(new Random().nextLong())
-                        .token(getRandomString())
-                        .build();
-  }
+  //public static Token generateRefreshTokenForIT(){
+    //return Token.builder()
+                        //.id(new Random().nextLong())
+                        //.token(getRandomString())
+                        //.build();
+  //}
 
   public static SignUpRequest generateSignUpRequest(){
     return SignUpRequest.builder()
