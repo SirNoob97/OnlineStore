@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AuthResponse {
 
+  private String userName;
   private String authToken;
   private String refreshToken;
   private Instant expiresAt;
