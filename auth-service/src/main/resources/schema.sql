@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS tokens (
       id bigint NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1 INCREMENT 1),
-      refresh-token character varying(512) NOT NULL,
-      access-token character varying(512) NOT NULL,
+      refresh_token character varying(1024) NOT NULL,
+      access_token character varying(1024) NOT NULL,
       PRIMARY KEY(id),
-      CONSTRAINT unique_rtoken UNIQUE (refresh-token),
-      CONSTRAINT unique_atoken UNIQUE (access-token));
+      CONSTRAINT unique_rtoken UNIQUE (refresh_token),
+      CONSTRAINT unique_atoken UNIQUE (access_token));
