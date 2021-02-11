@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy;
+import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter.Mode;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -67,7 +68,8 @@ public class SecurityConfig {
            .pathMatchers(DELETE, "/invoices/**").hasAnyAuthority(ADMIN, EMPLOYEE)
            .anyExchange().permitAll()
            .and()
-           .headers(headers -> headers.referrerPolicy(reffer -> reffer.policy(ReferrerPolicy.SAME_ORIGIN)))
+           .headers(headers -> headers.frameOptions(fo -> fo.mode(Mode.SAMEORIGIN))
+                              .referrerPolicy(reffer -> reffer.policy(ReferrerPolicy.SAME_ORIGIN)))
            .build();
     //@formatter:on
   }
