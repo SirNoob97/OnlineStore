@@ -87,15 +87,7 @@ public class JwtProvider {
     return getClaims(token).getExpiration().after(new Date());
   }
 
-  private Header getHeaders(String token) {
-    return Jwts.parserBuilder().setSigningKey(getPublicKey()).build().parseClaimsJws(token).getHeader();
-  }
-
-  public Claims getClaims(String token) {
-    return Jwts.parserBuilder().setSigningKey(getPublicKey()).build().parseClaimsJws(token).getBody();
-  }
-
-  private boolean checkHeaders(String token) {
+  public boolean checkHeaders(String token) {
     var headers = getHeaders(token);
     if (headers.get("alg") != null && !headers.get("alg").toString().equals(SignatureAlgorithm.RS256.toString())){
       return false;
@@ -113,7 +105,15 @@ public class JwtProvider {
     var issuerRef = getClaims(token.getRefreshToken()).getIssuer();
     var issuerAcc = getClaims(token.getAccessToken()).getIssuer();
     var issuerDbAcc = getClaims(dbAccessToken).getIssuer();
-	  return issuerRef.equals(issuerAcc) && issuerRef.equals(issuerDbAcc);
+	  return issuerRef.equals(issuerDbAcc) && issuerAcc.equals(issuerDbAcc);
+  }
+
+  private Header getHeaders(String token) {
+    return Jwts.parserBuilder().setSigningKey(getPublicKey()).build().parseClaimsJws(token).getHeader();
+  }
+
+  public Claims getClaims(String token) {
+    return Jwts.parserBuilder().setSigningKey(getPublicKey()).build().parseClaimsJws(token).getBody();
   }
 
   private PrivateKey getPrivateKey() {
