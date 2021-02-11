@@ -26,7 +26,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 
     String userName = jwtProvider.getUsernameFromJwt(authToken);
 
-    if (jwtProvider.checkExpiration(authToken)) {
+    if (jwtProvider.checkExpiration(authToken) && jwtProvider.checkHeaders(authToken)) {
       Claims claims = jwtProvider.getClaims(authToken);
 
       List<String> role = claims.get("role", List.class);
