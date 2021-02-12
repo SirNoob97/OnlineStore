@@ -7,7 +7,6 @@ import com.sirnoob.authservice.domain.Token;
 import com.sirnoob.authservice.repository.ITokenRepository;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
@@ -41,7 +40,6 @@ class TokenServiceTest {
     }
 
     @Test
-    @DisplayName("generateRefreshToken return a string when successful")
     public void generateRefreshToken_ResturnAString_WhenSuccessful(){
       StepVerifier.create(iTokenService.persistToken(staticToken))
                   .expectNext(staticToken)
@@ -49,7 +47,6 @@ class TokenServiceTest {
     }
 
     @Test
-    @DisplayName("validateRefreshToken return a string when successful")
     public void validateRefreshToken_ReturnAString_WhenSuccessful(){
       String token = staticToken.getRefreshToken();
 
@@ -59,7 +56,6 @@ class TokenServiceTest {
     }
 
     @Test
-    @DisplayName("validateRefreshToken throw ResponseStatusException when the token was not found")
     public void validateRefreshToken_ReturnAMonoErrorResponseStatusException_WhenTheRepositoryReturnsAnMonoEmpty(){
       BDDMockito.when(iTokenRepository.findByRefreshToken(anyString())).thenReturn(Mono.empty());
 
@@ -69,7 +65,6 @@ class TokenServiceTest {
     }
 
     @Test
-    @DisplayName("deleteRefreshToken return a mono void when successful")
     public void deleteRefreshToken_ReturnAMonoVoid_WhenSuccessful(){
       StepVerifier.create(iTokenService.deleteToken(staticToken.getRefreshToken()))
                   .expectSubscription()
@@ -77,7 +72,6 @@ class TokenServiceTest {
     }
 
     @Test
-    @DisplayName("deleteRefreshToken throw ResponseStatusException when the query operation returns 0")
     public void deleteRefreshToken_ReturnAMonoErrorResponseStatusException_WhenTheQueryOperationReturnsZero() {
       BDDMockito.when(iTokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(0));
 

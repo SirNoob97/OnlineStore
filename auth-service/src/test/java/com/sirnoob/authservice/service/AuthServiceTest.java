@@ -19,7 +19,6 @@ import com.sirnoob.authservice.repository.IUserRepository;
 import com.sirnoob.authservice.security.JwtProvider;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
@@ -86,7 +85,6 @@ class AuthServiceTest {
   }
 
   @Test
-  @DisplayName("signup return a Mono of AuthResponse when successful")
   public void signup_ReturnAMonoAuthResponse_WhenSuccessful(){
     StepVerifier.create(iAuthService.signup(staticSignUpRequest))
                 .expectSubscription()
@@ -98,7 +96,6 @@ class AuthServiceTest {
   }
 
   @Test
-  @DisplayName("login return a Mono of AuthResponse when successful")
   public void login_ReturnAMonoAuthResponse_WhenSuccessful(){
     StepVerifier.create(iAuthService.login(staticLoginRequest))
                 .expectSubscription()
@@ -110,7 +107,6 @@ class AuthServiceTest {
   }
 
   @Test
-  @DisplayName("login return a MonoError ResponseStatusException when the repository returns an MonoEmpty")
   public void login_ReturnAMonoErrorResponseStatusException_WhenTheRepositoryReturnsAnMonoEmpty(){
     BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(Mono.empty());
 
@@ -121,7 +117,6 @@ class AuthServiceTest {
   }
 
   @Test
-  @DisplayName("login return a MonoError ResponseStatusException when passwords do not match")
   public void login_ReturnAMonoErrorResponseStatusException_WhenPasswordsDoNotMatch(){
     BDDMockito.when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
@@ -132,7 +127,6 @@ class AuthServiceTest {
   }
 
   @Test
-  @DisplayName("refreshTokenRequest return a MonoAuthResponse when successful")
   public void refreshTokenRequest_ReturnAMonoAuthResponse_WhenSuccessful() {
     StepVerifier.create(iAuthService.refreshToken(staticToken))
                 .expectSubscription()

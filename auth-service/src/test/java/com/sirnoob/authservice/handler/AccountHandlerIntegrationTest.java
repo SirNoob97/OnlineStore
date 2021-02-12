@@ -23,7 +23,6 @@ import com.sirnoob.authservice.service.TokenServiceImpl;
 import com.sirnoob.authservice.validator.ConstraintValidator;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +93,6 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = ADMIN)
-  @DisplayName("createAccount return 201 status code and a confirmation message when succesful")
   public void createAccount_Return201StatusCodeAndAConfirmationMessage_WhenSuccesful(){
     webTestClient.post()
                   .uri("/accounts")
@@ -108,7 +106,6 @@ class AccountHandlerIntegrationTest{
   }
 
   @Test
-  @DisplayName("createAccount return 403 status code when access is denied")
   public void createAccount_Return403StatusCode_WhenUserIsNotAuhenticated(){
     webTestClient.post()
                   .uri("/accounts")
@@ -122,7 +119,6 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = EMPLOYEE)
-  @DisplayName("createAccount return 401 status code when access is denied")
   public void createAccount_Return401StatusCode_WhenAccessIsDenied(){
     webTestClient.post()
                   .uri("/accounts")
@@ -135,7 +131,6 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = ADMIN)
-  @DisplayName("updateAccount return 200 status code and a confirmation message when succesful")
   public void updateAccount_Return200StatusCodeAndAConfirmationMessage_WhenSuccesful(){
     webTestClient.put()
                   .uri("/accounts")
@@ -150,7 +145,6 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = ADMIN)
-  @DisplayName("updatePassword return 204 status code when successful")
   public void updatePassword_Return204StatusCode_WhenSuccessful() {
     webTestClient.put()
                   .uri("/accounts/passwords")
@@ -162,7 +156,6 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = ADMIN)
-  @DisplayName("updatePassword return 404 status code when repository update operation return 0")
   public void updatePassword_Return404StatusCode_WhenRepositoryUpdateOperationReturnZero() {
     BDDMockito.when(iUserRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(0));
 
@@ -177,7 +170,6 @@ class AccountHandlerIntegrationTest{
   }
 
   @Test
-  @DisplayName("updatePassword return 403 status code when user is not authenticated")
   public void updatePassword_Return403StatusCode_WhenUserIsNotAuthenticated() {
     webTestClient.put()
                   .uri("/accounts/passwords")
@@ -189,7 +181,6 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = ADMIN)
-  @DisplayName("deleteByUserId return 204 status code when successful")
   public void deleteByUserId_Return204StatusCode_WhenSuccessful() {
     webTestClient.delete()
                   .uri("/accounts/1")
@@ -199,7 +190,6 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = ADMIN)
-  @DisplayName("deleteByUserId return 404 status code when repository delete operation return 0")
   public void deleteByUserId_Return404StatusCode_WhenRepositoryDeleteOperationReturnZero() {
     BDDMockito.when(iUserRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(0));
 
@@ -212,7 +202,6 @@ class AccountHandlerIntegrationTest{
   }
 
   @Test
-  @DisplayName("getAllAccounts return 403 status code and when user is not authenticated")
   public void deleteByUserId_Return403StatusCode_WhenUserIsNotAuthenticated() {
     webTestClient.delete()
                   .uri("/accounts/1")
@@ -222,7 +211,6 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = ADMIN)
-  @DisplayName("getAllAccounts return 200 status code and flux user when successful")
   public void getAllAccounts_Return200StatusCodeAndFluxUser_WhenSuccesful() {
     webTestClient.get()
                   .uri("/accounts")
@@ -234,7 +222,6 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = ADMIN)
-  @DisplayName("getAllAccounts return 404 status code and when flux of user is empty")
   public void getAllAccounts_Return404StatusCode_WhenFluxUserIsEmpty() {
     BDDMockito.when(iUserRepository.findAll()).thenReturn(Flux.empty());
 
@@ -248,7 +235,6 @@ class AccountHandlerIntegrationTest{
   }
 
   @Test
-  @DisplayName("getAllAccounts return 403 status code and when user is not authenticated")
   public void getAllAccounts_Return403StatusCode_WhenUserIsNotAuthenticated() {
     webTestClient.get()
                   .uri("/accounts")
@@ -259,7 +245,6 @@ class AccountHandlerIntegrationTest{
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = EMPLOYEE)
-  @DisplayName("getAllAccounts return 401 status code and when access is denied")
   public void getAllAccounts_Return401StatusCode_WhenAccesIsDenied() {
     BDDMockito.when(iUserRepository.findAll()).thenReturn(Flux.empty());
 

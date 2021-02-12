@@ -1,12 +1,12 @@
 package com.sirnoob.authservice.repository;
 
-import com.sirnoob.authservice.domain.Token;
-
 import static com.sirnoob.authservice.util.Provider.generateTokenEntity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+import com.sirnoob.authservice.domain.Token;
+
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
@@ -16,7 +16,6 @@ import org.springframework.data.r2dbc.core.DatabaseClient;
 import reactor.test.StepVerifier;
 
 @DataR2dbcTest
-@DisplayName("Refresh Token Repository Test")
 class TokenRepositoryTest {
 
   @Autowired
@@ -56,7 +55,6 @@ class TokenRepositoryTest {
   }
 
   @Test
-  @DisplayName("save save/persist and return a new refresh token where successful")
   public void save_SavePersistAndReturnANewRefreshToken_WhereSuccessful(){
     Token tokenEntity = generateTokenEntity();
     String refreshToken = tokenEntity.getRefreshToken();
@@ -72,13 +70,11 @@ class TokenRepositoryTest {
   }
 
   @Test
-  @DisplayName("save throw IllegalArgumentException when refresh token is null")
   public void save_ThrowIllegalArgumentException_WhenRefreshTokenIsNull() {
     assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> iTokenRepository.save(null).subscribe());
   }
 
   @Test
-  @DisplayName("save throw DataIntegrityViolationException when refresh token is empty")
   public void save_ThrowDataIntegrityViolationException_WhenRefreshTokenIsEmpty(){
     StepVerifier.create(iTokenRepository.save(Token.builder().build()))
                 .expectError(DataIntegrityViolationException.class)
@@ -86,7 +82,6 @@ class TokenRepositoryTest {
   }
 
   @Test
-  @DisplayName("save throw DataIntegrityViolationException when there is already a refresh token saved with that token")
   public void save_ThrowDataIntegrityViolationException_WhenThereIsAlreadyARefreshTokenSavedWithThatToken(){
     Token newToken = Token.builder()
                     .accessToken(staticToken.getAccessToken())
@@ -98,7 +93,6 @@ class TokenRepositoryTest {
   }
 
   @Test
-  @DisplayName("findByToken return a refresh token log when successful")
   public void findByToken_ReturnARefreshTokenLog_WhenSuccessful(){
     String token = staticToken.getRefreshToken();
 
@@ -113,7 +107,6 @@ class TokenRepositoryTest {
   }
 
   @Test
-  @DisplayName("findByToken does not throw exception when token parameter is null")
   public void findByToken_DoesNotThrowException_WhenTokenParameterIsNull(){
     StepVerifier.create(iTokenRepository.findByRefreshToken(null))
                 .expectSubscription()
@@ -122,7 +115,6 @@ class TokenRepositoryTest {
   }
 
   @Test
-  @DisplayName("findByToken return a mono void when there is no refresh tokens in the registry")
   public void findByToken_ReturnAMonoVoid_WhenThereIsNoRefreshTokensInTheRegistry(){
     String token = staticToken.getRefreshToken();
     Token defaultToken = new Token();
@@ -140,7 +132,6 @@ class TokenRepositoryTest {
   }
 
   @Test
-  @DisplayName("deleteByToken return an integer equals to 1 and delete/remove an refresh token log when successful")
   public void deleteByToken_DeleteRemoveAnRefreshTokenLog_WhenSuccessful(){
     String token = staticToken.getRefreshToken();
 
@@ -151,7 +142,6 @@ class TokenRepositoryTest {
   }
 
   @Test
-  @DisplayName("deleteByToken does not throw exception when token parameter is null")
   public void deleteByToken_ReturnZeroAndDoesNotThrowException_WhenTokenParameterIsNull(){
     StepVerifier.create(iTokenRepository.deleteByRefreshToken(null))
                 .expectSubscription()
@@ -160,7 +150,6 @@ class TokenRepositoryTest {
   }
 
   @Test
-  @DisplayName("deleteByToken return 0 when there is no refresh tokens in the registry")
   public void deleteByToken_ReturnZero_WhenThereIsNoRefreshTokensInTheRegistry(){
     StepVerifier.create(iTokenRepository.deleteAll())
                 .expectSubscription()

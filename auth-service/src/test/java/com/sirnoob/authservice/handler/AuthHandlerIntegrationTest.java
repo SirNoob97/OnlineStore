@@ -5,9 +5,9 @@ import static com.sirnoob.authservice.util.Provider.JSON;
 import static com.sirnoob.authservice.util.Provider.PASSWORD;
 import static com.sirnoob.authservice.util.Provider.TEST;
 import static com.sirnoob.authservice.util.Provider.TEST_EMAIL;
-import static com.sirnoob.authservice.util.Provider.generateTokenEntity;
 import static com.sirnoob.authservice.util.Provider.generateLoginRequest;
 import static com.sirnoob.authservice.util.Provider.generateSignUpRequest;
+import static com.sirnoob.authservice.util.Provider.generateTokenEntity;
 import static com.sirnoob.authservice.util.Provider.generateUserStaticValuesForIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,7 +34,6 @@ import com.sirnoob.authservice.service.TokenServiceImpl;
 import com.sirnoob.authservice.validator.ConstraintValidator;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +106,6 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  @DisplayName("signup return an AuthResponse and 201 status code when successful")
   public void signup_ReturnAAuthResponseAnd201StatusCode_WhenSuccesful() {
     SignUpRequest signUpRequest = generateSignUpRequest();
 
@@ -126,7 +124,6 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  @DisplayName("signup return 400 status code when SignUpRequest has invalid fields")
   public void signup_Return400StatusCode_WhenSignUpRequestHasInvalidFields() {
     SignUpRequest invalidSignUpRequest = SignUpRequest.builder().userName("").email("").password("").build();
 
@@ -145,7 +142,6 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  @DisplayName("login return AuthResponseand 200 status code when successful")
   public void login_ReturnAuthResponseAnd200StatusCode_WhenSuccessful() {
     webTestClient.post()
                   .uri("/auth/login")
@@ -162,7 +158,6 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  @DisplayName("login return 404 status code when user was not found in the registry")
   public void login_Return404StatusCode_WhenUserWasNotFoundInTheRegistry() {
     BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(Mono.empty());
 
@@ -181,7 +176,6 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  @DisplayName("login return 400 status code when passwords does not match")
   public void login_Return400StatusCode_WhenPasswordsDoesNotMatch() {
     BDDMockito.when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
@@ -200,7 +194,6 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  @DisplayName("login return 400 status code when LoginRequest has invalid fields")
   public void login_Return400StatusCode_WhenLoginRequestHasInvalidFields() {
     LoginRequest invalidLoginRequest = new LoginRequest("", "");
     webTestClient.post()
@@ -219,7 +212,6 @@ class AuthHandlerIntegrationTest {
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
-  @DisplayName("getCurrentUser return 200 status code and MonoAccountView when successful")
   public void getCurrentUser_Return200StaticCodeAndMonoAccountView_WhenSuccessful() {
     webTestClient.get()
                   .uri("/auth/users")
@@ -237,7 +229,6 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  @DisplayName("getCurrentUser return 403 status code when user is not authenticated")
   public void getCurrentUser_Return403StaticCode_WhenUserIsNotAuthenticated() {
     webTestClient.get()
                   .uri("/auth/users")
@@ -251,7 +242,6 @@ class AuthHandlerIntegrationTest {
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
-  @DisplayName("refreshToken return AuthResponse and 200 status code when successful")
   public void refreshToken_ReturnAuthResponseAnd200StatusCode_WhenSuccessful() {
     webTestClient.post()
                   .uri("/auth/refresh-token")
@@ -266,7 +256,6 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  @DisplayName("refreshToken return 403 status code when user is not authenticated")
   public void refreshToken_Return403StatusCode_WhenUserIsNotAuthenticated() {
     webTestClient.post()
                   .uri("/auth/refresh-token")
@@ -284,7 +273,6 @@ class AuthHandlerIntegrationTest {
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
-  @DisplayName("refreshToken return 400 status code when RefreshTokenRequest has invalid fields")
   public void refreshToken_Return400StatusCode_WhenRefreshTokenRequestHasInvalidFields() {
     webTestClient.post()
                   .uri("/auth/refresh-token")
@@ -300,7 +288,6 @@ class AuthHandlerIntegrationTest {
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
-  @DisplayName("logout return 204 status code when successful")
   public void logout_Return204StatusCode_WhenSuccessful() {
     webTestClient.post()
                   .uri("/auth/logout")
@@ -315,7 +302,6 @@ class AuthHandlerIntegrationTest {
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
-  @DisplayName("logout return 404 status code when refresh token was not found")
   public void logout_Return404StatusCode_WhenRefreshTokenWasNotFound() {
     BDDMockito.when(iTokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(0));
 
@@ -331,7 +317,6 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  @DisplayName("logout return 403 status code when user is not authenticated")
   public void logout_Return403StatusCode_WhenUserIsNotAuthenticated() {
     webTestClient.post()
                   .uri("/auth/logout")
