@@ -1,5 +1,9 @@
 server:
   port: ${AUTH_SERVICE_PORT:8090}
+  error:
+    include-message: always
+    include-binding-errors: always
+
 
 logging:
   pattern:
