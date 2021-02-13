@@ -1,6 +1,7 @@
 package com.sirnoob.authservice.service;
 
 import static com.sirnoob.authservice.util.Provider.PASSWORD;
+import static com.sirnoob.authservice.util.Provider.TEST;
 import static com.sirnoob.authservice.util.Provider.generateTokenEntity;
 import static com.sirnoob.authservice.util.Provider.generateLoginRequest;
 import static com.sirnoob.authservice.util.Provider.generateSignUpRequest;
@@ -65,23 +66,31 @@ class AuthServiceTest {
 
     Mono<Token> token = Mono.just(staticToken);
 
-    BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
+    Mono<String> accessToken = Mono.just(staticToken.getAccessToken());
 
     BDDMockito.when(iUserMapper.mapSignUpRequestToUser(any(SignUpRequest.class))).thenReturn(staticUser);
 
     BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(monoUser);
 
+    BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(monoUser);
+
     BDDMockito.when(iTokenService.persistToken(any(Token.class))).thenReturn(token);
+
+    BDDMockito.when(iTokenService.getTokensByRefreshToken(anyString())).thenReturn(token);
+
+    BDDMockito.when(iTokenService.deleteToken(anyString())).thenReturn(Mono.empty());
 
     BDDMockito.when(jwtProvider.generateAccessToken(any(User.class), anyString())).thenReturn(staticToken.getAccessToken());
 
     BDDMockito.when(jwtProvider.getJwtExpirationTime()).thenReturn(getJwtExpirationTime());
 
-    BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(monoUser);
+    BDDMockito.when(jwtProvider.validateToken(any(Token.class), anyString())).thenReturn(accessToken);
+
+    BDDMockito.when(jwtProvider.getUsernameFromJwt(anyString())).thenReturn(TEST);
 
     BDDMockito.when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
-    BDDMockito.when(iTokenService.getTokensByRefreshToken(anyString())).thenReturn(token);
+    BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
   }
 
   @Test
