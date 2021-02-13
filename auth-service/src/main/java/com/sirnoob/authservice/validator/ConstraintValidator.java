@@ -21,7 +21,7 @@ public class ConstraintValidator {
     this.validator = validator;
   }
 
-  public <T> Mono<T> validateRequest(T t) {
+  public <T> Mono<T> validate(T t) {
     Set<ConstraintViolation<T>> constraintViolations = validator.validate(t);
     String errors = constraintViolations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(", "));
     if(!errors.isEmpty())
