@@ -51,7 +51,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 @WebFluxTest
-@Import({ AuthServiceImpl.class, AccountServiceImpl.class, TokenServiceImpl.class, JwtProvider.class, ConstraintValidator.class })
+@Import({ AuthServiceImpl.class, AccountServiceImpl.class, TokenServiceImpl.class, ConstraintValidator.class })
 @ContextConfiguration(classes = { SecurityConfig.class, AuthenticationManager.class, SecurityContextRepository.class,
                                   Router.class, RouteLocatorBuilder.class, PathRoutePredicateFactory.class, AuthHandler.class, AccountHandler.class })
 class AuthHandlerIntegrationTest {
@@ -67,6 +67,9 @@ class AuthHandlerIntegrationTest {
 
   @MockBean
   private PasswordEncoder passwordEncoder;
+
+  @MockBean
+  private JwtProvider jwtProvider;
 
   @Autowired
   private ApplicationContext applicationContext;
@@ -86,23 +89,33 @@ class AuthHandlerIntegrationTest {
 
     Mono<Token> token = Mono.just(staticToken);
 
-    BDDMockito.when(iUserMapper.mapSignUpRequestToUser(any(SignUpRequest.class))).thenReturn(staticUser);
-
-    BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(user);
-
-    BDDMockito.when(iTokenRepository.save(any(Token.class))).thenReturn(token);
-
-    BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
-
-    BDDMockito.when(iUserMapper.maptUserToAccountView(any(User.class))).thenReturn(staticAccountView);
+    Mono<String> accessToken = Mono.just(staticToken.getAccessToken());
 
     BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(user);
 
+    BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(user);
+
+    BDDMockito.when(iUserMapper.mapSignUpRequestToUser(any(SignUpRequest.class))).thenReturn(staticUser);
+
+    BDDMockito.when(iUserMapper.maptUserToAccountView(any(User.class))).thenReturn(staticAccountView);
+
+    BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
+
     BDDMockito.when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+    BDDMockito.when(iTokenRepository.save(any(Token.class))).thenReturn(token);
 
     BDDMockito.when(iTokenRepository.findByRefreshToken(anyString())).thenReturn(token);
 
     BDDMockito.when(iTokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(1));
+
+    BDDMockito.when(jwtProvider.validateToken(any(Token.class), anyString())).thenReturn(accessToken);
+
+    BDDMockito.when(jwtProvider.getUsernameFromJwt(anyString())).thenReturn(TEST);
+
+    BDDMockito.when(jwtProvider.generateAccessToken(any(User.class), anyString())).thenReturn(staticToken.getAccessToken());
+
+    BDDMockito.when(jwtProvider.generateRefreshToken(anyString(), anyString())).thenReturn(staticToken.getRefreshToken());
   }
 
   @Test
@@ -276,8 +289,8 @@ class AuthHandlerIntegrationTest {
   public void refreshToken_Return400StatusCode_WhenRefreshTokenRequestHasInvalidFields() {
     webTestClient.post()
                   .uri("/auth/refresh-token")
-                  .cookie("JWT", staticToken.getAccessToken())
-                  .cookie("RT", staticToken.getRefreshToken())
+                  .cookie("JWT", "")
+                  .cookie("RT", "")
                   .exchange()
                   .expectStatus().isBadRequest()
                   .expectBody(Void.class);
