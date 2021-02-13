@@ -39,8 +39,8 @@ POST start a new session with an existing account
       "password": "test"
     }' | jq
 
-
 !!!From this point, remember to replace the phrase 'valid token' with the cookies returned by the registration(signup) and login endpoints!!!
+---
 
 POST refresh the session and avoid losing the authentication in the app
 
