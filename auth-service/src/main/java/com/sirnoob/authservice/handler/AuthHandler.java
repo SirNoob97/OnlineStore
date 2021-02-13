@@ -34,14 +34,14 @@ public class AuthHandler {
 
   public Mono<ServerResponse> signup(ServerRequest serverRequest){
     return serverRequest.bodyToMono(SignUpRequest.class)
-           .doOnNext(constraintValidator::validateRequest)
+           .doOnNext(constraintValidator::validate)
            .flatMap(iAuthService::signup)
            .flatMap(data -> buildServerResponse(HttpStatus.CREATED, data));
   }
 
   public Mono<ServerResponse> login(ServerRequest serverRequest){
     return serverRequest.bodyToMono(LoginRequest.class)
-           .doOnNext(constraintValidator::validateRequest)
+           .doOnNext(constraintValidator::validate)
            .flatMap(iAuthService::login)
            .flatMap(data -> buildServerResponse(HttpStatus.OK, data));
   }
@@ -72,7 +72,11 @@ public class AuthHandler {
   }
 
   private Mono<Token> getTokens(MultiValueMap<String, HttpCookie> cookies){
-    return Mono.just(Token.builder().refreshToken(cookies.getFirst("RT").getValue()).accessToken(cookies.getFirst("JWT").getValue()).build());
+    return Mono.just(Token.builder()
+                      .refreshToken(cookies.getFirst("RT").getValue())
+                      .accessToken(cookies.getFirst("JWT").getValue())
+                      .build())
+            .doOnNext(constraintValidator::validate);
   }
 
   private ResponseCookie buildCookie(String name, String value) {
