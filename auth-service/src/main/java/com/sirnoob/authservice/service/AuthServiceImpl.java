@@ -1,10 +1,11 @@
 package com.sirnoob.authservice.service;
 
+import java.util.UUID;
+
+import com.sirnoob.authservice.domain.Token;
 import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountView;
-import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
-import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
 import com.sirnoob.authservice.mapper.IUserMapper;
 import com.sirnoob.authservice.repository.IUserRepository;
@@ -28,8 +29,9 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
 
   private static final String USER_NOT_FOUND = "User Not Found!!";
   private static final String WRONG_PASSWORD = "Wrong Password!!";
+  private static final String INVALID_TOKEN = "Invalid Token!!";
 
-  private final IRefreshTokenService iRefreshTokenService;
+  private final ITokenService iTokenService;
   private final IUserRepository iUserRepository;
   private final IUserMapper iUserMapper;
   private final JwtProvider jwtProvider;
@@ -44,46 +46,57 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
 
   @Transactional
   @Override
-  public Mono<AuthResponse> signup(SignUpRequest signUpRequest) {
+  public Mono<Token> signup(SignUpRequest signUpRequest) {
     return iUserRepository.save(iUserMapper.mapSignUpRequestToUser(signUpRequest))
-           .flatMap(userDb -> iRefreshTokenService.generateRefreshToken()
-           .flatMap(refreshToken -> createAuthResponse(userDb, refreshToken)));
+           .flatMap(user -> persistToken(user, UUID.randomUUID().toString()));
   }
 
   @Override
-  public Mono<AuthResponse> login(LoginRequest loginRequest) {
+  public Mono<Token> login(LoginRequest loginRequest) {
     String password = loginRequest.getPassword();
 
     return findByUsername(loginRequest.getUserName()).cast(User.class)
-           .flatMap(user -> verifyPassword(user, password).flatMap(result -> iRefreshTokenService.generateRefreshToken()
-           .flatMap(refreshToken -> createAuthResponse(user, refreshToken))));
+           .flatMap(user -> verifyPassword(user, password))
+           .flatMap(user -> persistToken(user, UUID.randomUUID().toString()));
   }
 
   @Override
   public Mono<AccountView> getCurrentUser() {
-    return ReactiveSecurityContextHolder.getContext().map(sc -> sc.getAuthentication().getName())
-           .flatMap(name -> findByUsername(name))
-           .cast(User.class)
-           .map(user -> iUserMapper.maptUserToAccountView(user));
+    return ReactiveSecurityContextHolder.getContext()
+          .map(sc -> sc.getAuthentication().getName())
+          .flatMap(name -> findByUsername(name))
+          .cast(User.class)
+          .map(user -> iUserMapper.maptUserToAccountView(user));
   }
 
   @Override
-  public Mono<AuthResponse> refreshToken(RefreshTokenRequest refreshTokenRequest) {
-    return iRefreshTokenService.validateRefreshToken(refreshTokenRequest.getToken())
-           .flatMap(result -> findByUsername(refreshTokenRequest.getUserName())
-           .cast(User.class)
-           .flatMap(userDb -> createAuthResponse(userDb, result)));
+  public Mono<Token> refreshToken(Token token) {
+    return iTokenService.getTokensByRefreshToken(token.getRefreshToken())
+            .flatMap(dbToken -> jwtProvider.validateToken(token, dbToken.getAccessToken()))
+            .switchIfEmpty(getMonoError(HttpStatus.NOT_ACCEPTABLE, INVALID_TOKEN))
+            .map(accessToken -> jwtProvider.getUsernameFromJwt(accessToken))
+            .flatMap(userName -> findByUsername(userName)
+              .cast(User.class)
+              .flatMap(userDb -> iTokenService.deleteToken(token.getRefreshToken())
+                                .then(persistToken(userDb, UUID.randomUUID().toString())))
+            );
   }
 
-  private Mono<AuthResponse> createAuthResponse(User user, String refreshToken) {
-    return Mono.just(AuthResponse.builder().userName(user.getUsername())
-           .authToken(jwtProvider.generateToken(user))
-           .refreshToken(refreshToken)
-           .expiresAt(jwtProvider.getJwtExpirationTime()).build());
+
+  private Mono<Token> persistToken(User user, String issuer) {
+    return Mono.just(buildTokenEntity(user, issuer))
+          .flatMap(token -> iTokenService.persistToken(token));
   }
 
-  private Mono<Boolean> verifyPassword(User user, String password) {
-    return passwordEncoder.matches(password, user.getPassword()) ? Mono.just(true)
+  private Token buildTokenEntity(User user, String issuer) {
+  return Token.builder()
+        .accessToken(jwtProvider.generateAccessToken(user, issuer))
+        .refreshToken(jwtProvider.generateRefreshToken(user.getUsername(), issuer))
+        .build();
+  }
+
+  private Mono<User> verifyPassword(User user, String password) {
+    return passwordEncoder.matches(password, user.getPassword()) ? Mono.just(user)
                                                                  : getMonoError(HttpStatus.BAD_REQUEST, WRONG_PASSWORD);
   }
 

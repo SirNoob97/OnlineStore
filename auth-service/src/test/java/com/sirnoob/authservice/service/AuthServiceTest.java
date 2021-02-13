@@ -2,10 +2,8 @@ package com.sirnoob.authservice.service;
 
 import static com.sirnoob.authservice.util.Provider.PASSWORD;
 import static com.sirnoob.authservice.util.Provider.TEST;
-import static com.sirnoob.authservice.util.Provider.TOKEN;
+import static com.sirnoob.authservice.util.Provider.generateTokenEntity;
 import static com.sirnoob.authservice.util.Provider.generateLoginRequest;
-import static com.sirnoob.authservice.util.Provider.generateRefreshToken;
-import static com.sirnoob.authservice.util.Provider.generateRefreshTokenRequest;
 import static com.sirnoob.authservice.util.Provider.generateSignUpRequest;
 import static com.sirnoob.authservice.util.Provider.generateUserForSignUpTest;
 import static com.sirnoob.authservice.util.Provider.getJwtExpirationTime;
@@ -13,18 +11,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
-import com.sirnoob.authservice.domain.RefreshToken;
+import com.sirnoob.authservice.domain.Token;
 import com.sirnoob.authservice.domain.User;
-import com.sirnoob.authservice.dto.AuthResponse;
 import com.sirnoob.authservice.dto.LoginRequest;
-import com.sirnoob.authservice.dto.RefreshTokenRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
 import com.sirnoob.authservice.mapper.IUserMapper;
 import com.sirnoob.authservice.repository.IUserRepository;
 import com.sirnoob.authservice.security.JwtProvider;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
@@ -40,7 +35,7 @@ import reactor.test.StepVerifier;
 class AuthServiceTest {
 
   @Mock
-  private IRefreshTokenService iRefreshTokenService;
+  private ITokenService iTokenService;
 
   @Mock
   private IUserRepository iUserRepository;
@@ -58,65 +53,69 @@ class AuthServiceTest {
 
 
   private static final User staticUser = generateUserForSignUpTest();
-  private static final RefreshToken staticRefreshToken = generateRefreshToken();
+  private static final Token staticToken = generateTokenEntity();
   private static final LoginRequest staticLoginRequest = generateLoginRequest();
   private static final SignUpRequest staticSignUpRequest = generateSignUpRequest();
-  private static final RefreshTokenRequest staticRefreshTokenRequest = generateRefreshTokenRequest();
 
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    iAuthService = new AuthServiceImpl(iRefreshTokenService, iUserRepository, iUserMapper, jwtProvider, passwordEncoder);
+    iAuthService = new AuthServiceImpl(iTokenService, iUserRepository, iUserMapper, jwtProvider, passwordEncoder);
 
     Mono<User> monoUser = Mono.just(staticUser);
 
-    Mono<String> token = Mono.just(staticRefreshToken.getToken());
+    Mono<Token> token = Mono.just(staticToken);
 
-    BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
+    Mono<String> accessToken = Mono.just(staticToken.getAccessToken());
 
     BDDMockito.when(iUserMapper.mapSignUpRequestToUser(any(SignUpRequest.class))).thenReturn(staticUser);
 
     BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(monoUser);
 
-    BDDMockito.when(iRefreshTokenService.generateRefreshToken()).thenReturn(token);
+    BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(monoUser);
 
-    BDDMockito.when(jwtProvider.generateToken(any(User.class))).thenReturn(TOKEN);
+    BDDMockito.when(iTokenService.persistToken(any(Token.class))).thenReturn(token);
+
+    BDDMockito.when(iTokenService.getTokensByRefreshToken(anyString())).thenReturn(token);
+
+    BDDMockito.when(iTokenService.deleteToken(anyString())).thenReturn(Mono.empty());
+
+    BDDMockito.when(jwtProvider.generateAccessToken(any(User.class), anyString())).thenReturn(staticToken.getAccessToken());
 
     BDDMockito.when(jwtProvider.getJwtExpirationTime()).thenReturn(getJwtExpirationTime());
 
-    BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(monoUser);
+    BDDMockito.when(jwtProvider.validateToken(any(Token.class), anyString())).thenReturn(accessToken);
+
+    BDDMockito.when(jwtProvider.getUsernameFromJwt(anyString())).thenReturn(TEST);
 
     BDDMockito.when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
-    BDDMockito.when(iRefreshTokenService.validateRefreshToken(anyString())).thenReturn(token);
+    BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
   }
 
   @Test
-  @DisplayName("signup return a Mono of AuthResponse when successful")
-  public void signup_ReturnAMonoAuthResponse_WhenSuccessful(){
+  public void signup_ReturnAMonoTokenEntity_WhenSuccessful(){
     StepVerifier.create(iAuthService.signup(staticSignUpRequest))
                 .expectSubscription()
-                .assertNext(authResponse -> {
-                  assertThat(authResponse.getClass()).isEqualTo(AuthResponse.class);
-                  assertThat(authResponse.getUserName()).isEqualTo(TEST);
-                  assertThat(authResponse.getRefreshToken()).isEqualTo(staticRefreshToken.getToken());
+                .assertNext(token -> {
+                  assertThat(token.getClass()).isEqualTo(Token.class);
+                  assertThat(token.getAccessToken()).isEqualTo(staticToken.getAccessToken());
+                  assertThat(token.getRefreshToken()).isEqualTo(staticToken.getRefreshToken());
                 }).verifyComplete();
   }
 
   @Test
-  @DisplayName("login return a Mono of AuthResponse when successful")
-  public void login_ReturnAMonoAuthResponse_WhenSuccessful(){
+  public void login_ReturnAMonoTokenEntity_WhenSuccessful(){
     StepVerifier.create(iAuthService.login(staticLoginRequest))
                 .expectSubscription()
-                .assertNext(authResponse -> {
-                  assertThat(authResponse.getClass()).isEqualTo(AuthResponse.class);
-                  assertThat(authResponse.getUserName()).isEqualTo(TEST);
-                  assertThat(authResponse.getRefreshToken()).isEqualTo(staticRefreshToken.getToken());
+                .assertNext(token -> {
+                  assertThat(token.getClass()).isEqualTo(Token.class);
+                  assertThat(token.getAccessToken()).isEqualTo(staticToken.getAccessToken());
+                  assertThat(token.getRefreshToken()).isEqualTo(staticToken.getRefreshToken());
                 }).verifyComplete();
   }
 
   @Test
-  @DisplayName("login return a MonoError ResponseStatusException when the repository returns an MonoEmpty")
   public void login_ReturnAMonoErrorResponseStatusException_WhenTheRepositoryReturnsAnMonoEmpty(){
     BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(Mono.empty());
 
@@ -127,7 +126,6 @@ class AuthServiceTest {
   }
 
   @Test
-  @DisplayName("login return a MonoError ResponseStatusException when passwords do not match")
   public void login_ReturnAMonoErrorResponseStatusException_WhenPasswordsDoNotMatch(){
     BDDMockito.when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
@@ -138,14 +136,13 @@ class AuthServiceTest {
   }
 
   @Test
-  @DisplayName("refreshTokenRequest return a MonoAuthResponse when successful")
-  public void refreshTokenRequest_ReturnAMonoAuthResponse_WhenSuccessful() {
-    StepVerifier.create(iAuthService.refreshToken(staticRefreshTokenRequest))
+  public void refreshToken_ReturnAMonoToken_WhenSuccessful() {
+    StepVerifier.create(iAuthService.refreshToken(staticToken))
                 .expectSubscription()
-                .assertNext(authResponse -> {
-                  assertThat(authResponse.getClass()).isEqualTo(AuthResponse.class);
-                  assertThat(authResponse.getUserName()).isEqualTo(TEST);
-                  assertThat(authResponse.getRefreshToken()).isEqualTo(staticRefreshToken.getToken());
+                .assertNext(token -> {
+                  assertThat(token.getClass()).isEqualTo(Token.class);
+                  assertThat(token.getAccessToken()).isEqualTo(staticToken.getAccessToken());
+                  assertThat(token.getRefreshToken()).isEqualTo(staticToken.getRefreshToken());
                 }).verifyComplete();
   }
 }

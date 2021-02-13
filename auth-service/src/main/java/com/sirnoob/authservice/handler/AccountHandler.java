@@ -34,7 +34,7 @@ public class AccountHandler {
 
   public Mono<ServerResponse> updatePassword(ServerRequest serverRequest){
     return serverRequest.bodyToMono(PasswordUpdateDto.class)
-           .doOnNext(validator::validateRequest)
+           .doOnNext(validator::validate)
            .flatMap(dto -> iAccountService.updatePassword(dto))
            .then(ServerResponse.noContent().build());
   }
@@ -53,7 +53,7 @@ public class AccountHandler {
 
   private Mono<String> persistUser(ServerRequest serverRequest){
     return serverRequest.bodyToMono(AccountPayload.class)
-           .doOnNext(validator::validateRequest)
+           .doOnNext(validator::validate)
            .flatMap(iAccountService::persistAccount);
   }
 }

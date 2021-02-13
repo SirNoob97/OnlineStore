@@ -11,7 +11,6 @@ import com.sirnoob.authservice.domain.Role;
 import com.sirnoob.authservice.domain.User;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
@@ -21,7 +20,6 @@ import org.springframework.data.r2dbc.core.DatabaseClient;
 import reactor.test.StepVerifier;
 
 @DataR2dbcTest
-@DisplayName("User Repository Test")
 class UserRepositoryTest {
 
   @Autowired
@@ -61,7 +59,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("save save/persist and return a new user when successful")
   public void save_SavePersistANewUser_WhenSuccessful() {
     StepVerifier.create(iUserRepository.save(generateUserRandomValues(Role.EMPLOYEE)))
                 .assertNext(user -> {
@@ -72,13 +69,11 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("save throw IllegalArgumentException when user is null")
   public void save_ThrowIllegalArgumentException_WhenUserIsNull(){
     assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> iUserRepository.save(null).subscribe());
   }
 
   @Test
-  @DisplayName("save throw DataIntegrityViolationException when user is empty")
   public void save_ThrowIllegalArgumentException_WhenUserIsEmpty(){
     StepVerifier.create(iUserRepository.save(User.builder().build()))
                 .expectError(DataIntegrityViolationException.class)
@@ -86,7 +81,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("save throw DataIntegrityViolationException when there is already a user saved with that name")
   public void save_ThrowDataIntegrityViolationException_WhenThereIsAlreadyAUserSavedWithThatName(){
     User user = User.builder().userName(staticUser.getUsername()).password(PASSWORD).email("fake@email.com").role(Role.ADMIN).build();
 
@@ -96,7 +90,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("save throw DataIntegrityViolationException when there is already a user saved with that email")
   public void save_ThrowDataIntegrityViolationException_WhenThereIsAlreadyAUserSavedWithThatEmail(){
     User user = User.builder().userName("name").password(PASSWORD).email(staticUser.getEmail()).role(Role.ADMIN).build();
 
@@ -106,7 +99,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("findAll return a users flux when successful")
   public void findAll_ReturnAUsersFlux_WhenSuccesful() {
     StepVerifier.create(iUserRepository.findAll())
                 .expectNextCount(1)
@@ -115,7 +107,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("findAll return a flux empty when there is no users in the registry")
   public void findAll_ReturnAFluxEmpty_WhenSuccesful_() {
     StepVerifier.create(iUserRepository.deleteAll())
                 .expectSubscription()
@@ -129,7 +120,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("findByUserName return a user when successful")
   public void findByUserName_ReturnAUser_WhenSuccesfful(){
     String name = staticUser.getUsername();
     StepVerifier.create(iUserRepository.findByUserName(name))
@@ -139,7 +129,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("findByUserName does not throw exception when name parameter is null")
   public void findByUserName_DoesNotThrowException_WhenNameParameterIsNull(){
     StepVerifier.create(iUserRepository.findByUserName(null))
                 .expectSubscription()
@@ -148,8 +137,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("findByUserName return a mono void when there is no users in the registry")
-  public void findByToken_ReturnAMonoVoid_WhenThereIsNoRefreshTokensInTheRegistry(){
+  public void findByUserName_ReturnADefaultUser_WhenTheFetchOperationReturnAnEmptyEntity(){
     String name = staticUser.getUsername();
     User defaultUser = User.builder().userId(0L).userName(DEFAULT).email(DEFAULT).role(Role.CUSTOMER).build();
 
@@ -168,7 +156,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("deleteByUserId return an integer equals to 1 and delete/remove an user log when successful")
   public void deleteByUserId_DeleteRemoveAnUserLog_WhenSuccessful(){
     Long userId = iUserRepository.save(generateUserRandomValues(Role.EMPLOYEE)).map(User::getUserId).block();
 
@@ -179,7 +166,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("deleteByUserId does not throw exception when user id parameter is null")
   public void deleteByUserId_ReturnZeroAndDoesNotThrowException_WhenUserIdParameterIsNull(){
     StepVerifier.create(iUserRepository.deleteByUserId(null))
                 .expectSubscription()
@@ -188,7 +174,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("deleteByUserId return 0 when there is no users in the registry")
   public void deleteByUserId_ReturnZero_WhenThereIsNoUsersInTheRegistry(){
     StepVerifier.create(iUserRepository.deleteAll())
                 .expectSubscription()
@@ -201,7 +186,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("updatePasswordById return an integer equals to 1 and update the password of a user log when successful")
   public void updatePasswordById_ReturnAIntegerEqualsToOneAndUpdateThePasswordOfAUserLog_WhenSuccessful(){
     User userDB = iUserRepository.findByUserName(staticUser.getUsername()).block();
     Long id = userDB.getUserId();
@@ -219,7 +203,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("updatePasswordById return 0 and does not throw exception when parameters are null")
   public void updatePasswordById_ReturnZeroAndDoesNotThrowException_WhenParametersAreNull(){
     StepVerifier.create(iUserRepository.updatePasswordById(null, null))
                 .expectNextMatches(num -> num.equals(0))
@@ -228,7 +211,6 @@ class UserRepositoryTest {
   }
 
   @Test
-  @DisplayName("updatePasswordById return 0 when there is no users in the registry")
   public void updatePasswordById_ReturnZero_WhenThereIsNoUsersInTheRegistry(){
     StepVerifier.create(iUserRepository.deleteAll())
                 .expectSubscription()

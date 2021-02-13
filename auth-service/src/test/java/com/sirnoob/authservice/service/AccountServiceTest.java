@@ -13,7 +13,6 @@ import com.sirnoob.authservice.repository.IUserRepository;
 import static com.sirnoob.authservice.util.Provider.*;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
@@ -66,7 +65,6 @@ class AccountServiceTest {
   }
 
   @Test
-  @DisplayName("persistAccount save/update and return a user account when successful")
   public void persistAccount_ReturnAConfirmationMessage_WhenSuccessful() {
     StepVerifier.create(iAccountService.persistAccount(generateAccountPayloadStaticValues()))
                 .expectSubscription()
@@ -75,7 +73,6 @@ class AccountServiceTest {
   }
 
   @Test
-  @DisplayName("updatePassword update password and return a mono void when query operation returns an integer greater than 0")
   public void updatePassword_ReturnAMonoVoid_WheQueryOperationReturnAIntegerGreaterThanZero() {
     StepVerifier.create(iAccountService.updatePassword(new PasswordUpdateDto(1L, PASSWORD)))
                 .expectSubscription()
@@ -83,7 +80,6 @@ class AccountServiceTest {
   }
 
   @Test
-  @DisplayName("updatePassword return a mono error ResponseStatusException when the query operation returns an integer less than zero")
   public void updatePassword_ReturnAMonoErrorResponseStatusException_WhenTheQueryOperationReturnsAnIntegerLessThanZero() {
     BDDMockito.when(iUserRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(0));
 
@@ -93,7 +89,6 @@ class AccountServiceTest {
   }
 
   @Test
-  @DisplayName("deleteAccount delete an account and return a mono void when query operation returns an integer greater than 0")
   public void deleteAccount_ReturnAMonoVoid_WheQueryOperationReturnAIntegerGreaterThanZero() {
     StepVerifier.create(iAccountService.deleteAccount(1L))
                 .expectSubscription()
@@ -101,7 +96,6 @@ class AccountServiceTest {
   }
 
   @Test
-  @DisplayName("deleteAccount return a mono error ResponseStatusException when the query operation returns an integer less than zero")
   public void deleteAccount_ReturnAMonoErrorResponseStatusException_WhenTheQueryOperationReturnsAnIntegerLessThanZero() {
     BDDMockito.when(iUserRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(0));
 
@@ -111,7 +105,6 @@ class AccountServiceTest {
   }
 
   @Test
-  @DisplayName("getAllAccounts return a users flux when successful")
   public void getAllAccounts_ReturnAAccountViewsFlux_WhenSuccessful() {
     StepVerifier.create(iAccountService.getAllAccounts())
                 .expectSubscription()
@@ -121,7 +114,6 @@ class AccountServiceTest {
   }
 
   @Test
-  @DisplayName("getAllAccounts return a flux error ResponseStatusException when there is no users in the registry")
   public void getAllAccounts_ReturnAFluxErrorResponseStatusException_WhenThereIsNoUsersInTheRegistry() {
     BDDMockito.when(iUserRepository.findAll()).thenReturn(Flux.empty());
 
