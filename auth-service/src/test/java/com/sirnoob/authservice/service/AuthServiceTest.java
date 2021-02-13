@@ -94,7 +94,7 @@ class AuthServiceTest {
   }
 
   @Test
-  public void signup_ReturnAMonoAuthResponse_WhenSuccessful(){
+  public void signup_ReturnAMonoTokenEntity_WhenSuccessful(){
     StepVerifier.create(iAuthService.signup(staticSignUpRequest))
                 .expectSubscription()
                 .assertNext(token -> {
@@ -105,7 +105,7 @@ class AuthServiceTest {
   }
 
   @Test
-  public void login_ReturnAMonoAuthResponse_WhenSuccessful(){
+  public void login_ReturnAMonoTokenEntity_WhenSuccessful(){
     StepVerifier.create(iAuthService.login(staticLoginRequest))
                 .expectSubscription()
                 .assertNext(token -> {
@@ -136,7 +136,7 @@ class AuthServiceTest {
   }
 
   @Test
-  public void refreshTokenRequest_ReturnAMonoAuthResponse_WhenSuccessful() {
+  public void refreshToken_ReturnAMonoToken_WhenSuccessful() {
     StepVerifier.create(iAuthService.refreshToken(staticToken))
                 .expectSubscription()
                 .assertNext(token -> {

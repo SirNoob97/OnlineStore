@@ -40,14 +40,14 @@ class TokenServiceTest {
     }
 
     @Test
-    public void generateRefreshToken_ResturnAString_WhenSuccessful(){
+    public void persistToken_ResturnAString_WhenSuccessful(){
       StepVerifier.create(iTokenService.persistToken(staticToken))
                   .expectNext(staticToken)
                   .verifyComplete();
     }
 
     @Test
-    public void validateRefreshToken_ReturnAString_WhenSuccessful(){
+    public void getTokensByRefreshToken_ReturnAString_WhenSuccessful(){
       String token = staticToken.getRefreshToken();
 
       StepVerifier.create(iTokenService.getTokensByRefreshToken(token))
@@ -56,7 +56,7 @@ class TokenServiceTest {
     }
 
     @Test
-    public void validateRefreshToken_ReturnAMonoErrorResponseStatusException_WhenTheRepositoryReturnsAnMonoEmpty(){
+    public void getTokensByRefreshToken_ReturnAMonoErrorResponseStatusException_WhenTheRepositoryReturnsAnMonoEmpty(){
       BDDMockito.when(iTokenRepository.findByRefreshToken(anyString())).thenReturn(Mono.empty());
 
       StepVerifier.create(iTokenService.getTokensByRefreshToken(""))
@@ -65,14 +65,14 @@ class TokenServiceTest {
     }
 
     @Test
-    public void deleteRefreshToken_ReturnAMonoVoid_WhenSuccessful(){
+    public void deleteToken_ReturnAMonoVoid_WhenSuccessful(){
       StepVerifier.create(iTokenService.deleteToken(staticToken.getRefreshToken()))
                   .expectSubscription()
                   .verifyComplete();
     }
 
     @Test
-    public void deleteRefreshToken_ReturnAMonoErrorResponseStatusException_WhenTheQueryOperationReturnsZero() {
+    public void deleteToken_ReturnAMonoErrorResponseStatusException_WhenTheQueryOperationReturnsZero() {
       BDDMockito.when(iTokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(0));
 
       StepVerifier.create(iTokenService.deleteToken(""))

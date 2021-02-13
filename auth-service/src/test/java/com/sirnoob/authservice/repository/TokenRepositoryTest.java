@@ -55,7 +55,7 @@ class TokenRepositoryTest {
   }
 
   @Test
-  public void save_SavePersistAndReturnANewRefreshToken_WhereSuccessful(){
+  public void save_SavePersistAndReturnANewToken_WhereSuccessful(){
     Token tokenEntity = generateTokenEntity();
     String refreshToken = tokenEntity.getRefreshToken();
 
@@ -70,19 +70,19 @@ class TokenRepositoryTest {
   }
 
   @Test
-  public void save_ThrowIllegalArgumentException_WhenRefreshTokenIsNull() {
+  public void save_ThrowIllegalArgumentException_WhenTokenIsNull() {
     assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> iTokenRepository.save(null).subscribe());
   }
 
   @Test
-  public void save_ThrowDataIntegrityViolationException_WhenRefreshTokenIsEmpty(){
+  public void save_ThrowDataIntegrityViolationException_WhenTokenIsEmpty(){
     StepVerifier.create(iTokenRepository.save(Token.builder().build()))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
   }
 
   @Test
-  public void save_ThrowDataIntegrityViolationException_WhenThereIsAlreadyARefreshTokenSavedWithThatToken(){
+  public void save_ThrowDataIntegrityViolationException_WhenThereIsAlreadyATokenSavedWithThoseTokens(){
     Token newToken = Token.builder()
                     .accessToken(staticToken.getAccessToken())
                     .refreshToken(staticToken.getRefreshToken()).build();
@@ -93,7 +93,7 @@ class TokenRepositoryTest {
   }
 
   @Test
-  public void findByToken_ReturnARefreshTokenLog_WhenSuccessful(){
+  public void findByRefreshToken_ReturnATokenLog_WhenSuccessful(){
     String token = staticToken.getRefreshToken();
 
     StepVerifier.create(iTokenRepository.findByRefreshToken(token))
@@ -107,7 +107,7 @@ class TokenRepositoryTest {
   }
 
   @Test
-  public void findByToken_DoesNotThrowException_WhenTokenParameterIsNull(){
+  public void findByRefreshToken_DoesNotThrowException_WhenTokenParameterIsNull(){
     StepVerifier.create(iTokenRepository.findByRefreshToken(null))
                 .expectSubscription()
                 .expectComplete()
@@ -115,7 +115,7 @@ class TokenRepositoryTest {
   }
 
   @Test
-  public void findByToken_ReturnAMonoVoid_WhenThereIsNoRefreshTokensInTheRegistry(){
+  public void findByRefreshToken_ReturnAMonoVoid_WhenThereIsNoTokensInTheRegistry(){
     String token = staticToken.getRefreshToken();
     Token defaultToken = new Token();
 
@@ -132,7 +132,7 @@ class TokenRepositoryTest {
   }
 
   @Test
-  public void deleteByToken_DeleteRemoveAnRefreshTokenLog_WhenSuccessful(){
+  public void deleteByRefreshToken_DeleteRemoveAnTokenLog_WhenSuccessful(){
     String token = staticToken.getRefreshToken();
 
     StepVerifier.create(iTokenRepository.deleteByRefreshToken(token))
@@ -142,7 +142,7 @@ class TokenRepositoryTest {
   }
 
   @Test
-  public void deleteByToken_ReturnZeroAndDoesNotThrowException_WhenTokenParameterIsNull(){
+  public void deleteByRefreshToken_ReturnZeroAndDoesNotThrowException_WhenTokenParameterIsNull(){
     StepVerifier.create(iTokenRepository.deleteByRefreshToken(null))
                 .expectSubscription()
                 .assertNext(num -> assertThat(num).isGreaterThan(-1))
@@ -150,7 +150,7 @@ class TokenRepositoryTest {
   }
 
   @Test
-  public void deleteByToken_ReturnZero_WhenThereIsNoRefreshTokensInTheRegistry(){
+  public void deleteByRefreshToken_ReturnZero_WhenThereIsNoTokensInTheRegistry(){
     StepVerifier.create(iTokenRepository.deleteAll())
                 .expectSubscription()
                 .verifyComplete();

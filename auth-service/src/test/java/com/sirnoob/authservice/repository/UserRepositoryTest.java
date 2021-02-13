@@ -137,7 +137,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  public void findByToken_ReturnAMonoVoid_WhenThereIsNoRefreshTokensInTheRegistry(){
+  public void findByUserName_ReturnADefaultUser_WhenTheFetchOperationReturnAnEmptyEntity(){
     String name = staticUser.getUsername();
     User defaultUser = User.builder().userId(0L).userName(DEFAULT).email(DEFAULT).role(Role.CUSTOMER).build();
 

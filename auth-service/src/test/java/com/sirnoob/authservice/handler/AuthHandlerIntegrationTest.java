@@ -119,7 +119,7 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  public void signup_ReturnAAuthResponseAnd201StatusCode_WhenSuccesful() {
+  public void signup_Return201StatusCode_WhenSuccesful() {
     SignUpRequest signUpRequest = generateSignUpRequest();
 
     webTestClient.post()
@@ -155,7 +155,7 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  public void login_ReturnAuthResponseAnd200StatusCode_WhenSuccessful() {
+  public void login_Return200StatusCode_WhenSuccessful() {
     webTestClient.post()
                   .uri("/auth/login")
                   .contentType(JSON)
@@ -225,7 +225,7 @@ class AuthHandlerIntegrationTest {
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
-  public void getCurrentUser_Return200StaticCodeAndMonoAccountView_WhenSuccessful() {
+  public void getCurrentUser_Return200StatusCodeAndMonoAccountView_WhenSuccessful() {
     webTestClient.get()
                   .uri("/auth/users")
                   .accept(JSON)
@@ -242,7 +242,7 @@ class AuthHandlerIntegrationTest {
   }
 
   @Test
-  public void getCurrentUser_Return403StaticCode_WhenUserIsNotAuthenticated() {
+  public void getCurrentUser_Return403StatusCode_WhenUserIsNotAuthenticated() {
     webTestClient.get()
                   .uri("/auth/users")
                   .accept(JSON)
@@ -255,7 +255,7 @@ class AuthHandlerIntegrationTest {
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
-  public void refreshToken_ReturnAuthResponseAnd200StatusCode_WhenSuccessful() {
+  public void refreshToken_Return200StatusCode_WhenSuccessful() {
     webTestClient.post()
                   .uri("/auth/refresh-token")
                   .cookie("JWT", staticToken.getAccessToken())
@@ -286,7 +286,7 @@ class AuthHandlerIntegrationTest {
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
-  public void refreshToken_Return400StatusCode_WhenRefreshTokenRequestHasInvalidFields() {
+  public void refreshToken_Return400StatusCode_WhenTokenRequestHasInvalidFields() {
     webTestClient.post()
                   .uri("/auth/refresh-token")
                   .cookie("JWT", "")
@@ -315,7 +315,7 @@ class AuthHandlerIntegrationTest {
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
-  public void logout_Return404StatusCode_WhenRefreshTokenWasNotFound() {
+  public void logout_Return404StatusCode_WhenTokenWasNotFound() {
     BDDMockito.when(iTokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(0));
 
     webTestClient.post()
