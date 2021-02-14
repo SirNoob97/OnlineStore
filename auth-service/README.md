@@ -2,6 +2,8 @@
 
 Microservice in charge of user authentication/authorization and acting as a gateway.
 
+![authDiagram](authDiagram.png)
+
 ## Execution Commands
 
 TEST spring and maven profile
