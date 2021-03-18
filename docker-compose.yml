@@ -29,8 +29,8 @@ services:
     container_name: config-service
     env_file: ./env/config-service.env
     build:
-      context: .
-      dockerfile: ./config-service/Dockerfile
+      context: ./online-store-backend
+      dockerfile: ./online-store-backend/config-service/Dockerfile
     image: config-service:latest
     hostname: config-service
     volumes:
@@ -51,8 +51,8 @@ services:
       - ./env/registry-service.env
       - ./env/config-service.env
     build:
-      context: .
-      dockerfile: ./registry-service/Dockerfile
+      context: ./online-store-backend
+      dockerfile: ./online-store-backend/registry-service/Dockerfile
     image: registry-service:latest
     hostname: registry-service
     volumes:
@@ -75,8 +75,8 @@ services:
       - ./env/registry-service.env
     container_name: auth-service
     build:
-        context: .
-        dockerfile: ./auth-service/Dockerfile
+      context: ./online-store-backend
+      dockerfile: ./online-store-backend/auth-service/Dockerfile
     image: auth-service:latest
     hostname: auth-service
     ports:
@@ -95,8 +95,8 @@ services:
       - ./env/registry-service.env
     container_name: product-service
     build:
-        context: .
-        dockerfile: ./product-service/Dockerfile
+      context: ./online-store-backend
+      dockerfile: ./online-store-backend/product-service/Dockerfile
     image: product-service:latest
     hostname: product-service
     volumes:
@@ -113,8 +113,8 @@ services:
       - ./env/registry-service.env
     container_name: shopping-service
     build:
-        context: .
-        dockerfile: ./shopping-service/Dockerfile
+      context: ./online-store-backend
+      dockerfile: ./online-store-backend/shopping-service/Dockerfile
     image: shopping-service:latest
     hostname: shopping-service
     volumes:
