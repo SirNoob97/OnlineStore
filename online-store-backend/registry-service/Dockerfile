@@ -3,7 +3,7 @@ FROM maven:3.6-jdk-11-slim AS builder
 ENV ONLINE_STORE=/opt/online-store
 
 WORKDIR $ONLINE_STORE
-COPY ./pom.xml .
+COPY ./registry-service/pom.xml .
 
 WORKDIR ${ONLINE_STORE}/registry-service
 COPY ./registry-service/pom.xml .
