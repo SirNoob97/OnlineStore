@@ -30,7 +30,7 @@ services:
     env_file: ./env/config-service.env
     build:
       context: ./online-store-backend
-      dockerfile: ./online-store-backend/config-service/Dockerfile
+      dockerfile: ./config-service/Dockerfile
     image: config-service:latest
     hostname: config-service
     volumes:
@@ -52,7 +52,7 @@ services:
       - ./env/config-service.env
     build:
       context: ./online-store-backend
-      dockerfile: ./online-store-backend/registry-service/Dockerfile
+      dockerfile: ./registry-service/Dockerfile
     image: registry-service:latest
     hostname: registry-service
     volumes:
