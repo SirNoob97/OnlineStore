@@ -2,9 +2,6 @@ FROM maven:3.6.3-adoptopenjdk-11-openj9 AS builder
 
 ENV ONLINE_STORE=/opt/online-store
 
-WORKDIR $ONLINE_STORE
-COPY ./config-service/pom.xml .
-
 WORKDIR ${ONLINE_STORE}/config-service
 COPY ./config-service/pom.xml .
 
