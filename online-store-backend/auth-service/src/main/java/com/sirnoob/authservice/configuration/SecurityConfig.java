@@ -17,7 +17,6 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy;
 import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter.Mode;
 
@@ -36,13 +35,16 @@ public class SecurityConfig {
   private final SecurityContextRepository securityContextRepository;
 
   @Bean
-  public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity serverHttpSecurity){
+  public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity serverHttpSecurity) {
     //@formatter:off
     return serverHttpSecurity
            .formLogin().disable()
            .httpBasic().disable()
-           .csrf().csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
-           .and()
+           .csrf()
+           .disable() // I will not create a frontend for this application, so csrf will be disabled. but it is important to use it, especially in this type of service.
+           //.csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse()) // AngularJS conventions
+           //.csrfTokenRepository(new CookieServerCsrfTokenRepository())               // httpOnly = true
+           //.and()
            .exceptionHandling()
            .authenticationEntryPoint(
                (swe, authex) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN)))
@@ -78,7 +80,7 @@ public class SecurityConfig {
   }
 
   @Bean
-  public PasswordEncoder passwordEncoder(){
+  public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 }
