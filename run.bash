@@ -12,13 +12,13 @@ validate_status(){
 
 main(){
     sudo docker-compose up -d postgresql
-    validate_status 20s "postgresql"
+    validate_status 25s "postgresql"
 
     sudo docker-compose up -d config-service
-    validate_status 30s "config-service"
+    validate_status 40s "config-service"
 
     sudo docker-compose up -d registry-service
-    validate_status 30s "registry-service"
+    validate_status 40s "registry-service"
 
     sudo docker-compose up -d auth-service
     sudo docker-compose up -d product-service
