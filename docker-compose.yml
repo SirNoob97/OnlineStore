@@ -76,7 +76,7 @@ services:
     container_name: auth-service
     build:
       context: ./online-store-backend
-      dockerfile: ./online-store-backend/auth-service/Dockerfile
+      dockerfile: ./auth-service/Dockerfile
     image: auth-service:latest
     hostname: auth-service
     ports:
@@ -96,7 +96,7 @@ services:
     container_name: product-service
     build:
       context: ./online-store-backend
-      dockerfile: ./online-store-backend/product-service/Dockerfile
+      dockerfile: ./product-service/Dockerfile
     image: product-service:latest
     hostname: product-service
     volumes:
@@ -114,7 +114,7 @@ services:
     container_name: shopping-service
     build:
       context: ./online-store-backend
-      dockerfile: ./online-store-backend/shopping-service/Dockerfile
+      dockerfile: ./shopping-service/Dockerfile
     image: shopping-service:latest
     hostname: shopping-service
     volumes:
