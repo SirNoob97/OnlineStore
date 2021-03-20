@@ -17,6 +17,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy;
 import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter.Mode;
 
@@ -37,9 +38,11 @@ public class SecurityConfig {
   @Bean
   public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity serverHttpSecurity){
     //@formatter:off
-    return serverHttpSecurity.csrf().disable()
+    return serverHttpSecurity
            .formLogin().disable()
            .httpBasic().disable()
+           .csrf().csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
+           .and()
            .exceptionHandling()
            .authenticationEntryPoint(
                (swe, authex) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN)))
@@ -69,7 +72,7 @@ public class SecurityConfig {
            .anyExchange().permitAll()
            .and()
            .headers(headers -> headers.frameOptions(fo -> fo.mode(Mode.SAMEORIGIN))
-                              .referrerPolicy(reffer -> reffer.policy(ReferrerPolicy.SAME_ORIGIN)))
+                                      .referrerPolicy(reffer -> reffer.policy(ReferrerPolicy.SAME_ORIGIN)))
            .build();
     //@formatter:on
   }
