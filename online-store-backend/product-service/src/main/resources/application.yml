@@ -5,10 +5,12 @@ server:
 
 spring:
   application:
-    name: ${SHOPPING_SERVICE_NAME:shopping-service}
+    name: ${PRODUCT_SERVICE_NAME:product-service}
+  config:
+    import: "configserver:"
   cloud:
     config:
-      label: spring-boot-2.4
+      #label: sleuth
       uri: http://${CONFIG_SERVICE_NAME:localhost}:${CONFIG_SERVICE_PORT:8081}
       username: ${CONFIG_SERVICE_USER:root}
       password: ${CONFIG_SERVICE_PASSWORD:root}

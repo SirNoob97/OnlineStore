@@ -5,7 +5,9 @@ server:
 
 spring:
   application:
-    name: ${PRODUCT_SERVICE_NAME:product-service}
+    name: ${AUTH_SERVICE_NAME:auth-service}
+  config:
+    import: "configserver:"
   cloud:
     config:
       #label: sleuth

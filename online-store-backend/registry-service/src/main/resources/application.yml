@@ -1,6 +1,8 @@
 spring:
   application:
     name: ${REGISTRY_SERVICE_NAME:registry-service}
+  config:
+    import: "configserver:"
   cloud:
     config:
       #label: registry-service
