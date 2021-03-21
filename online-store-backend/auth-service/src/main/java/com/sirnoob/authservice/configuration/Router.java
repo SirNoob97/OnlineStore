@@ -29,42 +29,44 @@ public class Router {
   private static final MediaType JSON = MediaType.APPLICATION_JSON;
 
   @Bean
-  public ResponseStatusExceptionHandler handler (){
+  public ResponseStatusExceptionHandler handler() {
     return new ResponseStatusExceptionHandler();
   }
 
   @Bean
   public RouteLocator routeLocator(RouteLocatorBuilder routeLocatorBuilder) {
     return routeLocatorBuilder.routes()
-           .route(route -> route.path("/products/**", "/main-categories/**", "/sub-categories/**", "/product-service/**")
-                                 .uri("lb://product-service")
-                                 .id("product-service")
-                                 .metadata(RESPONSE_TIMEOUT_ATTR, 10000)
-                                 .metadata(CONNECT_TIMEOUT_ATTR, 1000))
-           .route(route -> route.path("/invoices/**", "/shopping-service/**")
-                                 .uri("lb://shopping-service")
-                                 .id("shopping-service")
-                                 .metadata(RESPONSE_TIMEOUT_ATTR, 5000)
-                                 .metadata(CONNECT_TIMEOUT_ATTR, 1000))
+           .route("products", route -> route.host("product-service")
+                                .and()
+                                .path("/products/**", "/main-categories/**", "/sub-categories/**", "/product-service/**")
+                                .customize(c -> c.metadata(CONNECT_TIMEOUT_ATTR, 1000).metadata(RESPONSE_TIMEOUT_ATTR, 1000))
+                                .uri("lb://product-service")
+               )
+           .route("invoices", route -> route.host("shopping-service")
+                                .and()
+                                .path("/invoices/**", "/shopping-service/**")
+                                .customize(c -> c.metadata(CONNECT_TIMEOUT_ATTR, 10000).metadata(RESPONSE_TIMEOUT_ATTR, 50000))
+                                .uri("lb://product-service"))
            .build();
   }
 
   @Bean
-  public RouterFunction<ServerResponse> authEndPoints (AuthHandler authHandler){
+  public RouterFunction<ServerResponse> authEndPoints(AuthHandler authHandler) {
     return RouterFunctions.route(POST("/auth/signup").and(contentType(JSON)), authHandler::signup)
-           .andRoute(POST("/auth/login").and(contentType(JSON)), authHandler::login)
-           .andRoute(GET("/auth/users").and(accept(JSON)), authHandler::getCurrentUser)
-           .andRoute(POST("/auth/logout"), authHandler::logout)
-           .andRoute(POST("/auth/refresh-token"), authHandler::refreshToken);
+        .andRoute(POST("/auth/login").and(contentType(JSON)), authHandler::login)
+        .andRoute(GET("/auth/users").and(accept(JSON)), authHandler::getCurrentUser)
+        .andRoute(POST("/auth/logout"), authHandler::logout)
+        .andRoute(POST("/auth/refresh-token"), authHandler::refreshToken);
   }
 
   @Bean
-  public RouterFunction<ServerResponse> accountEndPoints (AccountHandler accountHandler){
-    return RouterFunctions.route(POST("/accounts").and(accept(JSON)).and(contentType(JSON)), accountHandler::createAccount)
-           .andRoute(PUT("/accounts").and(accept(JSON)).and(contentType(JSON)), accountHandler::updateAccount)
-           .andRoute(PUT("/accounts/passwords").and(contentType(JSON)), accountHandler::updatePassword)
-           .andRoute(DELETE("/accounts/{userId}"), accountHandler::deleteAccountById)
-           .andRoute(GET("/accounts").and(accept(JSON)), accountHandler::getAllAccounts);
+  public RouterFunction<ServerResponse> accountEndPoints(AccountHandler accountHandler) {
+    return RouterFunctions
+        .route(POST("/accounts").and(accept(JSON)).and(contentType(JSON)), accountHandler::createAccount)
+        .andRoute(PUT("/accounts").and(accept(JSON)).and(contentType(JSON)), accountHandler::updateAccount)
+        .andRoute(PUT("/accounts/passwords").and(contentType(JSON)), accountHandler::updatePassword)
+        .andRoute(DELETE("/accounts/{userId}"), accountHandler::deleteAccountById)
+        .andRoute(GET("/accounts").and(accept(JSON)), accountHandler::getAllAccounts);
   }
 
 }
