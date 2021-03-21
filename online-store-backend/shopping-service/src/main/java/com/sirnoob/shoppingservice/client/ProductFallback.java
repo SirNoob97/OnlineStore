@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProductHystrixFallback implements IProductClient {
+public class ProductFallback implements IProductClient {
 
   @Override
   public ResponseEntity<Product> getProductForInvoice(Long productBarCode, String productName) {

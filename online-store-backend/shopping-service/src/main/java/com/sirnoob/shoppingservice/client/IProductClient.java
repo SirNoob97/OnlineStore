@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "product-service", fallback = ProductHystrixFallback.class)
+@FeignClient(name = "product-service", fallback = ProductFallback.class)
 public interface IProductClient{
 
   @GetMapping("/products/invoices")
