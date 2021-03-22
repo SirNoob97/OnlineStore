@@ -1,6 +1,6 @@
 #!/bin/bash
 validate_status(){
-  timeout -v $1 ./healthcheck.bash $(sudo docker ps -aqf "name=$2") "$2"
+  timeout -v $1 ./healthcheck.sh $(sudo docker ps -aqf "name=$2") "$2"
 
   if [[ $? -gt 0 ]]; then
     echo "The $2 container cannot be up."
