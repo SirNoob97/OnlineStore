@@ -14,12 +14,26 @@ eureka:
     lease-expiration-duration-in-seconds: 20
 
 feign:
-  client:
-    config:
-      IProductClient:
-        connectionTimeout: 5000
-        readTimeout: 5000
-        loggerLevel: full
+  hystrix:
+    enabled: true
+
+hystrix:
+  dashboard:
+    proxy-stream-allow-list: "*"
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3000
+    circuitBreaker:
+      requestVolumeThreshold: 10
+      errorThresholdPercentage: 80
+      sleepWindowInMilliseconds: 6000
+  threadpool:
+    default:
+      coreSize: 15
+      mazQueueSize: 5
 
 spring:
   sleuth:
