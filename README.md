@@ -76,11 +76,11 @@ In this way, with all the services with fixed ip, I can test the application in 
   * Config [docs](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/)
   * Gateway [docs](https://docs.spring.io/spring-cloud-gateway/docs/current/reference/html/)
   * Openfeign [docs](https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/)
+  * CircuitBreaker [docs](https://docs.spring.io/spring-cloud-circuitbreaker/docs/current/reference/html/) [repo](https://github.com/spring-cloud/spring-cloud-circuitbreaker)
   * Netflix Eureka Server [docs](https://docs.spring.io/spring-cloud-netflix/docs/current/reference/html/)
-  * Netflix Hystrix [repo](https://github.com/Netflix/Hystrix)
-  * Netflix Hystrix Dashboard [repo](https://github.com/Netflix-Skunkworks/hystrix-dashboard)
   * Sleuth [docs](https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/)
 
+* Resilience4J [repo](https://github.com/resilience4j/resilience4j)
 * Zipkin [docs](https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/) [repo](https://github.com/openzipkin/zipkin)
 * JWT [repo](https://github.com/jwtk/jjwt)
 * H2 [ref](https://www.h2database.com/html/main.html) [repo](https://github.com/h2database/h2database)
