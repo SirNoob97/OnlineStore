@@ -28,6 +28,7 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cloud.gateway.handler.predicate.HostRoutePredicateFactory;
 import org.springframework.cloud.gateway.handler.predicate.PathRoutePredicateFactory;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.ApplicationContext;
@@ -43,7 +44,8 @@ import reactor.core.publisher.Mono;
 @WebFluxTest
 @Import({ AuthServiceImpl.class, AccountServiceImpl.class, TokenServiceImpl.class, JwtProvider.class, ConstraintValidator.class })
 @ContextConfiguration(classes = { SecurityConfig.class, AuthenticationManager.class, SecurityContextRepository.class,
-                                  Router.class, RouteLocatorBuilder.class, PathRoutePredicateFactory.class, AuthHandler.class, AccountHandler.class })
+                                  Router.class, RouteLocatorBuilder.class, PathRoutePredicateFactory.class, HostRoutePredicateFactory.class,
+                                  AuthHandler.class, AccountHandler.class })
 class AccountHandlerIntegrationTest{
 
   @MockBean
