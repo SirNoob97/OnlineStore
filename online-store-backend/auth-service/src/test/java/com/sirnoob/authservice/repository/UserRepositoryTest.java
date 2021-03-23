@@ -15,8 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.r2dbc.core.DatabaseClient;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 
+import io.r2dbc.spi.ConnectionFactory;
 import reactor.test.StepVerifier;
 
 @DataR2dbcTest
@@ -26,8 +27,7 @@ class UserRepositoryTest {
   private IUserRepository iUserRepository;
 
   @Autowired
-  private DatabaseClient databaseClient;
-
+  private ConnectionFactory connectionFactory;
 
   private static final User staticUser = generateUserRandomValues(Role.EMPLOYEE);
 
@@ -43,16 +43,18 @@ class UserRepositoryTest {
               "role character varying(10) NOT NULL," +
               "check (role in ('CUSTOMER', 'EMPLOYEE', 'ADMIN')))";
 
-    StepVerifier.create(databaseClient.execute(dropSql).then())
+    var template = new R2dbcEntityTemplate(connectionFactory);
+    var dbClient = template.getDatabaseClient();
+
+    StepVerifier.create(dbClient.sql(dropSql).then())
                 .expectSubscription()
                 .verifyComplete();
 
-    StepVerifier.create(databaseClient.execute(initSql).fetch().rowsUpdated())
+    StepVerifier.create(dbClient.sql(initSql).fetch().rowsUpdated())
                 .expectNextCount(1)
                 .verifyComplete();
 
-    StepVerifier.create(databaseClient.insert()
-                                      .into(User.class)
+    StepVerifier.create(template.insert(User.class)
                                       .using(staticUser)
                                       .then())
                 .verifyComplete();
