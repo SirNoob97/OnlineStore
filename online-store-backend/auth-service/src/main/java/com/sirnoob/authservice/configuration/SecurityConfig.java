@@ -54,7 +54,7 @@ public class SecurityConfig {
            .authenticationManager(authenticationManager)
            .securityContextRepository(securityContextRepository)
            .authorizeExchange()
-           .pathMatchers("/product-service", "shopping-service", "/actuator/**").hasAuthority(ADMIN)
+           .pathMatchers("/product-service/actuator/**", "/shopping-service/actuator/**", "/actuator/**").hasAuthority(ADMIN)
            .pathMatchers(GET, "/accounts").hasAuthority(ADMIN)
            .pathMatchers(POST, "/accounts").hasAuthority(ADMIN)
            .pathMatchers(PUT, "/accounts", "/accounts/**").authenticated()
