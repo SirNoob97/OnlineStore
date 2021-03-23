@@ -14,26 +14,8 @@ eureka:
     lease-expiration-duration-in-seconds: 20
 
 feign:
-  hystrix:
+  circuitbreaker:
     enabled: true
-
-hystrix:
-  dashboard:
-    proxy-stream-allow-list: "*"
-  command:
-    default:
-      execution:
-        isolation:
-          thread:
-            timeoutInMilliseconds: 3000
-    circuitBreaker:
-      requestVolumeThreshold: 10
-      errorThresholdPercentage: 80
-      sleepWindowInMilliseconds: 6000
-  threadpool:
-    default:
-      coreSize: 15
-      mazQueueSize: 5
 
 spring:
   sleuth:
