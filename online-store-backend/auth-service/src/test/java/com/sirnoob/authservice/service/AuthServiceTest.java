@@ -2,9 +2,9 @@ package com.sirnoob.authservice.service;
 
 import static com.sirnoob.authservice.util.Provider.PASSWORD;
 import static com.sirnoob.authservice.util.Provider.TEST;
-import static com.sirnoob.authservice.util.Provider.generateTokenEntity;
 import static com.sirnoob.authservice.util.Provider.generateLoginRequest;
 import static com.sirnoob.authservice.util.Provider.generateSignUpRequest;
+import static com.sirnoob.authservice.util.Provider.generateTokenEntity;
 import static com.sirnoob.authservice.util.Provider.generateUserForSignUpTest;
 import static com.sirnoob.authservice.util.Provider.getJwtExpirationTime;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +59,7 @@ class AuthServiceTest {
 
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    MockitoAnnotations.openMocks(this);
     iAuthService = new AuthServiceImpl(iTokenService, iUserRepository, iUserMapper, jwtProvider, passwordEncoder);
 
     Mono<User> monoUser = Mono.just(staticUser);
