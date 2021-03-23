@@ -78,7 +78,6 @@ public class Provider{
 
   public static Token generateTokenEntity(){
     return Token.builder()
-                        .id(0L)
                         .accessToken(JWTTEST)
                         .refreshToken(JWTTEST)
                         .build();
