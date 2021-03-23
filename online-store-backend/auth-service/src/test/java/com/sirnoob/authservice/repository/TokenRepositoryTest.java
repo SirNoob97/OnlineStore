@@ -11,8 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.r2dbc.core.DatabaseClient;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 
+import io.r2dbc.spi.ConnectionFactory;
 import reactor.test.StepVerifier;
 
 @DataR2dbcTest
@@ -22,7 +23,7 @@ class TokenRepositoryTest {
   private ITokenRepository iTokenRepository;
 
   @Autowired
-  private DatabaseClient databaseClient;
+  private ConnectionFactory connectionFactory;
 
   private static final Token staticToken = generateTokenEntity();
 
@@ -38,18 +39,20 @@ class TokenRepositoryTest {
       "CONSTRAINT unique_rtoken UNIQUE (refresh_token)," +
       "CONSTRAINT unique_atoken UNIQUE (access_token))";
 
-    StepVerifier.create(databaseClient.execute(dropSql).then())
+    var template = new R2dbcEntityTemplate(connectionFactory);
+    var dbClient = template.getDatabaseClient();
+
+    StepVerifier.create(dbClient.sql(dropSql).then())
                 .expectSubscription()
                 .verifyComplete();
 
-    StepVerifier.create(databaseClient.execute(init).fetch().rowsUpdated())
+    StepVerifier.create(dbClient.sql(init).fetch().rowsUpdated())
                 .expectNextCount(1)
                 .verifyComplete();
 
-    StepVerifier.create(databaseClient.insert()
-                                      .into(Token.class)
-                                      .using(staticToken)
-                                      .then())
+    StepVerifier.create(template.insert(Token.class)
+                                .using(staticToken)
+                                .then())
                 .expectSubscription()
                 .verifyComplete();
   }
@@ -58,6 +61,10 @@ class TokenRepositoryTest {
   public void save_SavePersistAndReturnANewToken_WhereSuccessful(){
     Token tokenEntity = generateTokenEntity();
     String refreshToken = tokenEntity.getRefreshToken();
+
+    StepVerifier.create(iTokenRepository.deleteAll())
+                .expectSubscription()
+                .verifyComplete();
 
     StepVerifier.create(iTokenRepository.save(tokenEntity))
                 .expectSubscription()
