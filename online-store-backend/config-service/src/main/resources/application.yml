@@ -6,7 +6,7 @@ spring:
     name: ${CONFIG_SERVICE_NAME:config-service}
   cloud:
     config:
-      label: spring-boot-2.4
+      #label: spring-boot-2.4
       server:
         git:
           uri: https://github.com/SirNoob97/OnlineStore.git
