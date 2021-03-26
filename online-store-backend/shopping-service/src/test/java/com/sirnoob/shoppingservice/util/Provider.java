@@ -8,10 +8,14 @@ import com.sirnoob.shoppingservice.entity.Item;
 import com.sirnoob.shoppingservice.model.Customer;
 import com.sirnoob.shoppingservice.model.Product;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 public class Provider {
 
   public static final String TEST = "TEST";
   public static final String TESTEMAIL = "TEST@TEST.TEST";
+  public static final Pageable PAGE = PageRequest.of(0, 10);
 
 
   public static Invoice createInvoiceRandomValues() {
