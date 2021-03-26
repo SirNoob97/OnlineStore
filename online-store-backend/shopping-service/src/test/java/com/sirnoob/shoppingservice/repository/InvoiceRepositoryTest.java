@@ -1,25 +1,25 @@
 package com.sirnoob.shoppingservice.repository;
 
-import static com.sirnoob.shoppingservice.util.Provider.*;
+import static com.sirnoob.shoppingservice.util.Provider.PAGE;
+import static com.sirnoob.shoppingservice.util.Provider.TEST;
+import static com.sirnoob.shoppingservice.util.Provider.createInvoiceRandomValues;
+import static com.sirnoob.shoppingservice.util.Provider.createItemRandomValues;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import com.sirnoob.shoppingservice.entity.Invoice;
 import com.sirnoob.shoppingservice.entity.Item;
-import com.sirnoob.shoppingservice.model.Product;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.repository.CrudRepository;
 
 @DataJpaTest
 class InvoiceRepositoryTest {
@@ -30,14 +30,30 @@ class InvoiceRepositoryTest {
   private IItemRepository itemRepository;
 
   @Test
-  public void save_PersistInvoice_WhenSuccessful() {
+  public void save_ReturnInvoice_WhenSuccessful() {
     Invoice invoice = createInvoiceRandomValues();
     var savedInvoice = invoiceRepository.save(invoice);
 
     assertThat(savedInvoice.getInvoiceNumber()).isNotNull();
-    assertThat(savedInvoice.getInvoiceNumber()).isNotEqualTo(invoice.getInvoiceNumber());
+    assertThat(savedInvoice.getInvoiceNumber()).isEqualTo(invoice.getInvoiceNumber());
     assertThat(savedInvoice.getTotal()).isEqualTo(invoice.getTotal());
     assertThat(savedInvoice.getCustomer()).isEqualTo(invoice.getCustomer());
+  }
+
+  @Test
+  public void save_ReturnInvoiceWithItems_WhenSuccessful() {
+    Invoice invoice = createInvoiceRandomValues();
+
+    Item item = createItemRandomValues();
+    Item item2 = createItemRandomValues();
+    Item item3 = createItemRandomValues();
+    invoice.setItems(Set.of(item, item2, item3));
+
+    var invoiceDB = invoiceRepository.save(invoice);
+
+    assertThat(invoiceDB.getInvoiceNumber()).isNotNull();
+    assertThat(invoiceDB).isEqualTo(invoice);
+    assertTrue(invoiceDB.getItems().contains(item));
   }
 
   @Test
@@ -53,16 +69,7 @@ class InvoiceRepositoryTest {
   }
 
   @Test
-  public void save_ThrowConstraintViolationException_WhenMainCategoryIsNotSaved() {
-    Invoice invoice = createInvoiceRandomValues();
-    invoice.setItems(Set.of(createItemRandomValues()));
-    
-    assertThatExceptionOfType(DataIntegrityViolationException.class)
-        .isThrownBy(() -> invoiceRepository.save(invoice));
-  }
-
-  @Test
-  public void save_ThrowUnsupportedOperationException_WhenSubCategoryIsAddedToAProductAfterItHasBeenPersisted() {
+  public void save_ThrowUnsupportedOperationException_WhenItemsAreAddedToAInvoiceAfterItHasBeenPersisted() {
     Invoice invoiceSaved = invoiceRepository.save(createInvoiceRandomValues());
 
     Item item = itemRepository.save(createItemRandomValues());
@@ -92,9 +99,32 @@ class InvoiceRepositoryTest {
   }
 
   @Test
+  public void findByInvoiceNumber_ReturnPresentOptional_WhenSuccessful() {
+    Invoice invoice = invoiceRepository.save(createInvoiceRandomValues());
+    var invoiceDB = invoiceRepository.findByInvoiceNumber(invoice.getInvoiceNumber());
+
+    assertThat(invoiceDB.isPresent()).isTrue();
+    assertThat(invoiceDB.get()).isEqualTo(invoice);
+  }
+
+  @Test
+  public void findByInvoiceNumber_ReturnEmptyOptional_WhenInvoiceNumberNotMatches() {
+    invoiceRepository.save(createInvoiceRandomValues());
+    var invoice = invoiceRepository.findByInvoiceNumber(-1L);
+
+    assertThat(invoice.isEmpty()).isTrue();
+  }
+
+  @Test
+  public void findByInvoiceNumber_ReturnEmptyOptional_WhenInvoiceNumberIsNull(){
+    var invoiceDB = invoiceRepository.findByInvoiceNumber(null);
+
+    assertThat(invoiceDB.isEmpty()).isTrue();
+  }
+
+  @Test
   public void delete_RemoveProduct_WhenSuccessful() {
     Invoice invoice = invoiceRepository.save(createInvoiceRandomValues());
-
     invoiceRepository.delete(invoice);
 
     Optional<Invoice> invoiceOptional = invoiceRepository.findByInvoiceNumber(invoice.getInvoiceNumber());
@@ -108,334 +138,91 @@ class InvoiceRepositoryTest {
     assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> invoiceRepository.delete(null));
   }
 
-  //@Test
-  //public void findByProductName_ReturnProduct_WhenSuccessful() {
-    //Product productSaved = invoiceRepository.save(createProduct());
+  @Test
+  public void findByCustomerName_ReturnInvoicePage_WhenSuccessful() {
+    Invoice inovice = invoiceRepository.save(createInvoiceRandomValues());
+    String name = inovice.getCustomer().getUserName();
+    var page = invoiceRepository.findByCustomerUserName(name, PAGE);
 
-    //String name = productSaved.getProductName();
+    assertFalse(page.isEmpty());
+    assertThat(page.getNumberOfElements()).isEqualTo(1);
+  }
 
-    //Optional<Product> productOptional = invoiceRepository.findByProductName(name);
+  @Test
+  public void findByCustomerName_ReturnEmptyPage_WhenTheNamesNotMatches() {
+    Invoice invoice = invoiceRepository.save(createInvoiceRandomValues());
+    var page = invoiceRepository.findByCustomerUserName(invoice.getCustomer().getUserName() + TEST, PAGE);
 
-    //assertThat(productOptional.isPresent()).isTrue();
-    //assertThat(productOptional.get().getProductName()).isEqualTo(name);
-  //}
+    assertThat(page.isEmpty()).isTrue();
+  }
 
-  //@Test
-  //public void findByProductName_ReturnEmptyOptionalProduct_WhenTheNamesNotMatches() {
-    //Product productSaved = invoiceRepository.save(createProduct());
+  @Test
+  public void findByCustomerName_ReturnEmptyPage_WhenUserNameIsNull(){
+    var page = invoiceRepository.findByCustomerUserName(null, PAGE);
 
-    //Optional<Product> productOptional = invoiceRepository.findByProductName(productSaved.getProductName() + "TEST");
+    assertThat(page.isEmpty()).isTrue();
+  }
 
-    //assertThat(productOptional.isEmpty()).isTrue();
-  //}
+  @Test
+  public void findByItemsProductBarCode_ReturnPageInvoice_WhenSuccessful() {
+    Invoice invoice1 = createInvoiceRandomValues();
+    Invoice invoice2 = createInvoiceRandomValues();
+    Invoice invoice3 = createInvoiceRandomValues();
 
-  //@Test
-  //public void findByProductNameOrProductBarCode_ReturnPresentOptionalProduct_WhenSuccessful() {
-    //Product productSaved = invoiceRepository.save(createProduct());
+    Item item = createItemRandomValues();
 
-    //Optional<Product> productFetchedByName = invoiceRepository.findByProductBarCodeOrProductName(-1L,
-        //productSaved.getProductName());
-    //Optional<Product> productFetchedByBarCode = invoiceRepository
-        //.findByProductBarCodeOrProductName(productSaved.getProductBarCode(), "");
+    invoice1.setItems(Set.of(item));
+    invoice2.setItems(Set.of(item));
+    invoice3.setItems(Set.of(item));
 
-    //assertThat(productFetchedByName.isPresent()).isTrue();
-    //assertThat(productFetchedByName.get()).isEqualTo(productSaved);
-    //assertThat(productFetchedByBarCode.isPresent()).isTrue();
-    //assertThat(productFetchedByBarCode.get()).isEqualTo(productSaved);
-  //}
+    invoiceRepository.save(invoice1);
+    invoiceRepository.save(invoice2);
+    invoiceRepository.save(invoice3);
 
-  //@Test
-  //public void findByProductNameOrProductBarCode_ReturnEmptyOptionalProduct_WhenNamesOrBarCodeNotMatches() {
-    //invoiceRepository.save(createProduct());
+    var page = invoiceRepository.findByItemsProductBarCode(item.getProductBarCode(), PAGE);
 
-    //Optional<Product> productFetchedByNameOrBarCode = invoiceRepository.findByProductBarCodeOrProductName(-1L, " ");
+    assertThat(page.isEmpty()).isFalse();
+    assertThat(page.getNumberOfElements()).isEqualTo(3);
+  }
 
-    //assertThat(productFetchedByNameOrBarCode.isEmpty()).isTrue();
-  //}
+  @Test
+  public void findByItemsProductBarCode_ReturnEmptyPage_WhenProductBarCodeNotMatches() {
+    invoiceRepository.save(createInvoiceRandomValues());
+    invoiceRepository.save(createInvoiceRandomValues());
+    invoiceRepository.save(createInvoiceRandomValues());
 
-  //@Test
-  //public void findByMainCategory_ReturnProductList_WhenSuccessful() {
-    //Product product1 = invoiceRepository.save(createProduct());
-    //Product product2 = invoiceRepository.save(createProduct());
-    //Product product3 = invoiceRepository.save(createProduct());
+    Item item = itemRepository.save(createItemRandomValues());
+    var page = invoiceRepository.findByItemsProductBarCode(item.getProductBarCode(), PAGE);
 
-    //CrudRepository<Invoice, Long> iMainCategoryRepository;
-	//product1.setMainCategory(mainCategory);
-    //product2.setMainCategory(mainCategory);
-    //product3.setMainCategory(mainCategory);
+    assertThat(page.isEmpty()).isTrue();
+  }
 
-    //invoiceRepository.save(product1);
-    //invoiceRepository.save(product2);
-    //invoiceRepository.save(product3);
+  @Test
+  public void findByItemsProductBarCode_ReturnEmptyPage_WhenProductBarCodeIsNull(){
+    var page = invoiceRepository.findByItemsProductBarCode(null, PAGE);
 
-    //List<Product> productsFetchedByMainCategory = invoiceRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId());
+    assertThat(page.isEmpty()).isTrue();
+  }
 
-    //int productCount = productsFetchedByMainCategory.size();
+  @Test
+  public void existsByInvoiceNumber_ReturnTrue_WhenSuccessful() {
+    Invoice invoice = invoiceRepository.save(createInvoiceRandomValues());
+    var res = invoiceRepository.existsByInvoiceNumber(invoice.getInvoiceNumber());
 
-    //assertThat(productsFetchedByMainCategory.isEmpty()).isFalse();
-    //assertThat(productsFetchedByMainCategory.size()).isEqualTo(productCount);
-  //}
+    assertTrue(res);
+  }
 
-  //@Test
-  //public void findByMainCategory_ReturnEmptyProductList_WhenMainCategoryIsSavedButDoenstContainsProduct() {
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
+  @Test
+  public void existsByInvoiceNumber_ReturnFalse_WhenInvoiceNumberNotMatch() {
+    var res = invoiceRepository.existsByInvoiceNumber(-1L);
 
-    //MainCategory mainCategorySaved = iMainCategoryRepository.save(createMainCategory());
+    assertFalse(res);
+  }
 
-    //List<Product> productsFetchedByMainCategory = invoiceRepository.findByMainCategoryMainCategoryId(mainCategorySaved.getMainCategoryId());
+  @Test
+  public void existsByInvoiceNumber_ReturnFalse_WhenInvoiceNumberIsNull(){
+    var res = invoiceRepository.existsByInvoiceNumber(null);
 
-    //assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
-  //}
-
-  //@Test
-  //public void findByMainCategory_ReturnEmptyProductList_WhenMainCategoryIsNotSaved() {
-    //List<Product> productsFetchedByMainCategory = invoiceRepository.findByMainCategoryMainCategoryId(createMainCategory().getMainCategoryId());
-
-    //assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
-  //}
-
-  //@Test
-  //public void findProductForInvoice_ReturnPresentProductInvoiceResponse_WhenSuccessful() {
-    //Product productSaved = invoiceRepository.save(createProduct());
-
-    //Optional<ProductInvoiceResponse> productInvoiceResponse = invoiceRepository
-        //.findProductForInvoice(productSaved.getProductBarCode(), productSaved.getProductName());
-
-    //assertThat(productInvoiceResponse.isPresent()).isTrue();
-    //assertThat(productInvoiceResponse.get().getClass()).isEqualTo(ProductInvoiceResponse.class);
-    //assertThat(productInvoiceResponse.get().getClass().getFields().length)
-        //.isEqualTo(ProductInvoiceResponse.class.getFields().length);
-  //}
-
-  //@Test
-  //public void findProductForInvoice_ReturnEmptyProductInvoiceResponse_WhenNamesAndBarCodeNotMatches() {
-    //invoiceRepository.save(createProduct());
-
-    //Optional<ProductInvoiceResponse> productInvoiceResponse = invoiceRepository.findProductForInvoice(0L, "");
-
-    //assertThat(productInvoiceResponse.isEmpty()).isTrue();
-  //}
-
-  //@Test
-  //public void getAll_ReturnPageOfProductListView_WhenSuccessful() {
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-
-    //int size = 3;
-
-    //Page<ProductListView> pageOfProducts = invoiceRepository.getAll(PageRequest.of(0, size));
-
-    //assertThat(pageOfProducts.isEmpty()).isFalse();
-    //assertThat(pageOfProducts.getSize()).isEqualTo(size);
-    //assertThat(pageOfProducts.getPageable().getPageNumber()).isEqualTo(0);
-  //}
-
-  //@Test
-  //public void getAll_ReturnEmptyPageOfProductListView_WhenThereAreNoRecordsInTheProductTable() {
-    //invoiceRepository.deleteAllInBatch();
-    //Page<ProductListView> pageOfProducts = invoiceRepository.getAll(PageRequest.of(0, 10));
-
-    //assertThat(pageOfProducts.isEmpty()).isTrue();
-  //}
-
-  //@Test
-  //public void listByName_ReturnPageOfProductListView_WhenTheProductNameMatchesTheSearchParameter() {
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-
-    //int size = 5;
-
-    //Page<ProductListView> products = invoiceRepository.findByProductNameContainingIgnoreCase("mo", PageRequest.of(0, 5));
-
-    //assertThat(products.isEmpty()).isFalse();
-    //assertThat(products.getSize()).isEqualTo(size);
-    //assertThat(products.getPageable().getPageNumber()).isEqualTo(0);
-  //}
-
-  //@Test
-  //public void listByName_ReturnEmptyPageOfProductListView_WhenTheProductNameNotMatchesTheSearchParameter() {
-    //Page<ProductListView> products = invoiceRepository.findByProductNameContainingIgnoreCase("asdf", PageRequest.of(0, 5));
-
-    //assertThat(products.isEmpty()).isTrue();
-  //}
-
-  //@Test
-  //public void findByMainCategory_ReturnPageOfProductListView_WhenSuccessful() {
-    //Product product1 = invoiceRepository.save(createProduct());
-    //Product product2 = invoiceRepository.save(createProduct());
-    //Product product3 = invoiceRepository.save(createProduct());
-
-    //MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
-
-    //product1.setMainCategory(mainCategory);
-    //product2.setMainCategory(mainCategory);
-    //product3.setMainCategory(mainCategory);
-
-    //invoiceRepository.save(product1);
-    //invoiceRepository.save(product2);
-    //invoiceRepository.save(product3);
-
-    //Page<ProductListView> productsFetchedByMainCategory = invoiceRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId(),
-        //PageRequest.of(0, 10));
-
-    //int productCount = productsFetchedByMainCategory.getSize();
-
-    //assertThat(productsFetchedByMainCategory.isEmpty()).isFalse();
-    //assertThat(productsFetchedByMainCategory.getSize()).isEqualTo(productCount);
-    //assertThat(productsFetchedByMainCategory.getContent().get(0).getClass()).isEqualTo(ProductListView.class);
-  //}
-
-  //@Test
-  //public void findByMainCategory_ReturnEmptyProductListView_WhenMainCategoryIsNotSaved() {
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-    //invoiceRepository.save(createProduct());
-
-    //Page<ProductListView> productsFetchedByMainCategory = invoiceRepository.findByMainCategoryMainCategoryId(createMainCategory().getMainCategoryId(),
-        //PageRequest.of(0, 10));
-
-    //assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
-  //}
-
-  //@Test
-  //public void findByMainCategory_ReturnEmptyProductListView_WhenMainCategoryIsSavedButDoesNotContainsProduct() {
-    //MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
-
-    //Page<ProductListView> productsFetchedByMainCategory = invoiceRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId(),
-        //PageRequest.of(0, 10));
-
-    //assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
-  //}
-
-  //@Test
-  //public void findBySubCategory_ReturnListOfProductListView_WhenSuccessful() {
-    //Product product1 = createProduct();
-    //Product product2 = createProduct();
-    //Product product3 = createProduct();
-    //Product product4 = createProduct();
-    //Product product5 = createProduct();
-
-    //SubCategory subCategory = itemRepository.save(createSubCategoryWithPersistedMainCategory());
-    //SubCategory subCategory2 = itemRepository.save(createSubCategoryWithPersistedMainCategory());
-    //SubCategory subCategory3 = itemRepository.save(createSubCategoryWithPersistedMainCategory());
-    //SubCategory subCategory4 = itemRepository.save(createSubCategoryWithPersistedMainCategory());
-
-    //product1.setSubCategories(Set.of(subCategory, subCategory2));
-    //product2.setSubCategories(Set.of(subCategory, subCategory3));
-    //product3.setSubCategories(Set.of(subCategory, subCategory4));
-
-    //product4.setSubCategories(Set.of(subCategory2, subCategory4));
-    //product5.setSubCategories(Set.of(subCategory3, subCategory4));
-
-    //invoiceRepository.save(product1);
-    //invoiceRepository.save(product2);
-    //invoiceRepository.save(product3);
-    //invoiceRepository.save(product4);
-    //invoiceRepository.save(product5);
-
-    //List<ProductListView> productsFetchedBySubCategory = invoiceRepository.findBySubCategory(subCategory);
-
-    //assertThat(productsFetchedBySubCategory.isEmpty()).isFalse();
-    //assertThat(productsFetchedBySubCategory.size()).isEqualTo(3);
-  //}
-
-  //@Test
-  //public void findBySubCategory_ReturnEmptyListOfProductListView_WhenNoProductContainsThatSubCategory() {
-    //Product product1 = createProduct();
-    //Product product2 = createProduct();
-    //Product product3 = createProduct();
-
-    //SubCategory subCategory = itemRepository.save(createSubCategoryWithPersistedMainCategory());
-    //SubCategory subCategory2 = itemRepository.save(createSubCategoryWithPersistedMainCategory());
-    //SubCategory subCategory3 = itemRepository.save(createSubCategoryWithPersistedMainCategory());
-    //SubCategory subCategory4 = itemRepository.save(createSubCategoryWithPersistedMainCategory());
-
-    //product1.setSubCategories(Set.of(subCategory, subCategory2));
-    //product2.setSubCategories(Set.of(subCategory, subCategory3));
-    //product3.setSubCategories(Set.of(subCategory3, subCategory2));
-
-    //invoiceRepository.save(product1);
-    //invoiceRepository.save(product2);
-    //invoiceRepository.save(product3);
-
-    //List<ProductListView> productsFetchedBySubCategory = invoiceRepository.findBySubCategory(subCategory4);
-
-    //assertThat(productsFetchedBySubCategory.isEmpty()).isTrue();
-  //}
-
-  //@Test
-  //public void findBySubCategory_ReturnEmptyListOfProductListView_WhenThatSubCategoryIsNotSaved() {
-    //Product product1 = createProduct();
-    //Product product2 = createProduct();
-    //Product product3 = createProduct();
-
-    //SubCategory subCategory = itemRepository.save(createSubCategoryWithPersistedMainCategory());
-    //SubCategory subCategory2 = itemRepository.save(createSubCategoryWithPersistedMainCategory());
-    //SubCategory subCategory3 = itemRepository.save(createSubCategoryWithPersistedMainCategory());
-
-    //product1.setSubCategories(Set.of(subCategory, subCategory2));
-    //product2.setSubCategories(Set.of(subCategory, subCategory3));
-    //product3.setSubCategories(Set.of(subCategory3, subCategory2));
-
-    //invoiceRepository.save(product1);
-    //invoiceRepository.save(product2);
-    //invoiceRepository.save(product3);
-
-    //List<ProductListView> productsFetchedBySubCategory = invoiceRepository.findBySubCategory(createSubCategory());
-
-    //assertThat(productsFetchedBySubCategory.isEmpty()).isTrue();
-  //}
-
-  //@Test
-  //public void updateProductStockByProductBarCode_ReturnAnIntegerGreaterThanZero_WhenSuccessful() {
-    //Product productSaved = invoiceRepository.save(createProduct());
-
-    //Integer returnFromUpdateOperation = invoiceRepository.updateProductStockByProductBarCode(100,
-        //productSaved.getProductBarCode());
-
-    //Product productWithUpdatedStock = invoiceRepository.findById(productSaved.getProductId()).get();
-
-    //assertThat(returnFromUpdateOperation).isNotNull();
-    //assertThat(returnFromUpdateOperation).isGreaterThan(0);
-    //assertThat(productWithUpdatedStock.getProductStock()).isNotEqualTo(productSaved.getProductStock());
-  //}
-
-  //@Test
-  //public void updateProductStockByProductBarCode_ReturnZero_WhenNoProductHasThatBarCode() {
-    //Integer returnFromUpdateOperation = invoiceRepository.updateProductStockByProductBarCode(100, -1L);
-
-    //assertThat(returnFromUpdateOperation).isNotNull();
-    //assertThat(returnFromUpdateOperation).isEqualTo(0);
-  //}
-
-  //@Test
-  //public void updateProductStockByProductBarCode_ReturnZero_WhenProductBarCodeIsNull() {
-    //Integer returnFromUpdateOperation = invoiceRepository.updateProductStockByProductBarCode(100, null);
-
-    //assertThat(returnFromUpdateOperation).isNotNull();
-    //assertThat(returnFromUpdateOperation).isEqualTo(0);
-  //}
-
-  //private SubCategory createSubCategoryWithPersistedMainCategory(){
-    //SubCategory subCategory = createSubCategory();
-
-    //MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
-
-    //subCategory.setMainCategory(mainCategory);
-
-    //return subCategory;
-  //}
+    assertFalse(res);
+  }
 }
