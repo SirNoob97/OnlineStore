@@ -20,4 +20,7 @@ CREATE TABLE IF NOT EXISTS items (
   PRIMARY KEY (item_id)
 );
 
-ALTER TABLE items ADD CONSTRAINT fk_invoices FOREIGN KEY(fk_invoice_id) REFERENCES invoices(invoice_id);
+CREATE TABLE invoices_items(
+  fk_invoice BIGINT REFERENCES invoices(invoice_id) ON DELETE CASCADE,
+  fk_item BIGINT REFERENCES items(item_id),
+  CONSTRAINT invoices_items_pkey PRIMARY KEY(fk_invoice, fk_item));
