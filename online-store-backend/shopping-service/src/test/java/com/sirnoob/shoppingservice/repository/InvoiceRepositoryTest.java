@@ -1,6 +1,9 @@
 package com.sirnoob.shoppingservice.repository;
 
-import static com.sirnoob.shoppingservice.util.Provider.*;
+import static com.sirnoob.shoppingservice.util.Provider.PAGE;
+import static com.sirnoob.shoppingservice.util.Provider.TEST;
+import static com.sirnoob.shoppingservice.util.Provider.createInvoiceRandomValues;
+import static com.sirnoob.shoppingservice.util.Provider.createItemRandomValues;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -57,8 +60,7 @@ class InvoiceRepositoryTest {
     var invoice = createInvoiceRandomValues();
     invoice.setItems(Set.of(new Item()));
 
-    assertThatExceptionOfType(DataIntegrityViolationException.class)
-        .isThrownBy(() -> invoiceRepository.save(invoice));
+    assertThatExceptionOfType(DataIntegrityViolationException.class).isThrownBy(() -> invoiceRepository.save(invoice));
   }
 
   @Test
@@ -152,7 +154,7 @@ class InvoiceRepositoryTest {
   }
 
   @Test
-  public void delete_RemoveInvoiceWithItems_WhenSuccessful() {
+  public void delete_RemoveInvoiceWithItemsWithoutRemoveTheItems_WhenSuccessful() {
     var invoice = createInvoiceRandomValues();
 
     var item = createItemRandomValues();
@@ -165,6 +167,7 @@ class InvoiceRepositoryTest {
 
     var invoiceOptional = invoiceRepository.findByInvoiceNumber(invoice.getInvoiceNumber());
 
+    itemRepository.findAll().forEach(i -> assertThat(itemRepository.findById(i.getItemId()).isPresent()));
     assertThat(invoice).isNotNull();
     assertThat(invoiceDB).isNotNull();
     assertThat(invoiceOptional.isEmpty()).isTrue();
@@ -208,10 +211,12 @@ class InvoiceRepositoryTest {
     var invoice3 = createInvoiceRandomValues();
 
     var item = createItemRandomValues();
+    var item2 = createItemRandomValues();
+    var item3 = createItemRandomValues();
 
-    invoice1.setItems(Set.of(item));
-    invoice2.setItems(Set.of(item));
-    invoice3.setItems(Set.of(item));
+    invoice1.setItems(Set.of(item, item2, item3));
+    invoice2.setItems(Set.of(item, item2, item3));
+    invoice3.setItems(Set.of(item, item2, item3));
 
     invoiceRepository.save(invoice1);
     invoiceRepository.save(invoice2);
