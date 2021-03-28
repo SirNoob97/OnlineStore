@@ -53,7 +53,7 @@ class InvoiceRepositoryTest {
 
     assertThat(invoiceDB.getInvoiceNumber()).isNotNull();
     assertThat(invoiceDB).isEqualTo(invoice);
-    assertTrue(invoiceDB.getItems().contains(item));
+    assertThat(invoiceDB.getItems().size()).isEqualTo(3);
   }
 
   @Test
