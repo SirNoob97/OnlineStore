@@ -1,15 +1,11 @@
 package com.sirnoob.shoppingservice.repository;
 
-import static com.sirnoob.shoppingservice.util.Provider.PAGE;
-import static com.sirnoob.shoppingservice.util.Provider.TEST;
-import static com.sirnoob.shoppingservice.util.Provider.createInvoiceRandomValues;
-import static com.sirnoob.shoppingservice.util.Provider.createItemRandomValues;
+import static com.sirnoob.shoppingservice.util.Provider.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Optional;
 import java.util.Set;
 
 import com.sirnoob.shoppingservice.entity.Invoice;
@@ -31,7 +27,7 @@ class InvoiceRepositoryTest {
 
   @Test
   public void save_ReturnInvoice_WhenSuccessful() {
-    Invoice invoice = createInvoiceRandomValues();
+    var invoice = createInvoiceRandomValues();
     var savedInvoice = invoiceRepository.save(invoice);
 
     assertThat(savedInvoice.getInvoiceNumber()).isNotNull();
@@ -42,11 +38,11 @@ class InvoiceRepositoryTest {
 
   @Test
   public void save_ReturnInvoiceWithItems_WhenSuccessful() {
-    Invoice invoice = createInvoiceRandomValues();
+    var invoice = createInvoiceRandomValues();
 
-    Item item = createItemRandomValues();
-    Item item2 = createItemRandomValues();
-    Item item3 = createItemRandomValues();
+    var item = createItemRandomValues();
+    var item2 = createItemRandomValues();
+    var item3 = createItemRandomValues();
     invoice.setItems(Set.of(item, item2, item3));
 
     var invoiceDB = invoiceRepository.save(invoice);
@@ -57,10 +53,18 @@ class InvoiceRepositoryTest {
   }
 
   @Test
-  public void save_ThrowDataIntegrityViolationException_WhenInvoiceIsEmpty() {
-    Invoice invoice = new Invoice();
+  public void save_ReturnInvoiceWithEmptyItems_WhenSuccessful() {
+    var invoice = createInvoiceRandomValues();
+    invoice.setItems(Set.of(new Item()));
 
-    assertThatExceptionOfType(DataIntegrityViolationException.class).isThrownBy(() -> invoiceRepository.save(invoice));
+    assertThatExceptionOfType(DataIntegrityViolationException.class)
+        .isThrownBy(() -> invoiceRepository.save(invoice));
+  }
+
+  @Test
+  public void save_ThrowDataIntegrityViolationException_WhenInvoiceIsEmpty() {
+    assertThatExceptionOfType(DataIntegrityViolationException.class)
+        .isThrownBy(() -> invoiceRepository.save(new Invoice()));
   }
 
   @Test
@@ -69,12 +73,12 @@ class InvoiceRepositoryTest {
   }
 
   @Test
-  public void save_ThrowUnsupportedOperationException_WhenItemsAreAddedToAInvoiceAfterItHasBeenPersisted() {
-    Invoice invoiceSaved = invoiceRepository.save(createInvoiceRandomValues());
+  public void save_ThrowUnsupportedOperationException_WhenPersistedItemsAreAddedToAInvoiceAfterItHasBeenPersisted() {
+    var invoiceSaved = invoiceRepository.save(createInvoiceRandomValues());
 
-    Item item = itemRepository.save(createItemRandomValues());
-    Item item2 = itemRepository.save(createItemRandomValues());
-    Item item3 = itemRepository.save(createItemRandomValues());
+    var item = itemRepository.save(createItemRandomValues());
+    var item2 = itemRepository.save(createItemRandomValues());
+    var item3 = itemRepository.save(createItemRandomValues());
 
     invoiceSaved.setItems(Set.of(item, item2, item3));
 
@@ -83,8 +87,8 @@ class InvoiceRepositoryTest {
   }
 
   @Test
-  public void save_UpdateProduct_WhenSuccessful() {
-    Invoice invoice = invoiceRepository.save(createInvoiceRandomValues());
+  public void save_ReturnUpdatedInvoice_WhenSuccessful() {
+    var invoice = invoiceRepository.save(createInvoiceRandomValues());
 
     Long invoiceNumber = invoice.getInvoiceNumber();
     Double total = invoice.getTotal();
@@ -99,8 +103,22 @@ class InvoiceRepositoryTest {
   }
 
   @Test
+  public void save_ThrowUnsupportedOperationException_WhenTryToUpdatePersistedInvoicesItems() {
+    var invoice = createInvoiceRandomValues();
+    var item = createItemRandomValues();
+    var item2 = createItemRandomValues();
+    var item3 = createItemRandomValues();
+    invoice.setItems(Set.of(item, item2, item3));
+
+    var invoiceDB = invoiceRepository.save(invoice);
+    invoiceDB.getItems().forEach(i -> i.setQuantity(1));
+
+    assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> invoiceRepository.save(invoiceDB));
+  }
+
+  @Test
   public void findByInvoiceNumber_ReturnPresentOptional_WhenSuccessful() {
-    Invoice invoice = invoiceRepository.save(createInvoiceRandomValues());
+    var invoice = invoiceRepository.save(createInvoiceRandomValues());
     var invoiceDB = invoiceRepository.findByInvoiceNumber(invoice.getInvoiceNumber());
 
     assertThat(invoiceDB.isPresent()).isTrue();
@@ -116,31 +134,51 @@ class InvoiceRepositoryTest {
   }
 
   @Test
-  public void findByInvoiceNumber_ReturnEmptyOptional_WhenInvoiceNumberIsNull(){
+  public void findByInvoiceNumber_ReturnEmptyOptional_WhenInvoiceNumberIsNull() {
     var invoiceDB = invoiceRepository.findByInvoiceNumber(null);
 
     assertThat(invoiceDB.isEmpty()).isTrue();
   }
 
   @Test
-  public void delete_RemoveProduct_WhenSuccessful() {
-    Invoice invoice = invoiceRepository.save(createInvoiceRandomValues());
+  public void delete_RemoveInvoice_WhenSuccessful() {
+    var invoice = invoiceRepository.save(createInvoiceRandomValues());
     invoiceRepository.delete(invoice);
 
-    Optional<Invoice> invoiceOptional = invoiceRepository.findByInvoiceNumber(invoice.getInvoiceNumber());
+    var invoiceOptional = invoiceRepository.findByInvoiceNumber(invoice.getInvoiceNumber());
 
     assertThat(invoice).isNotNull();
     assertThat(invoiceOptional.isEmpty()).isTrue();
   }
 
   @Test
-  public void delete_ThrowInvalidDataAccessApiUsageException_WhenProductIsNull() {
-    assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> invoiceRepository.delete(null));
+  public void delete_RemoveInvoiceWithItems_WhenSuccessful() {
+    var invoice = createInvoiceRandomValues();
+
+    var item = createItemRandomValues();
+    var item2 = createItemRandomValues();
+    var item3 = createItemRandomValues();
+    invoice.setItems(Set.of(item, item2, item3));
+
+    var invoiceDB = invoiceRepository.save(invoice);
+    invoiceRepository.delete(invoiceDB);
+
+    var invoiceOptional = invoiceRepository.findByInvoiceNumber(invoice.getInvoiceNumber());
+
+    assertThat(invoice).isNotNull();
+    assertThat(invoiceDB).isNotNull();
+    assertThat(invoiceOptional.isEmpty()).isTrue();
+  }
+
+  @Test
+  public void delete_ThrowInvalidDataAccessApiUsageException_WhenInvoiceIsNull() {
+    assertThatExceptionOfType(InvalidDataAccessApiUsageException.class)
+        .isThrownBy(() -> invoiceRepository.delete(null));
   }
 
   @Test
   public void findByCustomerName_ReturnInvoicePage_WhenSuccessful() {
-    Invoice inovice = invoiceRepository.save(createInvoiceRandomValues());
+    var inovice = invoiceRepository.save(createInvoiceRandomValues());
     String name = inovice.getCustomer().getUserName();
     var page = invoiceRepository.findByCustomerUserName(name, PAGE);
 
@@ -150,14 +188,14 @@ class InvoiceRepositoryTest {
 
   @Test
   public void findByCustomerName_ReturnEmptyPage_WhenTheNamesNotMatches() {
-    Invoice invoice = invoiceRepository.save(createInvoiceRandomValues());
+    var invoice = invoiceRepository.save(createInvoiceRandomValues());
     var page = invoiceRepository.findByCustomerUserName(invoice.getCustomer().getUserName() + TEST, PAGE);
 
     assertThat(page.isEmpty()).isTrue();
   }
 
   @Test
-  public void findByCustomerName_ReturnEmptyPage_WhenUserNameIsNull(){
+  public void findByCustomerName_ReturnEmptyPage_WhenUserNameIsNull() {
     var page = invoiceRepository.findByCustomerUserName(null, PAGE);
 
     assertThat(page.isEmpty()).isTrue();
@@ -165,11 +203,11 @@ class InvoiceRepositoryTest {
 
   @Test
   public void findByItemsProductBarCode_ReturnPageInvoice_WhenSuccessful() {
-    Invoice invoice1 = createInvoiceRandomValues();
-    Invoice invoice2 = createInvoiceRandomValues();
-    Invoice invoice3 = createInvoiceRandomValues();
+    var invoice1 = createInvoiceRandomValues();
+    var invoice2 = createInvoiceRandomValues();
+    var invoice3 = createInvoiceRandomValues();
 
-    Item item = createItemRandomValues();
+    var item = createItemRandomValues();
 
     invoice1.setItems(Set.of(item));
     invoice2.setItems(Set.of(item));
@@ -191,14 +229,14 @@ class InvoiceRepositoryTest {
     invoiceRepository.save(createInvoiceRandomValues());
     invoiceRepository.save(createInvoiceRandomValues());
 
-    Item item = itemRepository.save(createItemRandomValues());
+    var item = itemRepository.save(createItemRandomValues());
     var page = invoiceRepository.findByItemsProductBarCode(item.getProductBarCode(), PAGE);
 
     assertThat(page.isEmpty()).isTrue();
   }
 
   @Test
-  public void findByItemsProductBarCode_ReturnEmptyPage_WhenProductBarCodeIsNull(){
+  public void findByItemsProductBarCode_ReturnEmptyPage_WhenProductBarCodeIsNull() {
     var page = invoiceRepository.findByItemsProductBarCode(null, PAGE);
 
     assertThat(page.isEmpty()).isTrue();
@@ -206,7 +244,7 @@ class InvoiceRepositoryTest {
 
   @Test
   public void existsByInvoiceNumber_ReturnTrue_WhenSuccessful() {
-    Invoice invoice = invoiceRepository.save(createInvoiceRandomValues());
+    var invoice = invoiceRepository.save(createInvoiceRandomValues());
     var res = invoiceRepository.existsByInvoiceNumber(invoice.getInvoiceNumber());
 
     assertTrue(res);
@@ -220,7 +258,7 @@ class InvoiceRepositoryTest {
   }
 
   @Test
-  public void existsByInvoiceNumber_ReturnFalse_WhenInvoiceNumberIsNull(){
+  public void existsByInvoiceNumber_ReturnFalse_WhenInvoiceNumberIsNull() {
     var res = invoiceRepository.existsByInvoiceNumber(null);
 
     assertFalse(res);
