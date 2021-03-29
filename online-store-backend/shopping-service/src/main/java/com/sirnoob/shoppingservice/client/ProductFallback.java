@@ -2,6 +2,7 @@ package com.sirnoob.shoppingservice.client;
 
 import com.sirnoob.shoppingservice.model.Product;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,7 @@ public class ProductFallback implements IProductClient {
   public ResponseEntity<Product> getProductForInvoice(Long productBarCode, String productName) {
     Product product = Product.builder().productName("none").productPrice(0.0).build();
 
-    return ResponseEntity.ok(product);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(product);
   }
 
   @Override
