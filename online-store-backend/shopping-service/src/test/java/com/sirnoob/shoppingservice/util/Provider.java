@@ -1,8 +1,11 @@
 package com.sirnoob.shoppingservice.util;
 
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
+import com.sirnoob.shoppingservice.dto.InvoiceRequest;
+import com.sirnoob.shoppingservice.dto.ProductDto;
 import com.sirnoob.shoppingservice.entity.Invoice;
 import com.sirnoob.shoppingservice.entity.Item;
 import com.sirnoob.shoppingservice.model.Customer;
@@ -21,7 +24,7 @@ public class Provider {
   public static Invoice createInvoiceRandomValues() {
     return Invoice.builder()
                   .invoiceNumber(getRandomLongNumber())
-                  .customer(new Customer(TEST, TESTEMAIL))
+                  .customer(createTestCustomer())
                   .total(getRandomDoubleNumber())
                   .build();
   }
@@ -30,9 +33,29 @@ public class Provider {
     return Item.builder()
                 .quantity(getRandomIntegerNumber())
                 .productBarCode(getRandomLongNumber())
-                .product(new Product(TEST, getRandomDoubleNumber()))
+                .product(createProductRandomPrice())
                 .subTotal(getRandomDoubleNumber())
                 .build();
+  }
+
+  public static InvoiceRequest createInvoiceRequestRandomValues(){
+    return InvoiceRequest.builder()
+                          .invoiceNumber(getRandomLongNumber())
+                          .customer(createTestCustomer())
+                          .products(Set.of(createProductDtoRandomValues()))
+                          .build();
+  }
+
+  public static Product createProductRandomPrice() {
+    return new Product(TEST, getRandomDoubleNumber());
+  }
+
+  public static ProductDto createProductDtoRandomValues(){
+    return new ProductDto(getRandomLongNumber(), TEST, getRandomIntegerNumber());
+  }
+
+  public static Customer createTestCustomer(){
+    return new Customer(TEST, TESTEMAIL);
   }
 
   public static Long getRandomLongNumber() {
