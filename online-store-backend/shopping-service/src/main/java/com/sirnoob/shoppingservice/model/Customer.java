@@ -3,10 +3,7 @@ package com.sirnoob.shoppingservice.model;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-import lombok.Builder;
-
 @Embeddable
-@Builder
 public class Customer {
 
   @Column(name = "user_name", length = 60, nullable = false)
