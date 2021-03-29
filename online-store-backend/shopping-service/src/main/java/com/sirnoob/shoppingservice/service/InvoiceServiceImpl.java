@@ -78,9 +78,12 @@ public class InvoiceServiceImpl implements IInvoiceService{
 
 
   private Product getProductAndUpdateStock(ProductDto productDto){
-    Product product = iProductClient.getProductForInvoice(productDto.getProductBarCode(), productDto.getProductName()).getBody();
+    var productRes = iProductClient.getProductForInvoice(productDto.getProductBarCode(), productDto.getProductName());
+
+    if (productRes.getStatusCode().is2xxSuccessful())
     iProductClient.updateProductStock(productDto.getProductBarCode(), (productDto.getQuantity() * -1));
-    return product;
+
+    return productRes.getBody();
   }
 
 
@@ -98,14 +101,17 @@ public class InvoiceServiceImpl implements IInvoiceService{
                         .map(Item::getSubTotal)
                         .reduce(0.0, (a, b) -> a + b);
 
-    DecimalFormat dec = new DecimalFormat("#.00");
-
     return Invoice.builder()
                   .invoiceId(invoiceRequest.getInvoiceId())
                   .invoiceNumber(invoiceRequest.getInvoiceNumber())
                   .customer(invoiceRequest.getCustomer())
                   .items(items)
-                  .total(Double.valueOf(dec.format(total))).build();
+                  .total(getTotal(total)).build();
+  }
+
+  private Double getTotal(Double total) {
+    DecimalFormat dec = new DecimalFormat("#.00");
+    return Double.valueOf(dec.format(total));
   }
 
   private ResourceNotFoundException getResourceNotFoundException(String message){
