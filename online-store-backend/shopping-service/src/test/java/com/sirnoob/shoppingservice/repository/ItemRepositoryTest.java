@@ -98,11 +98,17 @@ class ItemRepositoryTest {
 
     var invoiceDB = invoiceRepository.save(invoice);
 
-    invoiceDB.getItems().forEach(i -> itemRepository.delete(i));
+    invoiceDB.getItems().forEach(i -> {
+      invoiceDB.getItems().remove(i);
+      itemRepository.delete(i);
+    });
 
     var optionalInvoice = invoiceRepository.findByInvoiceNumber(invoiceDB.getInvoiceNumber());
 
-    invoiceDB.getItems().forEach(i -> assertTrue(itemRepository.findById(i.getItemId()).isEmpty()));
+    invoiceDB.getItems().forEach(i -> {
+      var optItem = itemRepository.findById(i.getItemId());
+      assertTrue(optItem.isEmpty());
+    });
     assertThat(item).isNotNull();
     assertThat(invoice).isNotNull();
     assertTrue(optionalInvoice.isPresent());
