@@ -29,6 +29,12 @@ public class Provider {
                   .build();
   }
 
+  public static Invoice createInvoiceRandomValuesItems() {
+    var invoice = createInvoiceRandomValues();
+    invoice.setItems(Set.of(createItemRandomValues()));
+    return invoice;
+  }
+
   public static Item createItemRandomValues() {
     return Item.builder()
                 .quantity(getRandomIntegerNumber())
