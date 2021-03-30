@@ -14,7 +14,6 @@ import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 @DataJpaTest
-@DisplayName("Sub Category Repository Test")
 class SubCategoryRepositoryTest {
 
   Logger log = LoggerFactory.getLogger(SubCategoryRepositoryTest.class);
@@ -38,7 +36,6 @@ class SubCategoryRepositoryTest {
 
 
   @Test
-  @DisplayName("Save creates sub category when successful")
   public void save_PersistSubCategory_WhenSuccessful() {
     MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
 
@@ -55,7 +52,6 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Save throw DataIntegrityViolationException when sub category is empty")
   public void save_ThrowDataIntegrityViolationException_WhenSubCategoryIsEmpty() {
     SubCategory subCategory = new SubCategory();
 
@@ -64,14 +60,12 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Save throw DataIntegrityViolationException when the sub category doesnt have a main category")
   public void save_ThrowDataIntegrityViolationException_WhenTheSubCategoryDoesNotHaveAMainCategory() {
     assertThatExceptionOfType(DataIntegrityViolationException.class)
         .isThrownBy(() -> iSubCategoryRepository.save(createSubCategory()));
   }
 
   @Test
-  @DisplayName("Save creates sub category when the main category is null")
   public void save_ThrowDataIntegrityViolationException_WhenTheMainCategoryIsNull() {
     SubCategory subCategory = createSubCategory();
 
@@ -82,14 +76,12 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Save throw InvalidDataAccessApiUsageException when sub category is null")
   public void save_ThrowInvalidDataAccessApiUsageException_WhenSubCategoryIsNull() {
     assertThatExceptionOfType(InvalidDataAccessApiUsageException.class)
         .isThrownBy(() -> iSubCategoryRepository.save(null));
   }
 
   @Test
-  @DisplayName("Save throw DataIntegrityViolationException when main category was not persisted")
   public void save_ThrowDataIntegriryViolationExCeption_WhenTheMainCategoryWasNotPersisted() {
     MainCategory mainCategory = createMainCategory();
 
@@ -102,7 +94,6 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Delete removes sub category when successful")
   public void delete_RemoveSubCategory_WhenSuccessful() {
     SubCategory subCategoryToDelete = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
@@ -115,13 +106,11 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Delete throw InvalidDataAccessApiUsageException when sub category is null")
   public void delete_ThrowInvalidDataAccessApiUsageException_WhenSubCategoryIsNull() {
     assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> iSubCategoryRepository.delete(null));
   }
 
   @Test
-  @DisplayName("Delete removes sub category when successful")
   public void delete_Throw_WhenASubCategoryRelatedToAProductIsRemoved() {
     SubCategory subCategoryToDelete = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategoryAndProducts());
 
@@ -133,7 +122,6 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By sub category Name return present sub category when successful")
   public void findBySubCategoryName_ReturnPresenwSubCategorywWhenSuccessful() {
     SubCategory subCategorySaved = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
@@ -147,7 +135,6 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By sub category Name return empty sub category when name is null")
   public void findBySubCategoryName_ReturnEmptwSubCategorywWhenNameIsNull() {
     Optional<SubCategory> subCategoryOptional = iSubCategoryRepository.findBySubCategoryName(null);
 
@@ -155,7 +142,6 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Sub Category Name return empty sub category when names not matches")
   public void findBySubCategoryName_ReturnEmptwSubCategorywWhenNamesNotMatches() {
     SubCategory subCategorySaved = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
@@ -165,7 +151,6 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Main Category return a list of sub categories when successful")
   public void findByMainCategory_ReturnListOfSubCategories_WhenSuccessful(){
     SubCategory subCategory = createSubCategory();
     SubCategory subCategory2 = createSubCategory();
@@ -189,7 +174,6 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Main Category return a empty list of sub categories when no sub category is related to that main category")
   public void findByMainCategory_ReturnEmptyListOfSubCategories_WhenNoSubCategoryIsRelatedToThatMainCategory(){
     SubCategory subCategory = createSubCategory();
     SubCategory subCategory2 = createSubCategory();
@@ -213,7 +197,6 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Main Category return a empty list of sub categories when main category is null")
   public void findByMainCategory_ReturnEmptyListOfSubCategories_WhenMainCategoryIsNull(){
     List<SubCategory> subCategories = iSubCategoryRepository.findByMainCategoryMainCategoryId(null);
 
@@ -222,7 +205,6 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Update sub category name return an integer greater than zero when successful")
   public void updateSubCategoryName_ReturnAnIntegerGreaterThanZero_WhenSuccessful() {
     SubCategory subCategoryToUpdate = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
@@ -239,7 +221,6 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Update sub category name return zero when no sub category has that id")
   public void updateSubCategoryName_ReturnZero_WhenNwSubCategorywasThatId() {
     Integer returnFromUpdateOperation = iSubCategoryRepository.updateSubCategoryName("TEST", -1L);
 
@@ -248,7 +229,6 @@ class SubCategoryRepositoryTest {
   }
 
   @Test
-  @DisplayName("Update sub category name return zero when sub category id is null")
   public void updateSubCategoryName_ReturnZero_WhewSubCategorywdIsNull() {
     Integer returnFromUpdateOperation = iSubCategoryRepository.updateSubCategoryName("TEST", null);
 

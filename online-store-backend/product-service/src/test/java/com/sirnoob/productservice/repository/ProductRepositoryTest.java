@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -26,7 +25,6 @@ import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 
 @DataJpaTest
-@DisplayName("Product Repository Test")
 class ProductRepositoryTest {
 
   @Autowired
@@ -37,7 +35,6 @@ class ProductRepositoryTest {
   private ISubCategoryRepository iSubCategoryRepository;
 
   @Test
-  @DisplayName("Save creates product when successful")
   public void save_PersistProduct_WhenSuccessful() {
     Product product = createProduct();
     Product savedProduct = iProductRepository.save(product);
@@ -49,7 +46,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Save throw DataIntegrityViolationException when product is empty")
   public void save_ThrowDataIntegrityViolationException_WhenProductIsEmpty() {
     Product product = new Product();
 
@@ -57,13 +53,11 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("save throw InvalidDataAccessApiUsageException when product is null")
   public void save_ThrowInvalidDataAccessApiUsageException_WhenProductIsNull() {
     assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> iProductRepository.save(null));
   }
 
   @Test
-  @DisplayName("Save throw ConstraintViolationException when Main Category is not saved")
   public void save_ThrowConstraintViolationException_WhenMainCategoryIsNotSaved() {
     Product productSaved = createProduct();
 
@@ -76,7 +70,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Save throw UnsupportedOperationException when subcategory is added to a product after it has been persisted")
   public void save_ThrowUnsupportedOperationException_WhenSubCategoryIsAddedToAProductAfterItHasBeenPersisted() {
     Product productSaved = iProductRepository.save(createProduct());
 
@@ -91,7 +84,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Save Updates product when successful")
   public void save_UpdateProduct_WhenSuccessful() {
     Product productToUpdate = iProductRepository.save(createProduct());
 
@@ -111,7 +103,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Delete removes product when successful")
   public void delete_RemoveProduct_WhenSuccessful() {
     Product productToDelete = iProductRepository.save(createProduct());
 
@@ -124,13 +115,11 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Delete throw InvalidDataAccessApiUsageException when product is null")
   public void delete_ThrowInvalidDataAccessApiUsageException_WhenProductIsNull() {
     assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> iProductRepository.delete(null));
   }
 
   @Test
-  @DisplayName("Find By Product Name return product when successful")
   public void findByProductName_ReturnProduct_WhenSuccessful() {
     Product productSaved = iProductRepository.save(createProduct());
 
@@ -143,7 +132,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Product Name return empty optional product when names not matches")
   public void findByProductName_ReturnEmptyOptionalProduct_WhenTheNamesNotMatches() {
     Product productSaved = iProductRepository.save(createProduct());
 
@@ -153,7 +141,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Product Name Or Product Bar Code return product when successful")
   public void findByProductNameOrProductBarCode_ReturnPresentOptionalProduct_WhenSuccessful() {
     Product productSaved = iProductRepository.save(createProduct());
 
@@ -169,7 +156,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Product Name Or Product Bar Code return empty optional product when names or bar code not matches")
   public void findByProductNameOrProductBarCode_ReturnEmptyOptionalProduct_WhenNamesOrBarCodeNotMatches() {
     iProductRepository.save(createProduct());
 
@@ -179,7 +165,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Main Category return a list of product when successful")
   public void findByMainCategory_ReturnProductList_WhenSuccessful() {
     Product product1 = iProductRepository.save(createProduct());
     Product product2 = iProductRepository.save(createProduct());
@@ -204,7 +189,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Main Category return a list of product when main category is saved but doenst contains product")
   public void findByMainCategory_ReturnEmptyProductList_WhenMainCategoryIsSavedButDoenstContainsProduct() {
     iProductRepository.save(createProduct());
     iProductRepository.save(createProduct());
@@ -218,7 +202,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Main Category return empty list of product when main category isnt saved")
   public void findByMainCategory_ReturnEmptyProductList_WhenMainCategoryIsNotSaved() {
     List<Product> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(createMainCategory().getMainCategoryId());
 
@@ -226,7 +209,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find product for invoice return product invoice response when successful")
   public void findProductForInvoice_ReturnPresentProductInvoiceResponse_WhenSuccessful() {
     Product productSaved = iProductRepository.save(createProduct());
 
@@ -240,7 +222,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find product for invoice return product invoice response when names and bar code not matches")
   public void findProductForInvoice_ReturnEmptyProductInvoiceResponse_WhenNamesAndBarCodeNotMatches() {
     iProductRepository.save(createProduct());
 
@@ -250,7 +231,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Get all return a page of product list view when successful")
   public void getAll_ReturnPageOfProductListView_WhenSuccessful() {
     iProductRepository.save(createProduct());
     iProductRepository.save(createProduct());
@@ -268,7 +248,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Get all return empty page of product list view when there are no records in the product table")
   public void getAll_ReturnEmptyPageOfProductListView_WhenThereAreNoRecordsInTheProductTable() {
     iProductRepository.deleteAllInBatch();
     Page<ProductListView> pageOfProducts = iProductRepository.getAll(PageRequest.of(0, 10));
@@ -277,7 +256,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("List by name return page of ProductListView when the product name matches the search parameter")
   public void listByName_ReturnPageOfProductListView_WhenTheProductNameMatchesTheSearchParameter() {
     iProductRepository.save(createProduct());
     iProductRepository.save(createProduct());
@@ -300,7 +278,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("List by name return empty page of ProductListView when the product name not matches the search parameter")
   public void listByName_ReturnEmptyPageOfProductListView_WhenTheProductNameNotMatchesTheSearchParameter() {
     Page<ProductListView> products = iProductRepository.findByProductNameContainingIgnoreCase("asdf", PageRequest.of(0, 5));
 
@@ -308,7 +285,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Main Category return a page of productListView when successful")
   public void findByMainCategory_ReturnPageOfProductListView_WhenSuccessful() {
     Product product1 = iProductRepository.save(createProduct());
     Product product2 = iProductRepository.save(createProduct());
@@ -335,7 +311,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Main Category return empty page of product when main category isnt saved")
   public void findByMainCategory_ReturnEmptyProductListView_WhenMainCategoryIsNotSaved() {
     iProductRepository.save(createProduct());
     iProductRepository.save(createProduct());
@@ -348,7 +323,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Main Category return empty list of product when main category is saved but doenst contains product")
   public void findByMainCategory_ReturnEmptyProductListView_WhenMainCategoryIsSavedButDoesNotContainsProduct() {
     MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
 
@@ -359,7 +333,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Sub Category return a list of productListView when successful")
   public void findBySubCategory_ReturnListOfProductListView_WhenSuccessful() {
     Product product1 = createProduct();
     Product product2 = createProduct();
@@ -392,7 +365,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Sub Category return empty list of productListView when no product contains that sub category")
   public void findBySubCategory_ReturnEmptyListOfProductListView_WhenNoProductContainsThatSubCategory() {
     Product product1 = createProduct();
     Product product2 = createProduct();
@@ -417,7 +389,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Find By Sub Category return empty list of productListView when that sub category is not saved")
   public void findBySubCategory_ReturnEmptyListOfProductListView_WhenThatSubCategoryIsNotSaved() {
     Product product1 = createProduct();
     Product product2 = createProduct();
@@ -441,7 +412,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Update product stock by product barcode return an integer greater than zero when successful")
   public void updateProductStockByProductBarCode_ReturnAnIntegerGreaterThanZero_WhenSuccessful() {
     Product productSaved = iProductRepository.save(createProduct());
 
@@ -456,7 +426,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Update product stock by product barcode return zero when no product has that barcode")
   public void updateProductStockByProductBarCode_ReturnZero_WhenNoProductHasThatBarCode() {
     Integer returnFromUpdateOperation = iProductRepository.updateProductStockByProductBarCode(100, -1L);
 
@@ -465,7 +434,6 @@ class ProductRepositoryTest {
   }
 
   @Test
-  @DisplayName("Update product stock by product barcode return zero when no product has that barcode")
   public void updateProductStockByProductBarCode_ReturnZero_WhenProductBarCodeIsNull() {
     Integer returnFromUpdateOperation = iProductRepository.updateProductStockByProductBarCode(100, null);
 

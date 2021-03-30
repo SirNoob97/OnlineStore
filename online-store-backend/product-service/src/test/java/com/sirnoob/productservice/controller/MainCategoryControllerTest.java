@@ -30,7 +30,6 @@ import com.sirnoob.productservice.service.ProductServiceImpl;
 import com.sirnoob.productservice.service.SubCategoryServiceImpl;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest
 @Import({ MainCategoryServiceImpl.class, ProductServiceImpl.class, ProductMapperImpl.class, SubCategoryServiceImpl.class, SubCategoryMapperImpl.class })
-@DisplayName("Main Category Controller Test")
 class MainCategoryControllerTest {
 
   @MockBean
@@ -86,7 +84,6 @@ class MainCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("createMainCategory return 201 status code when successful")
   public void createMainCategory_Return201StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(post("/main-categories").contentType(JSON)
                                             .content(OBJECT_MAPPER.writeValueAsString(MAINCATEGORY))
@@ -96,7 +93,6 @@ class MainCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("createMainCategory return 400 status code when MainCategory has invalid fields")
   public void createMainCategory_Return400StatusCode_WhenMainCategoryHasInvalidFields() throws Exception{
     mockMvc.perform(post("/main-categories").contentType(JSON)
                                             .content(OBJECT_MAPPER.writeValueAsString(new MainCategory()))
@@ -106,14 +102,12 @@ class MainCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("updateMainCategory return 204 status code when successful")
   public void updateMainCategory_Return204StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(put("/main-categories/1?mainCategoryName=maincategory"))
             .andExpect(status().isNoContent());
   }
 
   @Test
-  @DisplayName("updateMainCategory return 404 status code when update operation returns 0")
   public void updateMainCategory_Return404StatusCode_WhenUpdateOperationReturnsZero() throws Exception{
     BDDMockito.when(iMainCategoryRepository.updateMainCategoryName(anyString(), anyLong())).thenReturn(0);
 
@@ -122,13 +116,11 @@ class MainCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("deleteMainCategory return 204 status code when successful")
   public void deleteMainCategory_Return204StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(delete("/main-categories/1")).andExpect(status().isNoContent());
   }
 
   @Test
-  @DisplayName("deleteMainCategory return 404 status code when MainCategory was not found")
   public void deleteMainCategory_Return404StatusCode_WhenMainCategoryWasNotFound() throws Exception{
     BDDMockito.when(iMainCategoryRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -136,7 +128,6 @@ class MainCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("getMainCategoryByName return 200 status code when successful")
   public void getMainCategoryByName_Return200StatusCode_WhenSuccesful() throws Exception{
     mockMvc.perform(get("/main-categories/maincategory").accept(JSON))
             .andExpect(status().isOk())
@@ -144,7 +135,6 @@ class MainCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("getMainCategoryByName return 404 status code when MainCategory was not found")
   public void getMainCategoryByName_Return404StatusCode_WhenMainCategoryWasNotFound() throws Exception{
     BDDMockito.when(iMainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.empty());
 
@@ -154,7 +144,6 @@ class MainCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("getAllMainCategory return 200 status code when successful")
   public void getAllMainCategory_Return200StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(get("/main-categories?page=0&size=10").accept(JSON))
             .andExpect(status().isOk())
@@ -162,7 +151,6 @@ class MainCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("getAllMainCategory return 404 status code when no MainCategory are found")
   public void getAllMainCategory_Return404StatusCode_WhenNoMainCategoriesAreFound() throws Exception{
     BDDMockito.when(iMainCategoryRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
 

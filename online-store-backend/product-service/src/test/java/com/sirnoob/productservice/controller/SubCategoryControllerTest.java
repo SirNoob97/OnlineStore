@@ -22,7 +22,6 @@ import com.sirnoob.productservice.service.ProductServiceImpl;
 import com.sirnoob.productservice.service.SubCategoryServiceImpl;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +38,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @WebMvcTest
 @Import({ SubCategoryServiceImpl.class, SubCategoryMapperImpl.class, MainCategoryServiceImpl.class, ProductServiceImpl.class, ProductMapperImpl.class })
-@DisplayName("Sub Category Controller Test")
 class SubCategoryControllerTest {
 
   @MockBean
@@ -77,7 +75,6 @@ class SubCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("createSubCategory return 201 status code when successful")
   public void createSubCategoryCategory_Return201StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(post("/sub-categories").contentType(JSON)
                                             .accept(JSON)
@@ -87,7 +84,6 @@ class SubCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("createSubCategory return 400 status code when SubCategoryRequest has invalid fields")
   public void createSubCategoryCategory_Return400StatusCode_WhenSubCategoryRequestHasInvalidFields() throws Exception{
     mockMvc.perform(post("/sub-categories").contentType(JSON)
                                             .accept(JSON)
@@ -97,7 +93,6 @@ class SubCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("updateSubCategoryNameCategory return 204 status code when successful")
   public void updateSubCategoryName_Return204StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(put("/sub-categories/1?subCategoryName=subcategory").contentType(JSON)
                                             .content(OBJECT_MAPPER.writeValueAsString(createSubCategoryRequest())))
@@ -105,7 +100,6 @@ class SubCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("updateSubCategoryNameCategory return 404 status code when update operation returns 0")
   public void updateSubCategoryName_Return404StatusCode_WhenUpdateOperationReturnsZero() throws Exception{
     BDDMockito.when(iSubCategoryRepository.updateSubCategoryName(anyString(), anyLong())).thenReturn(0);
 
@@ -115,13 +109,11 @@ class SubCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("deleteSubCategory return 204 status code when successful")
   public void deleteSubCategory_Return204StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(delete("/sub-categories/1")).andExpect(status().isNoContent());
   }
 
   @Test
-  @DisplayName("deleteSubCategory return 404 status code when SubCategory was not found")
   public void deleteSubCategory_Return404StatusCode_WhenSubCategoryWasNotFound() throws Exception{
     BDDMockito.when(iSubCategoryRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -129,7 +121,6 @@ class SubCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("getSubCategoryResponseByName return 200 status code when successful")
   public void getSubCategoryResponseByName_Return200StatusCode_WhenSuccesful() throws Exception{
     mockMvc.perform(get("/sub-categories/subcategory").accept(JSON))
             .andExpect(status().isOk())
@@ -137,7 +128,6 @@ class SubCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("getSubCategoryResponseByName return 404 status code when SubCategory was not found")
   public void getSubCategoryResponseByName_Return404StatusCode_WhenSubCategoryWasNotFound() throws Exception{
     BDDMockito.when(iSubCategoryRepository.findBySubCategoryName(anyString())).thenReturn(Optional.empty());
 
@@ -147,7 +137,6 @@ class SubCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("getAllSubCategoriesCategory return 200 status code when successful")
   public void getAllSubCategories_Return200StatusCode_WhenSuccessful() throws Exception{
     mockMvc.perform(get("/sub-categories?page=0&size=10").accept(JSON))
             .andExpect(status().isOk())
@@ -155,7 +144,6 @@ class SubCategoryControllerTest {
   }
 
   @Test
-  @DisplayName("getAllSubCategoriesCategory return 404 status code when no SubCategory are found")
   public void getAllSubCategories_Return404StatusCode_WhenNoSubCategoryAreFound() throws Exception{
     BDDMockito.when(iSubCategoryRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
 
