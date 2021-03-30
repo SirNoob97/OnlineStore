@@ -1,6 +1,15 @@
 package com.sirnoob.shoppingservice.service;
 
-import static com.sirnoob.shoppingservice.util.Provider.*;
+import static com.sirnoob.shoppingservice.util.Provider.PAGE;
+import static com.sirnoob.shoppingservice.util.Provider.TEST;
+import static com.sirnoob.shoppingservice.util.Provider.createInvoiceRandomValuesItems;
+import static com.sirnoob.shoppingservice.util.Provider.createInvoiceRequestRandomValues;
+import static com.sirnoob.shoppingservice.util.Provider.createProductRandomPrice;
+import static com.sirnoob.shoppingservice.util.Provider.getRandomLongNumber;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -8,11 +17,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.sirnoob.shoppingservice.client.IProductClient;
 import com.sirnoob.shoppingservice.dto.InvoiceRequest;
@@ -137,7 +141,7 @@ class InvoiceServiceTest {
   }
 
   @Test
-  public void getByUserName_ThrowResourceNotFoundException_WhenInvoiceIsNotFound() {
+  public void getByInvoiceNumber_ThrowResourceNotFoundException_WhenInvoiceIsNotFound() {
     BDDMockito.when(invoiceRepository.findByInvoiceNumber(anyLong())).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
