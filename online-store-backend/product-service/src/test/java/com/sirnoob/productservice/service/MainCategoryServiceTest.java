@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -35,7 +34,6 @@ import com.sirnoob.productservice.repository.IMainCategoryRepository;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-@DisplayName("Main Category Service Test")
 public class MainCategoryServiceTest {
 
   private static final String MAIN_CATEGORY_NOT_FOUND = "Main Category Not Found";
@@ -54,7 +52,7 @@ public class MainCategoryServiceTest {
 
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    MockitoAnnotations.openMocks(this);
     iMainCategoryService = new MainCategoryServiceImpl(iProductService, iSubCategoryService, iMainCategoryRepository);
 
     MainCategory mainCategory = createMainCategoryStaticValues();
@@ -83,7 +81,6 @@ public class MainCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("createMainCategory create a new main category log when successful")
   public void createMainCategory_CreateMainCategory_WhenSuccessful() {
     MainCategory mainCategory = iMainCategoryService.createMainCategory(createMainCategoryStaticValues());
 
@@ -93,13 +90,11 @@ public class MainCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("updateMainCategoryName update the name of an existing main category when successful")
   public void updateMainCategoryName_UpdateTheNameOfAnExistingMainCategory_WhenSuccessful() {
     assertThatCode(() -> iMainCategoryService.updateMainCategoryName(1L, "TEST")).doesNotThrowAnyException();
   }
 
   @Test
-  @DisplayName("updateMainCategoryName throw ResourceNotFoundException when the return of the query is less than one")
   public void updateMainCategoryName_ThrowResourceNotFoundEsception_WhenTheReturnOfTheQueryIsLessThanOne() {
     BDDMockito.when(iMainCategoryRepository.updateMainCategoryName(anyString(), anyLong()))
         .thenThrow(new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
@@ -109,13 +104,11 @@ public class MainCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("deleteMainCategory delete a main category log when successful")
   public void deleteMainCategory_DeleteMainCategory_WhenSuccessful() {
     assertThatCode(() -> iMainCategoryService.deleteMainCategory(1L)).doesNotThrowAnyException();
   }
 
   @Test
-  @DisplayName("getMainCategoryById return a main category when successful")
   public void getMainCategoryById_ReturnAMainCategory_WhenSuccessful() {
     MainCategory mainCategoryFetchedById = iMainCategoryService.getMainCategoryById(1L);
 
@@ -125,7 +118,6 @@ public class MainCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getMainCategoryById throw ResourceNotFoundException when main category was not found")
   public void getMainCategoryById_ThrowResourceNotFoundEsception_WhenMainCategoryWasNotFound() {
     BDDMockito.when(iMainCategoryRepository.findById(anyLong()))
         .thenThrow(new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
@@ -135,7 +127,6 @@ public class MainCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getMainCategoryByName return a main category when successful")
   public void getMainCategoryByName_ReturnAMainCategory_WhenSuccessful() {
     MainCategory mainCategoryFetchedByName = iMainCategoryService.getMainCategoryByName("TEST");
 
@@ -145,7 +136,6 @@ public class MainCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getMainCategoryByName throw ResourceNotFoundException when the main category was not found")
   public void getMainCategoryByName_ThrowResourceNotFoundEsception_WhenTheMainCategoryWasNotFound() {
     BDDMockito.when(iMainCategoryRepository.findByMainCategoryName(anyString()))
         .thenThrow(new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
@@ -155,7 +145,6 @@ public class MainCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getAllMainCategory return a set of string when successful")
   public void getAllMainCategory_ReturnASetOfString_WhenSuccessful() {
     Set<String> mainCategories = iMainCategoryService.getAllMainCategory(PageRequest.of(0, 10));
 
@@ -164,7 +153,6 @@ public class MainCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getAllMainCategory throw ResourceNotFoundException when there are no main categories in the registry")
   public void getAllMainCategory_ThrowResourceNotFoundEsception_WhenThereAreNoMainCategoriessInTheRegistry() {
     BDDMockito.when(iMainCategoryRepository.findAll(PageRequest.of(0, 10)))
         .thenThrow(new ResourceNotFoundException(NO_MAIN_CATEGORIES_FOUND));

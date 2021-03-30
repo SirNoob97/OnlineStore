@@ -34,7 +34,6 @@ import com.sirnoob.productservice.mapper.IProductMapper;
 import com.sirnoob.productservice.repository.IProductRepository;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -51,7 +50,6 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Transactional
-@DisplayName("Produc Service Test")
 public class ProductServiceTest {
 
   private static final String PRODUCT_NOT_FOUND = "Product Not Found";
@@ -71,7 +69,7 @@ public class ProductServiceTest {
 
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    MockitoAnnotations.openMocks(this);
     iProductService = new ProductServiceImpl(iSubCategoryService, iProductRepository, iProductMapper);
 
     Set<SubCategory> subCategories = Set.of(createSubCategory(), createSubCategory());
@@ -124,7 +122,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("createProduct create a new product log when successful")
   public void createProduct_CreateProduct_WhenSuccessful() {
     ProductResponse productSaved = iProductService.createProduct(createProductRequest(), createMainCategoryStaticValues());
 
@@ -136,7 +133,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("updateProduct update an existing product when successful")
   public void updateProduct_UpdateAnExistingProduct_WhenSuccessful() {
     ProductResponse productUpdated = iProductService.updateProduct(1L, createProductRequest(), createMainCategoryStaticValues());
 
@@ -147,13 +143,11 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("updateProductStock update the stock of an existing product when successful")
   public void updateProductStock_UpdateStockOfAnExistingProduct_WhenSuccessful() {
     assertThatCode(() -> iProductService.updateProductStock(1L, 100)).doesNotThrowAnyException();
   }
 
   @Test
-  @DisplayName("updateProductStock throw ResourceNotFoundException when the return of the query is less than one")
   public void updateProductStock_ThrowResourceNotFoundException_WhenTheReturnOfTheQueryIsLessThanOne() {
     BDDMockito.when(iProductRepository.updateProductStockByProductBarCode(anyInt(), anyLong()))
         .thenThrow(new ResourceNotFoundException(PRODUCT_NOT_FOUND));
@@ -163,13 +157,11 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("deleteProductById removes a product when successful")
   public void deleteProductById_RemovesAProduct_WhenSuccessful() {
     assertThatCode(() -> iProductService.deleteProductById(1L)).doesNotThrowAnyException();
   }
 
   @Test
-  @DisplayName("getProductResponseByBarCodeOrProductName return a product response when successful")
   public void getProductResponseByBarCodeOrProductName_ReturnAProductResponse_WhenSuccessful() {
     ProductResponse productFetchedByName = iProductService.getProductResponseByBarCodeOrProductName(-1L,
       PRODUCT);
@@ -180,7 +172,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getProductResponseByBarCodeOrProductName throw ResourceNotFoundException when product was not found")
   public void getProductResponseByBarCodeOrProductName_ThrowResourceNotFoundException_WhenProductNotFound() {
     BDDMockito.when(iProductRepository.findByProductBarCodeOrProductName(anyLong(), anyString()))
         .thenThrow(new ResourceNotFoundException(PRODUCT_NOT_FOUND));
@@ -190,7 +181,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getProductForInvoiceResponse return a product invoice response when successful")
   public void getProductForInvoiceResponse_ReturnAProductInvoiceResponse_WhenSuccessful() {
     ProductInvoiceResponse productForInvoiceResponse = iProductService
       .getProductForInvoiceResponse(1L, PRODUCT);
@@ -201,7 +191,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getProductForInvoiceResponse throw ResourceNotFoundException when product was not found")
   public void getProductForInvoiceResponse_ThrowResourceNotFoundException_WhenProductNotFound() {
     BDDMockito.when(iProductRepository.findProductForInvoice(anyLong(), anyString()))
         .thenThrow(new ResourceNotFoundException(PRODUCT_NOT_FOUND));
@@ -211,7 +200,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getProductById return a product when successful")
   public void getProductById_ReturnAProduct_WhenSuccessful() {
     Product productFetchedById = iProductService.getProductById(1L);
 
@@ -221,7 +209,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getProductById throw ResourceNotFoundException when product was not found")
   public void getProductById_ThrowResourceNotFoundException_WhenProductWasNotFound() {
     BDDMockito.when(iProductRepository.findById(anyLong())).thenThrow(new ResourceNotFoundException(PRODUCT_NOT_FOUND));
 
@@ -230,7 +217,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getProductByMainCategory return a list of product when successful")
   public void getProductByMainCategory_ReturnAListOfProduct_WhenSuccessful() {
     List<Product> products = iProductService.getProductByMainCategory(1L);
 
@@ -239,7 +225,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getProductByMainCategory return an empty product list when the main category has no products")
   public void getProductByMainCategory_ReturnAnEmptyProductList_WhenTheMainCategoryHasNoProducts() {
     BDDMockito.when(iProductRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of());
 
@@ -250,7 +235,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("findProductViewByName return a product view when successful")
   public void findProductViewByName_ReturnAProductView_WhenSuccessful() {
     ProductView productView = iProductService.getProductViewByName(PRODUCT);
 
@@ -260,7 +244,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("findProductViewByName throw ResourceNotFoundException when product was not found")
   public void findProductViewByName_ThrowResourceNotFoundException_WhenProductNotFound() {
     BDDMockito.when(iProductRepository.findByProductName(anyString())).thenThrow(new ResourceNotFoundException(PRODUCT_NOT_FOUND));
 
@@ -269,7 +252,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getProductListViewByName return a page of product list view when successful")
   public void getProductListViewByName_ReturnAPageProductListView_WhenSuccessful() {
     Page<ProductListView> products = iProductService.getPageOfProductListViewByName("sa", PageRequest.of(0, 10));
 
@@ -278,7 +260,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getPageOfProductListViewByName throw ResourceNotFoundException when the names dont match")
   public void getPageOfProductListViewByName_ThrowResourceNotFoundException_WhenTheNamesDoNotMatch() {
     BDDMockito.when(iProductRepository.findByProductNameContainingIgnoreCase(anyString(), any(Pageable.class)))
         .thenThrow(new ResourceNotFoundException(NO_PRODUCTS_FOUND));
@@ -289,7 +270,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getPageOfProductListView return a page of product list view when successful")
   public void getPageOfProductListView_ReturnAPageProductListView_WhenSuccessful() {
     Page<ProductListView> products = iProductService.getPageOfProductListView(PageRequest.of(0, 10));
 
@@ -298,7 +278,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getPageOfProductListView throw ResourceNotFoundException when there are no products in the registry")
   public void getPageOfProductListView_ThrowResourceNotFoundException_WhenThereAreNoProductsInTheRegistry() {
     BDDMockito.when(iProductRepository.getAll(any(Pageable.class))).thenThrow(new ResourceNotFoundException(NO_PRODUCTS_FOUND));
 
@@ -307,7 +286,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getPageOfProductListViewByMainCategory return a page of product list view when successful")
   public void getPageOfProductListViewByMainCategory_ReturnAPageProductListView_WhenSuccessful() {
     Page<ProductListView> products = iProductService.getPageOfProductListViewByMainCategory(1L, PageRequest.of(0, 10));
 
@@ -316,7 +294,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getPageOfProductListViewByMainCategory throw ResourceNotFoundException when the main category has no products")
   public void getPageOfProductListViewByMainCategory_ThrowResourceNotFoundException_WhenTheMainCategoryHasNoProducts() {
     BDDMockito.when(iProductRepository.findByMainCategoryMainCategoryId(anyLong(), any(Pageable.class)))
         .thenThrow(new ResourceNotFoundException(NO_PRODUCTS_FOUND));
@@ -327,7 +304,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getSetOfProductListViewBySubCategory return a set of product list view when successful")
   public void getSetOfProductListViewBySubCategory_ReturnASetProductListView_WhenSuccessful() {
     String[] subcategories = { "Sub Category 1" };
 
@@ -338,7 +314,6 @@ public class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("getSetOfProductListViewBySubCategory throw ResourceNotFoundException when the sub category or sub categories has no products")
   public void getSetOfProductListViewBySubCategory_ThrowResourceNotFoundException_WhenTheSubCategoryOrSubCategoriesHasNoProducts() {
     String[] subcategories = { "Sub Category 1", "Sub Category 2" };
 

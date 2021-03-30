@@ -23,7 +23,6 @@ import com.sirnoob.productservice.mapper.ISubCategoryMapper;
 import com.sirnoob.productservice.repository.ISubCategoryRepository;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -39,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Transactional
-@DisplayName("Sub Category Service Test")
 public class SubCategoryServiceTest {
 
   private static final String SUB_CATEGORY_NOT_FOUND = "Sub Category Not Found";
@@ -56,7 +54,7 @@ public class SubCategoryServiceTest {
 
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    MockitoAnnotations.openMocks(this);
     iSubCategoryService = new SubCategoryServiceImpl(iSubCategoryMapper, iSubCategoryRepository);
 
     MainCategory mainCategory = createMainCategoryStaticValues();
@@ -85,7 +83,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("createSubCategory create a new sub category log when successful")
   public void createMainCategory_CreateMainCategory_WhenSuccessful() {
     SubCategoryResponse subCategory = iSubCategoryService.createSubCategory("Sub Category", createMainCategoryStaticValues());
 
@@ -98,13 +95,11 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("updateSubCategoryName update the name of an existing sub category when successful")
   public void updateSubCategoryName_UpdateTheNameOfAnExistingSubCategory_WhenSuccessful() {
     assertThatCode(() -> iSubCategoryService.updateSubCategoryName(1L, "TEST")).doesNotThrowAnyException();
   }
 
   @Test
-  @DisplayName("updateSubCategoryName throw ResourceNotFoundException when the return of the query is less than one")
   public void updateSubCategoryName_ThrowResourceNotFoundEsception_WhenTheReturnOfTheQueryIsLessThanOne() {
     BDDMockito.when(iSubCategoryRepository.updateSubCategoryName(anyString(), anyLong()))
         .thenThrow(new ResourceNotFoundException(SUB_CATEGORY_NOT_FOUND));
@@ -114,7 +109,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("deleteSubCategory delete sub category even if it is related to products and sub categories when successful")
   public void deleteSubCategory_DeleteSubCategoryEvenIfItIsRelatedToProducts_WhenSuccessful() {
     BDDMockito.when(iSubCategoryRepository.findById(anyLong())).thenReturn(Optional.of(createSubCategoryForDeleteTest()));
 
@@ -122,7 +116,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("deleteSubCategory delete sub category even though it has a null product set when successful")
   public void deleteSubCategory_DeleteSubCategoryEvenThoughItHasANullProductSet_WhenSuccessful() {
     MainCategory mainCategory = createMainCategoryStaticValues();
 
@@ -132,7 +125,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("deleteSubCategory delete main category even if the products have null the set of sub categories when successful")
   public void deleteSubCategory_RemoveSubCategoryEvenIfTheProductsHaveNullTheSetOfSubCategories_WhenSuccessful() {
     SubCategory subCategory = createSubCategoryForDeleteTest();
 
@@ -144,7 +136,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getSubCategoryById return a sub category when successful")
   public void getSubCategoryById_ReturnAMainCategory_WhenSuccessful() {
     String expectedName = "Sub Category 1";
 
@@ -156,7 +147,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getSubCategoryById throw ResourceNotFoundException when sub category was not found")
   public void getSubCategoryById_ThrowResourceNotFoundEsception_WhenSubCategoryWasNotFound() {
     BDDMockito.when(iSubCategoryRepository.findById(anyLong())).thenThrow(new ResourceNotFoundException(SUB_CATEGORY_NOT_FOUND));
 
@@ -165,7 +155,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getSubCategoryResponseByName return a sub category response when successful")
   public void getSubCategoryResponseByName_ReturnASubCategoryResponse_WhenSuccessful() {
     String expectedName = "Sub Category";
 
@@ -179,7 +168,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getSubCategoryByName return a sub category when successful")
   public void getSubCategoryByName_ReturnAMainCategory_WhenSuccessful() {
     String expectedName = "Sub Category 1";
 
@@ -191,7 +179,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getSubCategoryByName throw ResourceNotFoundException when sub category was not found")
   public void getSubCategoryByName_ThrowResourceNotFoundEsception_WhenSubCategoryWasNotFound() {
     BDDMockito.when(iSubCategoryRepository.findBySubCategoryName(anyString())).thenThrow(new ResourceNotFoundException(SUB_CATEGORY_NOT_FOUND));
 
@@ -200,7 +187,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getAllSubCategories return a set of string when successful")
   public void getAllSubCategories_ReturnASetOfString_WhenSuccessful() {
     Set<String> subCategories = iSubCategoryService.getAllSubCategories(PageRequest.of(0, 10));
 
@@ -209,7 +195,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getAllSubCategories throw ResourceNotFoundException when there are no sub categories in the registry")
   public void getAllSubCategories_ThrowResourceNotFoundEsception_WhenThereAreNoSubCategoriessInTheRegistry() {
     BDDMockito.when(iSubCategoryRepository.findAll(any(Pageable.class))).thenThrow(new ResourceNotFoundException(NO_SUB_CATEGORIES_FOUND));
 
@@ -218,7 +203,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getSubcategoriesByName return a set of sub category when successful")
   public void getSubcategoriesByName_ReturnASetSubCategory_WhenSuccessful() {
     String[] names = { "Sub Category 1", "Sub Category 2", "Sub Category 3" };
 
@@ -229,7 +213,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getSubCategoryByMainCategory return a list of sub category when successful")
   public void getSubCategoryByMainCategory_ReturnAListSubCategory_WhenSuccessful() {
     List<SubCategory> subCategories = iSubCategoryService.getSubCategoryByMainCategory(1L);
 
@@ -238,7 +221,6 @@ public class SubCategoryServiceTest {
   }
 
   @Test
-  @DisplayName("getSubCategoryByMainCategory return an empty list of sub category when successful")
   public void getSubCategoryByMainCategory_ReturnAnEmptyListSubCategory_WhenSuccessful() {
     BDDMockito.when(iSubCategoryRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of());
 
