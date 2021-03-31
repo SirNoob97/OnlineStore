@@ -89,28 +89,4 @@ class ItemRepositoryTest {
 
     assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> itemRepository.save(item));
   }
-
-  @Test
-  public void delete_RemovePersistedItemsWithoutRemoveTheInvoice_WhenSuccessful() {
-    var item = createItemRandomValues();
-    var invoice = createInvoiceRandomValues();
-    invoice.setItems(Set.of(item));
-
-    var invoiceDB = invoiceRepository.save(invoice);
-
-    invoiceDB.getItems().forEach(i -> {
-      invoiceDB.getItems().remove(i);
-      itemRepository.delete(i);
-    });
-
-    var optionalInvoice = invoiceRepository.findByInvoiceNumber(invoiceDB.getInvoiceNumber());
-
-    invoiceDB.getItems().forEach(i -> {
-      var optItem = itemRepository.findById(i.getItemId());
-      assertTrue(optItem.isEmpty());
-    });
-    assertThat(item).isNotNull();
-    assertThat(invoice).isNotNull();
-    assertTrue(optionalInvoice.isPresent());
-  }
 }
