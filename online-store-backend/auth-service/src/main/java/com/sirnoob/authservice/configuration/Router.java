@@ -46,7 +46,7 @@ public class Router {
                                 .and()
                                 .path("/invoices/**", "/shopping-service/**")
                                 .customize(c -> c.metadata(CONNECT_TIMEOUT_ATTR, 10000).metadata(RESPONSE_TIMEOUT_ATTR, 50000))
-                                .uri("lb://product-service"))
+                                .uri("lb://shopping-service"))
            .build();
   }
 
