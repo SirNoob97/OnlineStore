@@ -14,7 +14,7 @@ POSTGRESQL spring and maven profile
 
 ## Endpoints
 
-If you are using docker you should use the respective IP of this microservice instead of "localhost"
+If you are using docker-compose you should use the respective IP of this microservice instead of "localhost"
 
     192.168.0.13
 

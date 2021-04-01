@@ -40,7 +40,7 @@ The other microservices have their own README file that contains the commands to
 
 ### Docker
 
-To run the application with Docker, use the run.sh.
+To run the application with Docker(docker-compose), use the run.sh.
 
 This script runs the application to be used with a Postgres database.
 

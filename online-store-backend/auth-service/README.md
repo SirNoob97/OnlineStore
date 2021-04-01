@@ -16,7 +16,7 @@ POSTGRESQL spring and maven profile
 
 ## Endpoints
 
-If you are using docker you should use the respective IP of this microservice instead of "localhost"
+If you are using docker-compose you should use the respective IP of this microservice instead of "localhost"
 
     192.168.0.11
 
@@ -108,8 +108,20 @@ DELETE delete the account(user must only be authenticated)
     curl -v -X DELETE http://localhost:8090/accounts/1 \
     -b 'JWT=valid-token; Secure; HttpOnly; Same-Site=Strict; RT=valid-token; Secure; HttpOnly; Same-Site=Strict;'
 
+### Other Services
+
+To access the endpoints of the other services, you must set the header 'Host' with the name of the service. actuator endpoints too
+
+    --header 'Host: product-service'
+    --header 'Host: shopping-service'
+
 ### Actuator
 
 The following endpoints are excluded: env,beans,heapdump,flyway,threaddump,liquidbase,prometheus
 
     curl -v -X GET http://localhost:8090/actuator/**
+
+To access the product-service or shopping-service actuator endpoints
+
+    curl -v -X GET http://localhost:8090/product-service/actuator/** --header 'Host: product-service'
+    curl -v -X GET http://localhost:8090/shopping-service/actuator/** --header 'Host: shopping-service'
