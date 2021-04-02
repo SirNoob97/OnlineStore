@@ -40,13 +40,11 @@ The other microservices have their own README file that contains the commands to
 
 ### Docker
 
-To run the application with Docker(docker-compose), use the run.sh.
+To run the application with Docker(docker-compose), use the Makefile.
 
-This script runs the application to be used with a Postgres database.
+Using the "depends_on" option of docker-compose does not ensure that the microservice or [PostgreSQL](https://www.postgresql.org/) are ready to receive requests, so I have created a little script (run.sh and healthcheck.sh) to ensure the order of execution and thus avoid conflicts.
 
-Using the "depends_on" option of docker-compose does not ensure that the microservice or the database is ready to receive requests, so I have created this little script to ensure the order of execution and thus avoid conflicts.
-
-    ./run.sh
+    make run
 
 If you use this method you should use the respective ips of the microservices instead of "localhost".
 
@@ -84,7 +82,7 @@ In this way, with all the services with fixed ip, I can test the application in 
 * Zipkin [docs](https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/) [repo](https://github.com/openzipkin/zipkin)
 * JWT [repo](https://github.com/jwtk/jjwt)
 * H2 [ref](https://www.h2database.com/html/main.html) [repo](https://github.com/h2database/h2database)
-* PostgreSQL [postgres docs](https://www.postgresql.org/docs/13/index.html)
+* PostgreSQL [docs](https://www.postgresql.org/docs/13/index.html)
 * Lombok [ref](https://projectlombok.org/) [repo](https://github.com/rzwitserloot/lombok)
 
 ### TODO
