@@ -1,6 +1,7 @@
 FROM adoptopenjdk/openjdk11-openj9:x86_64-alpine-jre11u-nightly
 RUN apk --no-cache add curl
-WORKDIR registry-service
+RUN addgroup -S spring && adduser -S config-service -G spring
+WORKDIR /registry-service
 ARG DEPENDENCY=registry-service/target/dependency
 COPY ${DEPENDENCY}/BOOT-INF/lib ./app/lib
 COPY ${DEPENDENCY}/BOOT-INF/classes ./app

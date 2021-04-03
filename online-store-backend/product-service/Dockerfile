@@ -1,5 +1,6 @@
 FROM adoptopenjdk/openjdk11-openj9:x86_64-alpine-jre11u-nightly
-WORKDIR product-service
+RUN addgroup -S spring && adduser -S config-service -G spring
+WORKDIR /product-service
 ARG DEPENDENCY=product-service/target/dependency
 COPY ${DEPENDENCY}/BOOT-INF/lib ./app/lib
 COPY ${DEPENDENCY}/BOOT-INF/classes ./app
