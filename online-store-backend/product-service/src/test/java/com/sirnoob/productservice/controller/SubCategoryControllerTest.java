@@ -14,9 +14,9 @@ import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.mapper.ProductMapperImpl;
 import com.sirnoob.productservice.mapper.SubCategoryMapperImpl;
-import com.sirnoob.productservice.repository.IMainCategoryRepository;
-import com.sirnoob.productservice.repository.IProductRepository;
-import com.sirnoob.productservice.repository.ISubCategoryRepository;
+import com.sirnoob.productservice.repository.MainCategoryRepository;
+import com.sirnoob.productservice.repository.ProductRepository;
+import com.sirnoob.productservice.repository.SubCategoryRepository;
 import com.sirnoob.productservice.service.MainCategoryServiceImpl;
 import com.sirnoob.productservice.service.ProductServiceImpl;
 import com.sirnoob.productservice.service.SubCategoryServiceImpl;
@@ -41,13 +41,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 class SubCategoryControllerTest {
 
   @MockBean
-  private ISubCategoryRepository iSubCategoryRepository;
+  private SubCategoryRepository subCategoryRepository;
 
   @MockBean
-  private IMainCategoryRepository iMainCategoryRepository;
+  private MainCategoryRepository mainCategoryRepository;
 
   @MockBean
-  private IProductRepository iProductRepository;
+  private ProductRepository productRepository;
 
   @Autowired
   private MockMvc mockMvc;
@@ -59,19 +59,19 @@ class SubCategoryControllerTest {
 
   @BeforeEach
   public void setUp() {
-    BDDMockito.when(iMainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.of(MAIN_CATEGORY));
+    BDDMockito.when(mainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.of(MAIN_CATEGORY));
 
-    BDDMockito.when(iSubCategoryRepository.save(any(SubCategory.class))).thenReturn(SUB_CATEGORY);
+    BDDMockito.when(subCategoryRepository.save(any(SubCategory.class))).thenReturn(SUB_CATEGORY);
 
-    BDDMockito.when(iSubCategoryRepository.updateSubCategoryName(anyString(), anyLong())).thenReturn(1);
+    BDDMockito.when(subCategoryRepository.updateName(anyString(), anyLong())).thenReturn(1);
 
-    BDDMockito.when(iSubCategoryRepository.findById(anyLong())).thenReturn(Optional.of(SUB_CATEGORY));
+    BDDMockito.when(subCategoryRepository.findById(anyLong())).thenReturn(Optional.of(SUB_CATEGORY));
 
-    BDDMockito.doNothing().when(iSubCategoryRepository).delete(any(SubCategory.class));
+    BDDMockito.doNothing().when(subCategoryRepository).delete(any(SubCategory.class));
 
-    BDDMockito.when(iSubCategoryRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(SUB_CATEGORY)));
+    BDDMockito.when(subCategoryRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(SUB_CATEGORY)));
 
-    BDDMockito.when(iSubCategoryRepository.findBySubCategoryName(anyString())).thenReturn(Optional.of(SUB_CATEGORY));
+    BDDMockito.when(subCategoryRepository.findBySubCategoryName(anyString())).thenReturn(Optional.of(SUB_CATEGORY));
   }
 
   @Test
@@ -101,7 +101,7 @@ class SubCategoryControllerTest {
 
   @Test
   public void updateSubCategoryName_Return404StatusCode_WhenUpdateOperationReturnsZero() throws Exception{
-    BDDMockito.when(iSubCategoryRepository.updateSubCategoryName(anyString(), anyLong())).thenReturn(0);
+    BDDMockito.when(subCategoryRepository.updateName(anyString(), anyLong())).thenReturn(0);
 
     mockMvc.perform(put("/sub-categories/1?subCategoryName=subcategory").contentType(JSON)
                                             .content(OBJECT_MAPPER.writeValueAsString(createSubCategoryRequest())))
@@ -115,7 +115,7 @@ class SubCategoryControllerTest {
 
   @Test
   public void deleteSubCategory_Return404StatusCode_WhenSubCategoryWasNotFound() throws Exception{
-    BDDMockito.when(iSubCategoryRepository.findById(anyLong())).thenReturn(Optional.empty());
+    BDDMockito.when(subCategoryRepository.findById(anyLong())).thenReturn(Optional.empty());
 
     mockMvc.perform(delete("/sub-categories/1")).andExpect(status().isNotFound());
   }
@@ -129,7 +129,7 @@ class SubCategoryControllerTest {
 
   @Test
   public void getSubCategoryResponseByName_Return404StatusCode_WhenSubCategoryWasNotFound() throws Exception{
-    BDDMockito.when(iSubCategoryRepository.findBySubCategoryName(anyString())).thenReturn(Optional.empty());
+    BDDMockito.when(subCategoryRepository.findBySubCategoryName(anyString())).thenReturn(Optional.empty());
 
     mockMvc.perform(get("/sub-categories/subcategory").accept(JSON))
             .andExpect(status().isNotFound())
@@ -145,7 +145,7 @@ class SubCategoryControllerTest {
 
   @Test
   public void getAllSubCategories_Return404StatusCode_WhenNoSubCategoryAreFound() throws Exception{
-    BDDMockito.when(iSubCategoryRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
+    BDDMockito.when(subCategoryRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
 
     mockMvc.perform(get("/sub-categories?page=0&size=10").accept(JSON))
             .andExpect(status().isNotFound())

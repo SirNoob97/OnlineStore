@@ -30,8 +30,8 @@ import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
-import com.sirnoob.productservice.mapper.IProductMapper;
-import com.sirnoob.productservice.repository.IProductRepository;
+import com.sirnoob.productservice.mapper.ProductMapper;
+import com.sirnoob.productservice.repository.ProductRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,20 +57,20 @@ public class ProductServiceTest {
   private static final String PRODUCT = "Product";
 
   @Mock
-  ISubCategoryService iSubCategoryService;
+  SubCategoryService subCategoryService;
 
   @Mock
-  IProductRepository iProductRepository;
+  ProductRepository productRepository;
 
   @Mock
-  IProductMapper iProductMapper;
+  ProductMapper productMapper;
 
-  IProductService iProductService;
+  ProductService productService;
 
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
-    iProductService = new ProductServiceImpl(iSubCategoryService, iProductRepository, iProductMapper);
+    productService = new ProductServiceImpl(subCategoryService, productRepository, productMapper);
 
     Set<SubCategory> subCategories = Set.of(createSubCategory(), createSubCategory());
 
@@ -86,44 +86,44 @@ public class ProductServiceTest {
 
     PageImpl<ProductListView> productListViewPage = new PageImpl<>(List.of(productListView));
 
-    BDDMockito.when(iSubCategoryService.getSubcategoriesByName(any())).thenReturn(subCategories);
+    BDDMockito.when(subCategoryService.getSetByName(any())).thenReturn(subCategories);
 
-    BDDMockito.when(iProductMapper.mapProductRequestToProduct(any(ProductRequest.class), any(MainCategory.class), anySet())).thenReturn(product);
+    BDDMockito.when(productMapper.productRequestToProduct(any(ProductRequest.class), any(MainCategory.class), anySet())).thenReturn(product);
 
-    BDDMockito.when(iProductRepository.save(any(Product.class))).thenReturn(product);
+    BDDMockito.when(productRepository.save(any(Product.class))).thenReturn(product);
 
-    BDDMockito.when(iProductMapper.mapProductToProductResponse(any(Product.class))).thenReturn(productResponse);
+    BDDMockito.when(productMapper.productToProductResponse(any(Product.class))).thenReturn(productResponse);
 
-    BDDMockito.when(iProductRepository.updateProductStockByProductBarCode(anyInt(), anyLong())).thenReturn(1);
+    BDDMockito.when(productRepository.updateStockByBarCode(anyInt(), anyLong())).thenReturn(1);
 
-    BDDMockito.doNothing().when(iProductRepository).delete(any(Product.class));
+    BDDMockito.doNothing().when(productRepository).delete(any(Product.class));
 
-    BDDMockito.when(iProductRepository.findByProductBarCodeOrProductName(anyLong(), anyString())).thenReturn(Optional.of(product));
+    BDDMockito.when(productRepository.findByProductBarCodeOrProductName(anyLong(), anyString())).thenReturn(Optional.of(product));
 
-    BDDMockito.when(iProductRepository.findProductForInvoice(anyLong(), anyString())).thenReturn(Optional.of(productForInvoiceResponse));
+    BDDMockito.when(productRepository.findForInvoice(anyLong(), anyString())).thenReturn(Optional.of(productForInvoiceResponse));
 
-    BDDMockito.when(iProductRepository.findById(anyLong())).thenReturn(Optional.of(product));
+    BDDMockito.when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
 
-    BDDMockito.when(iProductRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of(product));
+    BDDMockito.when(productRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of(product));
 
-    BDDMockito.when(iProductRepository.findByProductName(anyString())).thenReturn(Optional.of(product));
+    BDDMockito.when(productRepository.findByProductName(anyString())).thenReturn(Optional.of(product));
 
-    BDDMockito.when(iProductMapper.mapProductToProductView(any(Product.class))).thenReturn(productView);
+    BDDMockito.when(productMapper.productToProductView(any(Product.class))).thenReturn(productView);
 
-    BDDMockito.when(iProductRepository.findByProductNameContainingIgnoreCase(anyString(), any(Pageable.class))).thenReturn(productListViewPage);
+    BDDMockito.when(productRepository.findByProductNameContainingIgnoreCase(anyString(), any(Pageable.class))).thenReturn(productListViewPage);
 
-    BDDMockito.when(iProductRepository.getAll(any(Pageable.class))).thenReturn(productListViewPage);
+    BDDMockito.when(productRepository.getAll(any(Pageable.class))).thenReturn(productListViewPage);
 
-    BDDMockito.when(iProductRepository.findByMainCategoryMainCategoryId(anyLong(), any(Pageable.class))).thenReturn(productListViewPage);
+    BDDMockito.when(productRepository.findByMainCategoryMainCategoryId(anyLong(), any(Pageable.class))).thenReturn(productListViewPage);
 
-    BDDMockito.when(iSubCategoryService.getSubcategoriesByName(any())).thenReturn(subCategories);
+    BDDMockito.when(subCategoryService.getSetByName(any())).thenReturn(subCategories);
 
-    BDDMockito.when(iProductRepository.findBySubCategory(any(SubCategory.class))).thenReturn(List.of(productListView));
+    BDDMockito.when(productRepository.findBySubCategory(any(SubCategory.class))).thenReturn(List.of(productListView));
   }
 
   @Test
   public void createProduct_CreateProduct_WhenSuccessful() {
-    ProductResponse productSaved = iProductService.createProduct(createProductRequest(), createMainCategoryStaticValues());
+    ProductResponse productSaved = productService.create(createProductRequest(), createMainCategoryStaticValues());
 
     assertThat(productSaved).isNotNull();
     assertThat(productSaved.getProductStatus()).isEqualTo("CREATED");
@@ -134,7 +134,7 @@ public class ProductServiceTest {
 
   @Test
   public void updateProduct_UpdateAnExistingProduct_WhenSuccessful() {
-    ProductResponse productUpdated = iProductService.updateProduct(1L, createProductRequest(), createMainCategoryStaticValues());
+    ProductResponse productUpdated = productService.update(1L, createProductRequest(), createMainCategoryStaticValues());
 
     assertThat(productUpdated).isNotNull();
     assertThat(productUpdated.getMainCategoryName()).isNotNull();
@@ -144,26 +144,26 @@ public class ProductServiceTest {
 
   @Test
   public void updateProductStock_UpdateStockOfAnExistingProduct_WhenSuccessful() {
-    assertThatCode(() -> iProductService.updateProductStock(1L, 100)).doesNotThrowAnyException();
+    assertThatCode(() -> productService.updateStock(1L, 100)).doesNotThrowAnyException();
   }
 
   @Test
   public void updateProductStock_ThrowResourceNotFoundException_WhenTheReturnOfTheQueryIsLessThanOne() {
-    BDDMockito.when(iProductRepository.updateProductStockByProductBarCode(anyInt(), anyLong()))
+    BDDMockito.when(productRepository.updateStockByBarCode(anyInt(), anyLong()))
         .thenThrow(new ResourceNotFoundException(PRODUCT_NOT_FOUND));
 
-    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> iProductService.updateProductStock(-1L, 0))
+    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> productService.updateStock(-1L, 0))
       .withMessage(PRODUCT_NOT_FOUND);
   }
 
   @Test
   public void deleteProductById_RemovesAProduct_WhenSuccessful() {
-    assertThatCode(() -> iProductService.deleteProductById(1L)).doesNotThrowAnyException();
+    assertThatCode(() -> productService.deleteById(1L)).doesNotThrowAnyException();
   }
 
   @Test
   public void getProductResponseByBarCodeOrProductName_ReturnAProductResponse_WhenSuccessful() {
-    ProductResponse productFetchedByName = iProductService.getProductResponseByBarCodeOrProductName(-1L,
+    ProductResponse productFetchedByName = productService.getProductResponseByBarCodeOrProductName(-1L,
       PRODUCT);
 
     assertThat(productFetchedByName).isNotNull();
@@ -173,17 +173,17 @@ public class ProductServiceTest {
 
   @Test
   public void getProductResponseByBarCodeOrProductName_ThrowResourceNotFoundException_WhenProductNotFound() {
-    BDDMockito.when(iProductRepository.findByProductBarCodeOrProductName(anyLong(), anyString()))
+    BDDMockito.when(productRepository.findByProductBarCodeOrProductName(anyLong(), anyString()))
         .thenThrow(new ResourceNotFoundException(PRODUCT_NOT_FOUND));
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-      .isThrownBy(() -> iProductService.getProductResponseByBarCodeOrProductName(-1L, "")).withMessage(PRODUCT_NOT_FOUND);
+      .isThrownBy(() -> productService.getProductResponseByBarCodeOrProductName(-1L, "")).withMessage(PRODUCT_NOT_FOUND);
   }
 
   @Test
   public void getProductForInvoiceResponse_ReturnAProductInvoiceResponse_WhenSuccessful() {
-    ProductInvoiceResponse productForInvoiceResponse = iProductService
-      .getProductForInvoiceResponse(1L, PRODUCT);
+    ProductInvoiceResponse productForInvoiceResponse = productService
+      .getForInvoiceResponse(1L, PRODUCT);
 
     assertThat(productForInvoiceResponse).isNotNull();
     assertThat(productForInvoiceResponse.getProductName()).isNotNull();
@@ -192,16 +192,16 @@ public class ProductServiceTest {
 
   @Test
   public void getProductForInvoiceResponse_ThrowResourceNotFoundException_WhenProductNotFound() {
-    BDDMockito.when(iProductRepository.findProductForInvoice(anyLong(), anyString()))
+    BDDMockito.when(productRepository.findForInvoice(anyLong(), anyString()))
         .thenThrow(new ResourceNotFoundException(PRODUCT_NOT_FOUND));
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-      .isThrownBy(() -> iProductService.getProductForInvoiceResponse(-1L, "")).withMessage(PRODUCT_NOT_FOUND);
+      .isThrownBy(() -> productService.getForInvoiceResponse(-1L, "")).withMessage(PRODUCT_NOT_FOUND);
   }
 
   @Test
   public void getProductById_ReturnAProduct_WhenSuccessful() {
-    Product productFetchedById = iProductService.getProductById(1L);
+    Product productFetchedById = productService.getById(1L);
 
     assertThat(productFetchedById).isNotNull();
     assertThat(productFetchedById.getMainCategory()).isNotNull();
@@ -210,15 +210,15 @@ public class ProductServiceTest {
 
   @Test
   public void getProductById_ThrowResourceNotFoundException_WhenProductWasNotFound() {
-    BDDMockito.when(iProductRepository.findById(anyLong())).thenThrow(new ResourceNotFoundException(PRODUCT_NOT_FOUND));
+    BDDMockito.when(productRepository.findById(anyLong())).thenThrow(new ResourceNotFoundException(PRODUCT_NOT_FOUND));
 
-    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> iProductService.getProductById(-1L))
+    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> productService.getById(-1L))
       .withMessage(PRODUCT_NOT_FOUND);
   }
 
   @Test
   public void getProductByMainCategory_ReturnAListOfProduct_WhenSuccessful() {
-    List<Product> products = iProductService.getProductByMainCategory(1L);
+    List<Product> products = productService.getByMainCategory(1L);
 
     assertThat(products).isNotNull();
     assertThat(products.isEmpty()).isFalse();
@@ -226,9 +226,9 @@ public class ProductServiceTest {
 
   @Test
   public void getProductByMainCategory_ReturnAnEmptyProductList_WhenTheMainCategoryHasNoProducts() {
-    BDDMockito.when(iProductRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of());
+    BDDMockito.when(productRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of());
 
-    List<Product> products = iProductService.getProductByMainCategory(1L);
+    List<Product> products = productService.getByMainCategory(1L);
 
     assertThat(products).isNotNull();
     assertThat(products.isEmpty()).isTrue();
@@ -236,7 +236,7 @@ public class ProductServiceTest {
 
   @Test
   public void findProductViewByName_ReturnAProductView_WhenSuccessful() {
-    ProductView productView = iProductService.getProductViewByName(PRODUCT);
+    ProductView productView = productService.getProductViewByName(PRODUCT);
 
     assertThat(productView).isNotNull();
     assertThat(productView.getMainCategoryName()).isNotNull();
@@ -245,15 +245,15 @@ public class ProductServiceTest {
 
   @Test
   public void findProductViewByName_ThrowResourceNotFoundException_WhenProductNotFound() {
-    BDDMockito.when(iProductRepository.findByProductName(anyString())).thenThrow(new ResourceNotFoundException(PRODUCT_NOT_FOUND));
+    BDDMockito.when(productRepository.findByProductName(anyString())).thenThrow(new ResourceNotFoundException(PRODUCT_NOT_FOUND));
 
-    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> iProductService.getProductViewByName(""))
+    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> productService.getProductViewByName(""))
       .withMessage(PRODUCT_NOT_FOUND);
   }
 
   @Test
   public void getProductListViewByName_ReturnAPageProductListView_WhenSuccessful() {
-    Page<ProductListView> products = iProductService.getPageOfProductListViewByName("sa", PageRequest.of(0, 10));
+    Page<ProductListView> products = productService.getListViewByName("sa", PageRequest.of(0, 10));
 
     assertThat(products).isNotNull();
     assertThat(products.isEmpty()).isFalse();
@@ -261,17 +261,17 @@ public class ProductServiceTest {
 
   @Test
   public void getPageOfProductListViewByName_ThrowResourceNotFoundException_WhenTheNamesDoNotMatch() {
-    BDDMockito.when(iProductRepository.findByProductNameContainingIgnoreCase(anyString(), any(Pageable.class)))
+    BDDMockito.when(productRepository.findByProductNameContainingIgnoreCase(anyString(), any(Pageable.class)))
         .thenThrow(new ResourceNotFoundException(NO_PRODUCTS_FOUND));
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-      .isThrownBy(() -> iProductService.getPageOfProductListViewByName("?>~!#", PageRequest.of(0, 10)))
+      .isThrownBy(() -> productService.getListViewByName("?>~!#", PageRequest.of(0, 10)))
       .withMessage(NO_PRODUCTS_FOUND);
   }
 
   @Test
   public void getPageOfProductListView_ReturnAPageProductListView_WhenSuccessful() {
-    Page<ProductListView> products = iProductService.getPageOfProductListView(PageRequest.of(0, 10));
+    Page<ProductListView> products = productService.getListView(PageRequest.of(0, 10));
 
     assertThat(products).isNotNull();
     assertThat(products.isEmpty()).isFalse();
@@ -279,15 +279,15 @@ public class ProductServiceTest {
 
   @Test
   public void getPageOfProductListView_ThrowResourceNotFoundException_WhenThereAreNoProductsInTheRegistry() {
-    BDDMockito.when(iProductRepository.getAll(any(Pageable.class))).thenThrow(new ResourceNotFoundException(NO_PRODUCTS_FOUND));
+    BDDMockito.when(productRepository.getAll(any(Pageable.class))).thenThrow(new ResourceNotFoundException(NO_PRODUCTS_FOUND));
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-      .isThrownBy(() -> iProductService.getPageOfProductListView(PageRequest.of(0, 10))).withMessage(NO_PRODUCTS_FOUND);
+      .isThrownBy(() -> productService.getListView(PageRequest.of(0, 10))).withMessage(NO_PRODUCTS_FOUND);
   }
 
   @Test
   public void getPageOfProductListViewByMainCategory_ReturnAPageProductListView_WhenSuccessful() {
-    Page<ProductListView> products = iProductService.getPageOfProductListViewByMainCategory(1L, PageRequest.of(0, 10));
+    Page<ProductListView> products = productService.getListViewByMainCategory(1L, PageRequest.of(0, 10));
 
     assertThat(products).isNotNull();
     assertThat(products.isEmpty()).isFalse();
@@ -295,11 +295,11 @@ public class ProductServiceTest {
 
   @Test
   public void getPageOfProductListViewByMainCategory_ThrowResourceNotFoundException_WhenTheMainCategoryHasNoProducts() {
-    BDDMockito.when(iProductRepository.findByMainCategoryMainCategoryId(anyLong(), any(Pageable.class)))
+    BDDMockito.when(productRepository.findByMainCategoryMainCategoryId(anyLong(), any(Pageable.class)))
         .thenThrow(new ResourceNotFoundException(NO_PRODUCTS_FOUND));
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-        .isThrownBy(() -> iProductService.getPageOfProductListViewByMainCategory(1L, PageRequest.of(0, 10)))
+        .isThrownBy(() -> productService.getListViewByMainCategory(1L, PageRequest.of(0, 10)))
         .withMessage(NO_PRODUCTS_FOUND);
   }
 
@@ -307,7 +307,7 @@ public class ProductServiceTest {
   public void getSetOfProductListViewBySubCategory_ReturnASetProductListView_WhenSuccessful() {
     String[] subcategories = { "Sub Category 1" };
 
-    Set<ProductListView> products = iProductService.getSetOfProductListViewBySubCategory(subcategories);
+    Set<ProductListView> products = productService.getListViewBySubCategory(subcategories);
 
     assertThat(products).isNotNull();
     assertThat(products.isEmpty()).isFalse();
@@ -317,9 +317,9 @@ public class ProductServiceTest {
   public void getSetOfProductListViewBySubCategory_ThrowResourceNotFoundException_WhenTheSubCategoryOrSubCategoriesHasNoProducts() {
     String[] subcategories = { "Sub Category 1", "Sub Category 2" };
 
-    BDDMockito.when(iProductRepository.findBySubCategory(any(SubCategory.class))).thenReturn(List.of());
+    BDDMockito.when(productRepository.findBySubCategory(any(SubCategory.class))).thenReturn(List.of());
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-      .isThrownBy(() -> iProductService.getSetOfProductListViewBySubCategory(subcategories)).withMessage(NO_PRODUCTS_FOUND);
+      .isThrownBy(() -> productService.getListViewBySubCategory(subcategories)).withMessage(NO_PRODUCTS_FOUND);
   }
 }

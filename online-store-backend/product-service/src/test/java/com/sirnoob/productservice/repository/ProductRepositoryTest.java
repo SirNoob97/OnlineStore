@@ -6,8 +6,6 @@ import static com.sirnoob.productservice.util.RandomEntityGenerator.createSubCat
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import com.sirnoob.productservice.dto.ProductInvoiceResponse;
@@ -28,16 +25,16 @@ import com.sirnoob.productservice.entity.SubCategory;
 class ProductRepositoryTest {
 
   @Autowired
-  private IProductRepository iProductRepository;
+  private ProductRepository productRepository;
   @Autowired
-  private IMainCategoryRepository iMainCategoryRepository;
+  private MainCategoryRepository mainCategoryRepository;
   @Autowired
-  private ISubCategoryRepository iSubCategoryRepository;
+  private SubCategoryRepository subCategoryRepository;
 
   @Test
   public void save_PersistProduct_WhenSuccessful() {
     Product product = createProduct();
-    Product savedProduct = iProductRepository.save(product);
+    Product savedProduct = productRepository.save(product);
 
     assertThat(savedProduct.getProductId()).isNotNull();
     assertThat(savedProduct.getProductId()).isNotEqualTo(product.getProductId());
@@ -49,12 +46,12 @@ class ProductRepositoryTest {
   public void save_ThrowDataIntegrityViolationException_WhenProductIsEmpty() {
     Product product = new Product();
 
-    assertThatExceptionOfType(DataIntegrityViolationException.class).isThrownBy(() -> iProductRepository.save(product));
+    assertThatExceptionOfType(DataIntegrityViolationException.class).isThrownBy(() -> productRepository.save(product));
   }
 
   @Test
   public void save_ThrowInvalidDataAccessApiUsageException_WhenProductIsNull() {
-    assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> iProductRepository.save(null));
+    assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> productRepository.save(null));
   }
 
   @Test
@@ -66,26 +63,26 @@ class ProductRepositoryTest {
     productSaved.setMainCategory(mainCategory);
 
     assertThatExceptionOfType(DataIntegrityViolationException.class)
-        .isThrownBy(() -> iProductRepository.save(productSaved));
+        .isThrownBy(() -> productRepository.save(productSaved));
   }
 
   @Test
   public void save_ThrowUnsupportedOperationException_WhenSubCategoryIsAddedToAProductAfterItHasBeenPersisted() {
-    Product productSaved = iProductRepository.save(createProduct());
+    Product productSaved = productRepository.save(createProduct());
 
-    SubCategory subCategory = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
-    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
-    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory2 = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory3 = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
     productSaved.setSubCategories(Set.of(subCategory, subCategory2, subCategory3));
 
     assertThatExceptionOfType(UnsupportedOperationException.class)
-        .isThrownBy(() -> iProductRepository.save(productSaved));
+        .isThrownBy(() -> productRepository.save(productSaved));
   }
 
   @Test
   public void save_UpdateProduct_WhenSuccessful() {
-    Product productToUpdate = iProductRepository.save(createProduct());
+    Product productToUpdate = productRepository.save(createProduct());
 
     String name = productToUpdate.getProductName();
     String status = productToUpdate.getProductStatus();
@@ -93,7 +90,7 @@ class ProductRepositoryTest {
     productToUpdate.setProductName("Test");
     productToUpdate.setProductStatus("TEST");
 
-    iProductRepository.save(productToUpdate);
+    productRepository.save(productToUpdate);
 
     assertThat(productToUpdate.getProductId()).isNotNull();
     assertThat(productToUpdate.getProductName()).isNotEqualToIgnoringCase(name);
@@ -104,11 +101,11 @@ class ProductRepositoryTest {
 
   @Test
   public void delete_RemoveProduct_WhenSuccessful() {
-    Product productToDelete = iProductRepository.save(createProduct());
+    Product productToDelete = productRepository.save(createProduct());
 
-    iProductRepository.delete(productToDelete);
+    productRepository.delete(productToDelete);
 
-    Optional<Product> productOptional = iProductRepository.findById(productToDelete.getProductId());
+    var productOptional = productRepository.findById(productToDelete.getProductId());
 
     assertThat(productToDelete.getProductId()).isNotNull();
     assertThat(productOptional.isEmpty()).isTrue();
@@ -116,16 +113,16 @@ class ProductRepositoryTest {
 
   @Test
   public void delete_ThrowInvalidDataAccessApiUsageException_WhenProductIsNull() {
-    assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> iProductRepository.delete(null));
+    assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> productRepository.delete(null));
   }
 
   @Test
   public void findByProductName_ReturnProduct_WhenSuccessful() {
-    Product productSaved = iProductRepository.save(createProduct());
+    Product productSaved = productRepository.save(createProduct());
 
     String name = productSaved.getProductName();
 
-    Optional<Product> productOptional = iProductRepository.findByProductName(name);
+    var productOptional = productRepository.findByProductName(name);
 
     assertThat(productOptional.isPresent()).isTrue();
     assertThat(productOptional.get().getProductName()).isEqualTo(name);
@@ -133,20 +130,20 @@ class ProductRepositoryTest {
 
   @Test
   public void findByProductName_ReturnEmptyOptionalProduct_WhenTheNamesNotMatches() {
-    Product productSaved = iProductRepository.save(createProduct());
+    Product productSaved = productRepository.save(createProduct());
 
-    Optional<Product> productOptional = iProductRepository.findByProductName(productSaved.getProductName() + "TEST");
+    var productOptional = productRepository.findByProductName(productSaved.getProductName() + "TEST");
 
     assertThat(productOptional.isEmpty()).isTrue();
   }
 
   @Test
   public void findByProductNameOrProductBarCode_ReturnPresentOptionalProduct_WhenSuccessful() {
-    Product productSaved = iProductRepository.save(createProduct());
+    Product productSaved = productRepository.save(createProduct());
 
-    Optional<Product> productFetchedByName = iProductRepository.findByProductBarCodeOrProductName(-1L,
+    var productFetchedByName = productRepository.findByProductBarCodeOrProductName(-1L,
         productSaved.getProductName());
-    Optional<Product> productFetchedByBarCode = iProductRepository
+    var productFetchedByBarCode = productRepository
         .findByProductBarCodeOrProductName(productSaved.getProductBarCode(), "");
 
     assertThat(productFetchedByName.isPresent()).isTrue();
@@ -157,30 +154,30 @@ class ProductRepositoryTest {
 
   @Test
   public void findByProductNameOrProductBarCode_ReturnEmptyOptionalProduct_WhenNamesOrBarCodeNotMatches() {
-    iProductRepository.save(createProduct());
+    productRepository.save(createProduct());
 
-    Optional<Product> productFetchedByNameOrBarCode = iProductRepository.findByProductBarCodeOrProductName(-1L, " ");
+    var productFetchedByNameOrBarCode = productRepository.findByProductBarCodeOrProductName(-1L, " ");
 
     assertThat(productFetchedByNameOrBarCode.isEmpty()).isTrue();
   }
 
   @Test
   public void findByMainCategory_ReturnProductList_WhenSuccessful() {
-    Product product1 = iProductRepository.save(createProduct());
-    Product product2 = iProductRepository.save(createProduct());
-    Product product3 = iProductRepository.save(createProduct());
+    Product product1 = productRepository.save(createProduct());
+    Product product2 = productRepository.save(createProduct());
+    Product product3 = productRepository.save(createProduct());
 
-    MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
+    MainCategory mainCategory = mainCategoryRepository.save(createMainCategory());
 
     product1.setMainCategory(mainCategory);
     product2.setMainCategory(mainCategory);
     product3.setMainCategory(mainCategory);
 
-    iProductRepository.save(product1);
-    iProductRepository.save(product2);
-    iProductRepository.save(product3);
+    productRepository.save(product1);
+    productRepository.save(product2);
+    productRepository.save(product3);
 
-    List<Product> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId());
+    var productsFetchedByMainCategory = productRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId());
 
     int productCount = productsFetchedByMainCategory.size();
 
@@ -190,30 +187,30 @@ class ProductRepositoryTest {
 
   @Test
   public void findByMainCategory_ReturnEmptyProductList_WhenMainCategoryIsSavedButDoenstContainsProduct() {
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
 
-    MainCategory mainCategorySaved = iMainCategoryRepository.save(createMainCategory());
+    MainCategory mainCategorySaved = mainCategoryRepository.save(createMainCategory());
 
-    List<Product> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(mainCategorySaved.getMainCategoryId());
+    var productsFetchedByMainCategory = productRepository.findByMainCategoryMainCategoryId(mainCategorySaved.getMainCategoryId());
 
     assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
   }
 
   @Test
   public void findByMainCategory_ReturnEmptyProductList_WhenMainCategoryIsNotSaved() {
-    List<Product> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(createMainCategory().getMainCategoryId());
+    var productsFetchedByMainCategory = productRepository.findByMainCategoryMainCategoryId(createMainCategory().getMainCategoryId());
 
     assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
   }
 
   @Test
   public void findProductForInvoice_ReturnPresentProductInvoiceResponse_WhenSuccessful() {
-    Product productSaved = iProductRepository.save(createProduct());
+    Product productSaved = productRepository.save(createProduct());
 
-    Optional<ProductInvoiceResponse> productInvoiceResponse = iProductRepository
-        .findProductForInvoice(productSaved.getProductBarCode(), productSaved.getProductName());
+    var productInvoiceResponse = productRepository
+        .findForInvoice(productSaved.getProductBarCode(), productSaved.getProductName());
 
     assertThat(productInvoiceResponse.isPresent()).isTrue();
     assertThat(productInvoiceResponse.get().getClass()).isEqualTo(ProductInvoiceResponse.class);
@@ -223,24 +220,24 @@ class ProductRepositoryTest {
 
   @Test
   public void findProductForInvoice_ReturnEmptyProductInvoiceResponse_WhenNamesAndBarCodeNotMatches() {
-    iProductRepository.save(createProduct());
+    productRepository.save(createProduct());
 
-    Optional<ProductInvoiceResponse> productInvoiceResponse = iProductRepository.findProductForInvoice(0L, "");
+    var productInvoiceResponse = productRepository.findForInvoice(0L, "");
 
     assertThat(productInvoiceResponse.isEmpty()).isTrue();
   }
 
   @Test
   public void getAll_ReturnPageOfProductListView_WhenSuccessful() {
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
 
     int size = 3;
 
-    Page<ProductListView> pageOfProducts = iProductRepository.getAll(PageRequest.of(0, size));
+    var pageOfProducts = productRepository.getAll(PageRequest.of(0, size));
 
     assertThat(pageOfProducts.isEmpty()).isFalse();
     assertThat(pageOfProducts.getSize()).isEqualTo(size);
@@ -249,28 +246,28 @@ class ProductRepositoryTest {
 
   @Test
   public void getAll_ReturnEmptyPageOfProductListView_WhenThereAreNoRecordsInTheProductTable() {
-    iProductRepository.deleteAllInBatch();
-    Page<ProductListView> pageOfProducts = iProductRepository.getAll(PageRequest.of(0, 10));
+    productRepository.deleteAllInBatch();
+    var pageOfProducts = productRepository.getAll(PageRequest.of(0, 10));
 
     assertThat(pageOfProducts.isEmpty()).isTrue();
   }
 
   @Test
   public void listByName_ReturnPageOfProductListView_WhenTheProductNameMatchesTheSearchParameter() {
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
 
     int size = 5;
 
-    Page<ProductListView> products = iProductRepository.findByProductNameContainingIgnoreCase("mo", PageRequest.of(0, 5));
+    var products = productRepository.findByProductNameContainingIgnoreCase("mo", PageRequest.of(0, 5));
 
     assertThat(products.isEmpty()).isFalse();
     assertThat(products.getSize()).isEqualTo(size);
@@ -279,28 +276,28 @@ class ProductRepositoryTest {
 
   @Test
   public void listByName_ReturnEmptyPageOfProductListView_WhenTheProductNameNotMatchesTheSearchParameter() {
-    Page<ProductListView> products = iProductRepository.findByProductNameContainingIgnoreCase("asdf", PageRequest.of(0, 5));
+    var products = productRepository.findByProductNameContainingIgnoreCase("asdf", PageRequest.of(0, 5));
 
     assertThat(products.isEmpty()).isTrue();
   }
 
   @Test
   public void findByMainCategory_ReturnPageOfProductListView_WhenSuccessful() {
-    Product product1 = iProductRepository.save(createProduct());
-    Product product2 = iProductRepository.save(createProduct());
-    Product product3 = iProductRepository.save(createProduct());
+    Product product1 = productRepository.save(createProduct());
+    Product product2 = productRepository.save(createProduct());
+    Product product3 = productRepository.save(createProduct());
 
-    MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
+    MainCategory mainCategory = mainCategoryRepository.save(createMainCategory());
 
     product1.setMainCategory(mainCategory);
     product2.setMainCategory(mainCategory);
     product3.setMainCategory(mainCategory);
 
-    iProductRepository.save(product1);
-    iProductRepository.save(product2);
-    iProductRepository.save(product3);
+    productRepository.save(product1);
+    productRepository.save(product2);
+    productRepository.save(product3);
 
-    Page<ProductListView> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId(),
+    var productsFetchedByMainCategory = productRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId(),
         PageRequest.of(0, 10));
 
     int productCount = productsFetchedByMainCategory.getSize();
@@ -312,11 +309,11 @@ class ProductRepositoryTest {
 
   @Test
   public void findByMainCategory_ReturnEmptyProductListView_WhenMainCategoryIsNotSaved() {
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
-    iProductRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
+    productRepository.save(createProduct());
 
-    Page<ProductListView> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(createMainCategory().getMainCategoryId(),
+    var productsFetchedByMainCategory = productRepository.findByMainCategoryMainCategoryId(createMainCategory().getMainCategoryId(),
         PageRequest.of(0, 10));
 
     assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
@@ -324,9 +321,9 @@ class ProductRepositoryTest {
 
   @Test
   public void findByMainCategory_ReturnEmptyProductListView_WhenMainCategoryIsSavedButDoesNotContainsProduct() {
-    MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
+    MainCategory mainCategory = mainCategoryRepository.save(createMainCategory());
 
-    Page<ProductListView> productsFetchedByMainCategory = iProductRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId(),
+    var productsFetchedByMainCategory = productRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId(),
         PageRequest.of(0, 10));
 
     assertThat(productsFetchedByMainCategory.isEmpty()).isTrue();
@@ -340,10 +337,10 @@ class ProductRepositoryTest {
     Product product4 = createProduct();
     Product product5 = createProduct();
 
-    SubCategory subCategory = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
-    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
-    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
-    SubCategory subCategory4 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory2 = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory3 = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory4 = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
     product1.setSubCategories(Set.of(subCategory, subCategory2));
     product2.setSubCategories(Set.of(subCategory, subCategory3));
@@ -352,13 +349,13 @@ class ProductRepositoryTest {
     product4.setSubCategories(Set.of(subCategory2, subCategory4));
     product5.setSubCategories(Set.of(subCategory3, subCategory4));
 
-    iProductRepository.save(product1);
-    iProductRepository.save(product2);
-    iProductRepository.save(product3);
-    iProductRepository.save(product4);
-    iProductRepository.save(product5);
+    productRepository.save(product1);
+    productRepository.save(product2);
+    productRepository.save(product3);
+    productRepository.save(product4);
+    productRepository.save(product5);
 
-    List<ProductListView> productsFetchedBySubCategory = iProductRepository.findBySubCategory(subCategory);
+    var productsFetchedBySubCategory = productRepository.findBySubCategory(subCategory);
 
     assertThat(productsFetchedBySubCategory.isEmpty()).isFalse();
     assertThat(productsFetchedBySubCategory.size()).isEqualTo(3);
@@ -370,20 +367,20 @@ class ProductRepositoryTest {
     Product product2 = createProduct();
     Product product3 = createProduct();
 
-    SubCategory subCategory = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
-    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
-    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
-    SubCategory subCategory4 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory2 = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory3 = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory4 = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
     product1.setSubCategories(Set.of(subCategory, subCategory2));
     product2.setSubCategories(Set.of(subCategory, subCategory3));
     product3.setSubCategories(Set.of(subCategory3, subCategory2));
 
-    iProductRepository.save(product1);
-    iProductRepository.save(product2);
-    iProductRepository.save(product3);
+    productRepository.save(product1);
+    productRepository.save(product2);
+    productRepository.save(product3);
 
-    List<ProductListView> productsFetchedBySubCategory = iProductRepository.findBySubCategory(subCategory4);
+    var productsFetchedBySubCategory = productRepository.findBySubCategory(subCategory4);
 
     assertThat(productsFetchedBySubCategory.isEmpty()).isTrue();
   }
@@ -394,31 +391,31 @@ class ProductRepositoryTest {
     Product product2 = createProduct();
     Product product3 = createProduct();
 
-    SubCategory subCategory = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
-    SubCategory subCategory2 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
-    SubCategory subCategory3 = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory2 = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategory3 = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
     product1.setSubCategories(Set.of(subCategory, subCategory2));
     product2.setSubCategories(Set.of(subCategory, subCategory3));
     product3.setSubCategories(Set.of(subCategory3, subCategory2));
 
-    iProductRepository.save(product1);
-    iProductRepository.save(product2);
-    iProductRepository.save(product3);
+    productRepository.save(product1);
+    productRepository.save(product2);
+    productRepository.save(product3);
 
-    List<ProductListView> productsFetchedBySubCategory = iProductRepository.findBySubCategory(createSubCategory());
+    var productsFetchedBySubCategory = productRepository.findBySubCategory(createSubCategory());
 
     assertThat(productsFetchedBySubCategory.isEmpty()).isTrue();
   }
 
   @Test
   public void updateProductStockByProductBarCode_ReturnAnIntegerGreaterThanZero_WhenSuccessful() {
-    Product productSaved = iProductRepository.save(createProduct());
+    Product productSaved = productRepository.save(createProduct());
 
-    Integer returnFromUpdateOperation = iProductRepository.updateProductStockByProductBarCode(100,
+    Integer returnFromUpdateOperation = productRepository.updateStockByBarCode(100,
         productSaved.getProductBarCode());
 
-    Product productWithUpdatedStock = iProductRepository.findById(productSaved.getProductId()).get();
+    Product productWithUpdatedStock = productRepository.findById(productSaved.getProductId()).get();
 
     assertThat(returnFromUpdateOperation).isNotNull();
     assertThat(returnFromUpdateOperation).isGreaterThan(0);
@@ -427,7 +424,7 @@ class ProductRepositoryTest {
 
   @Test
   public void updateProductStockByProductBarCode_ReturnZero_WhenNoProductHasThatBarCode() {
-    Integer returnFromUpdateOperation = iProductRepository.updateProductStockByProductBarCode(100, -1L);
+    Integer returnFromUpdateOperation = productRepository.updateStockByBarCode(100, -1L);
 
     assertThat(returnFromUpdateOperation).isNotNull();
     assertThat(returnFromUpdateOperation).isEqualTo(0);
@@ -435,7 +432,7 @@ class ProductRepositoryTest {
 
   @Test
   public void updateProductStockByProductBarCode_ReturnZero_WhenProductBarCodeIsNull() {
-    Integer returnFromUpdateOperation = iProductRepository.updateProductStockByProductBarCode(100, null);
+    Integer returnFromUpdateOperation = productRepository.updateStockByBarCode(100, null);
 
     assertThat(returnFromUpdateOperation).isNotNull();
     assertThat(returnFromUpdateOperation).isEqualTo(0);
@@ -444,7 +441,7 @@ class ProductRepositoryTest {
   private SubCategory createSubCategoryWithPersistedMainCategory(){
     SubCategory subCategory = createSubCategory();
 
-    MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
+    MainCategory mainCategory = mainCategoryRepository.save(createMainCategory());
 
     subCategory.setMainCategory(mainCategory);
 

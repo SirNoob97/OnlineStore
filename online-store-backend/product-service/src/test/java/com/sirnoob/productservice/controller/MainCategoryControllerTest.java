@@ -22,9 +22,9 @@ import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.mapper.ProductMapperImpl;
 import com.sirnoob.productservice.mapper.SubCategoryMapperImpl;
-import com.sirnoob.productservice.repository.IMainCategoryRepository;
-import com.sirnoob.productservice.repository.IProductRepository;
-import com.sirnoob.productservice.repository.ISubCategoryRepository;
+import com.sirnoob.productservice.repository.MainCategoryRepository;
+import com.sirnoob.productservice.repository.ProductRepository;
+import com.sirnoob.productservice.repository.SubCategoryRepository;
 import com.sirnoob.productservice.service.MainCategoryServiceImpl;
 import com.sirnoob.productservice.service.ProductServiceImpl;
 import com.sirnoob.productservice.service.SubCategoryServiceImpl;
@@ -47,13 +47,13 @@ import org.springframework.test.web.servlet.MockMvc;
 class MainCategoryControllerTest {
 
   @MockBean
-  private IMainCategoryRepository iMainCategoryRepository;
+  private MainCategoryRepository mainCategoryRepository;
 
   @MockBean
-  private ISubCategoryRepository iSubCategoryRespository;
+  private SubCategoryRepository subCategoryRespository;
 
   @MockBean
-  private IProductRepository iProductRepository;
+  private ProductRepository productRepository;
 
   @Autowired
   private MockMvc mockMvc;
@@ -66,21 +66,21 @@ class MainCategoryControllerTest {
 
   @BeforeEach
   public void setUp() {
-    BDDMockito.when(iMainCategoryRepository.save(any(MainCategory.class))).thenReturn(MAINCATEGORY);
+    BDDMockito.when(mainCategoryRepository.save(any(MainCategory.class))).thenReturn(MAINCATEGORY);
 
-    BDDMockito.when(iMainCategoryRepository.updateMainCategoryName(anyString(), anyLong())).thenReturn(1);
+    BDDMockito.when(mainCategoryRepository.updateName(anyString(), anyLong())).thenReturn(1);
 
-    BDDMockito.when(iSubCategoryRespository.findById(anyLong())).thenReturn(Optional.of(SUBCATEGORY));
+    BDDMockito.when(subCategoryRespository.findById(anyLong())).thenReturn(Optional.of(SUBCATEGORY));
 
-    BDDMockito.when(iMainCategoryRepository.findById(anyLong())).thenReturn(Optional.of(MAINCATEGORY));
+    BDDMockito.when(mainCategoryRepository.findById(anyLong())).thenReturn(Optional.of(MAINCATEGORY));
 
-    BDDMockito.doNothing().when(iSubCategoryRespository).delete(any(SubCategory.class));
+    BDDMockito.doNothing().when(subCategoryRespository).delete(any(SubCategory.class));
 
-    BDDMockito.when(iProductRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of(PRODUCT));
+    BDDMockito.when(productRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of(PRODUCT));
 
-    BDDMockito.when(iMainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.of(MAINCATEGORY));
+    BDDMockito.when(mainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.of(MAINCATEGORY));
 
-    BDDMockito.when(iMainCategoryRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(MAINCATEGORY)));
+    BDDMockito.when(mainCategoryRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(MAINCATEGORY)));
   }
 
   @Test
@@ -109,7 +109,7 @@ class MainCategoryControllerTest {
 
   @Test
   public void updateMainCategory_Return404StatusCode_WhenUpdateOperationReturnsZero() throws Exception{
-    BDDMockito.when(iMainCategoryRepository.updateMainCategoryName(anyString(), anyLong())).thenReturn(0);
+    BDDMockito.when(mainCategoryRepository.updateName(anyString(), anyLong())).thenReturn(0);
 
     mockMvc.perform(put("/main-categories/1?mainCategoryName=maincategory"))
             .andExpect(status().isNotFound());
@@ -122,7 +122,7 @@ class MainCategoryControllerTest {
 
   @Test
   public void deleteMainCategory_Return404StatusCode_WhenMainCategoryWasNotFound() throws Exception{
-    BDDMockito.when(iMainCategoryRepository.findById(anyLong())).thenReturn(Optional.empty());
+    BDDMockito.when(mainCategoryRepository.findById(anyLong())).thenReturn(Optional.empty());
 
     mockMvc.perform(delete("/main-categories/1")).andExpect(status().isNotFound());
   }
@@ -136,7 +136,7 @@ class MainCategoryControllerTest {
 
   @Test
   public void getMainCategoryByName_Return404StatusCode_WhenMainCategoryWasNotFound() throws Exception{
-    BDDMockito.when(iMainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.empty());
+    BDDMockito.when(mainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.empty());
 
     mockMvc.perform(get("/main-categories/maincategory").accept(JSON))
             .andExpect(status().isNotFound())
@@ -152,7 +152,7 @@ class MainCategoryControllerTest {
 
   @Test
   public void getAllMainCategory_Return404StatusCode_WhenNoMainCategoriesAreFound() throws Exception{
-    BDDMockito.when(iMainCategoryRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
+    BDDMockito.when(mainCategoryRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
 
     mockMvc.perform(get("/main-categories?page=0&size=10").accept(JSON))
             .andExpect(status().isNotFound())

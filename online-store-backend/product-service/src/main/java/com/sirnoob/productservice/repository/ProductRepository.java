@@ -17,7 +17,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface IProductRepository extends JpaRepository<Product, Long>{
+public interface ProductRepository extends JpaRepository<Product, Long>{
 
   public Optional<Product> findByProductName(String productName);
 
@@ -26,7 +26,7 @@ public interface IProductRepository extends JpaRepository<Product, Long>{
   public List<Product> findByMainCategoryMainCategoryId(Long mainCategoryId);
 
   @Query("SELECT new com.sirnoob.productservice.dto.ProductInvoiceResponse(p.productName, p.productPrice) FROM Product p WHERE p.productName = :productName AND p.productBarCode = :productBarCode")
-  public Optional<ProductInvoiceResponse> findProductForInvoice(@Param("productBarCode") Long productBarCode, @Param("productName") String productName);
+  public Optional<ProductInvoiceResponse> findForInvoice(@Param("productBarCode") Long productBarCode, @Param("productName") String productName);
 
   @Query("SELECT new com.sirnoob.productservice.dto.ProductListView(p.productName, p.productDescription, p.productPrice) FROM Product p")
   public Page<ProductListView> getAll(Pageable pageable);
@@ -40,6 +40,6 @@ public interface IProductRepository extends JpaRepository<Product, Long>{
 
   @Modifying(clearAutomatically = true)
   @Query("UPDATE Product AS p SET p.productStock = p.productStock + (:stock) WHERE p.productBarCode = :productBarCode")
-  public int updateProductStockByProductBarCode(@Param("stock") Integer stock, @Param("productBarCode") Long productBarCode);
+  public int updateStockByBarCode(@Param("stock") Integer stock, @Param("productBarCode") Long productBarCode);
 
 }

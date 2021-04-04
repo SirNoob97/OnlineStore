@@ -7,7 +7,7 @@ import javax.transaction.Transactional;
 
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
-import com.sirnoob.productservice.repository.IMainCategoryRepository;
+import com.sirnoob.productservice.repository.MainCategoryRepository;
 import com.sirnoob.productservice.util.CollectionValidator;
 
 import org.springframework.data.domain.Pageable;
@@ -17,59 +17,59 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class MainCategoryServiceImpl implements IMainCategoryService {
+public class MainCategoryServiceImpl implements MainCategoryService {
 
-  private final IProductService iProductService;
-  private final ISubCategoryService iSubCategoryService;
-  private final IMainCategoryRepository iMainCategoryRepository;
+  private final ProductService productService;
+  private final SubCategoryService subCategoryService;
+  private final MainCategoryRepository mainCategoryRepository;
 
   private static final String MAIN_CATEGORY_NOT_FOUND = "Main Category Not Found";
   private static final String NO_MAIN_CATEGORIES_FOUND = "No Main Categories Found";
 
   @Transactional
   @Override
-  public MainCategory createMainCategory(MainCategory mainCategory) {
-    return iMainCategoryRepository.save(mainCategory);
+  public MainCategory create(MainCategory mainCategory) {
+    return mainCategoryRepository.save(mainCategory);
   }
 
   @Transactional
   @Override
-  public void updateMainCategoryName(Long mainCategoryId, String mainCategoryName) {
-    if (iMainCategoryRepository.updateMainCategoryName(mainCategoryName, mainCategoryId) < 1)
+  public void updateName(Long mainCategoryId, String mainCategoryName) {
+    if (mainCategoryRepository.updateName(mainCategoryName, mainCategoryId) < 1)
       throw new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND);
   }
 
   @Transactional
   @Override
-  public void deleteMainCategory(Long mainCategoryId) {
-    MainCategory mainCategory = getMainCategoryById(mainCategoryId);
+  public void deleteById(Long mainCategoryId) {
+    MainCategory mainCategory = getById(mainCategoryId);
 
-    iSubCategoryService.getSubCategoryByMainCategory(mainCategoryId)
-      .forEach(sc -> iSubCategoryService.deleteSubCategory(sc.getSubCategoryId()));
+    subCategoryService.getMainCategory(mainCategoryId)
+      .forEach(sc -> subCategoryService.deleteById(sc.getSubCategoryId()));
 
-    iProductService.getProductByMainCategory(mainCategoryId).forEach(prs -> {
+    productService.getByMainCategory(mainCategoryId).forEach(prs -> {
       if (prs.getSubCategories() != null && !prs.getSubCategories().isEmpty())
         prs.getSubCategories().clear();
     });
 
-    iMainCategoryRepository.delete(mainCategory);
+    mainCategoryRepository.delete(mainCategory);
   }
 
   @Override
-  public MainCategory getMainCategoryById(Long mainCategoryId) {
-    return iMainCategoryRepository.findById(mainCategoryId)
+  public MainCategory getById(Long mainCategoryId) {
+    return mainCategoryRepository.findById(mainCategoryId)
       .orElseThrow(() -> new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
   }
 
   @Override
-  public MainCategory getMainCategoryByName(String mainCategoryName) {
-    return iMainCategoryRepository.findByMainCategoryName(mainCategoryName)
+  public MainCategory getByName(String mainCategoryName) {
+    return mainCategoryRepository.findByMainCategoryName(mainCategoryName)
       .orElseThrow(() -> new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
   }
 
   @Override
-  public Set<String> getAllMainCategory(Pageable pageable) {
-    Set<String> mainCategories = iMainCategoryRepository.findAll(pageable).stream().map(MainCategory::getMainCategoryName)
+  public Set<String> getAll(Pageable pageable) {
+    Set<String> mainCategories = mainCategoryRepository.findAll(pageable).stream().map(MainCategory::getMainCategoryName)
       .collect(Collectors.toSet());
     return CollectionValidator.throwExceptionIfSetIsEmpty(mainCategories, NO_MAIN_CATEGORIES_FOUND);
   }

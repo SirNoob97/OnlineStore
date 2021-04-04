@@ -1,7 +1,6 @@
 package com.sirnoob.productservice.handler;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import com.sirnoob.productservice.exception.ExceptionDetails;
@@ -49,10 +48,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
   @Override
   protected ResponseEntity<Object> handleMethodArgumentNotValid(
     MethodArgumentNotValidException exception, HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-    List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
-    String fields = fieldErrors.stream().map(FieldError::getField).collect(Collectors.joining(", "));
-    String fieldsMessage = fieldErrors.stream().map(FieldError::getDefaultMessage).collect(Collectors.joining(", "));
+    var fieldErrors = exception.getBindingResult().getFieldErrors();
+    var fields = fieldErrors.stream().map(FieldError::getField).collect(Collectors.joining(", "));
+    var fieldsMessage = fieldErrors.stream().map(FieldError::getDefaultMessage).collect(Collectors.joining(", "));
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                          .body(ValidationExceptionDetails.builder()
@@ -69,8 +67,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
   @Override
   protected ResponseEntity<Object> handleExceptionInternal(
     Exception exception, @Nullable Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-    ExceptionDetails exceptionDetails = ExceptionDetails.builder()
+    var exceptionDetails = ExceptionDetails.builder()
                       .timestamp(LocalDateTime.now())
                       .status(status.value())
                       .title(exception.getCause().getMessage())

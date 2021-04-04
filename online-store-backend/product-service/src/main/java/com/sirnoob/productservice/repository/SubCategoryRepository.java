@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.sirnoob.productservice.entity.SubCategory;
 
 @Repository
-public interface ISubCategoryRepository extends JpaRepository<SubCategory, Long>{
+public interface SubCategoryRepository extends JpaRepository<SubCategory, Long>{
 
   public Optional<SubCategory> findBySubCategoryName(String subCategoryName);
 
@@ -20,5 +20,5 @@ public interface ISubCategoryRepository extends JpaRepository<SubCategory, Long>
 
   @Modifying(clearAutomatically = true)
   @Query("UPDATE SubCategory AS s SET s.subCategoryName = :subCategoryName WHERE s.subCategoryId = :subCategoryId")
-  public int updateSubCategoryName(@Param("subCategoryName") String subCategoryName, @Param("subCategoryId") Long subCategoryId);
+  public int updateName(@Param("subCategoryName") String subCategoryName, @Param("subCategoryId") Long subCategoryId);
 }

@@ -5,7 +5,7 @@ import java.util.Set;
 import javax.validation.Valid;
 
 import com.sirnoob.productservice.entity.MainCategory;
-import com.sirnoob.productservice.service.IMainCategoryService;
+import com.sirnoob.productservice.service.MainCategoryService;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -28,34 +28,34 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/main-categories")
 public class MainCategoryController {
 
-  private final IMainCategoryService iMainCategoryService;
+  private final MainCategoryService mainCategoryService;
 
   private static final MediaType JSON = MediaType.APPLICATION_JSON;
 
   @PostMapping
-  public ResponseEntity<MainCategory> createMainCategory(@Valid @RequestBody MainCategory mainCategory){
-    return ResponseEntity.status(HttpStatus.CREATED).contentType(JSON).body(iMainCategoryService.createMainCategory(mainCategory));
+  public ResponseEntity<MainCategory> create(@Valid @RequestBody MainCategory mainCategory){
+    return ResponseEntity.status(HttpStatus.CREATED).contentType(JSON).body(mainCategoryService.create(mainCategory));
   }
 
   @PutMapping("/{mainCategoryId}")
-  public ResponseEntity<Void> updateMainCategory(@PathVariable Long mainCategoryId, @RequestParam(required = true) String mainCategoryName){
-    iMainCategoryService.updateMainCategoryName(mainCategoryId, mainCategoryName);
+  public ResponseEntity<Void> update(@PathVariable Long mainCategoryId, @RequestParam(required = true) String mainCategoryName){
+    mainCategoryService.updateName(mainCategoryId, mainCategoryName);
     return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping("/{mainCategoryId}")
-  public ResponseEntity<Void> deleteMainCategory(@PathVariable Long mainCategoryId){
-    iMainCategoryService.deleteMainCategory(mainCategoryId);
+  public ResponseEntity<Void> delete(@PathVariable Long mainCategoryId){
+    mainCategoryService.deleteById(mainCategoryId);
     return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/{mainCategoryName}")
-  public ResponseEntity<MainCategory> getMainCategoryByName(@PathVariable String mainCategoryName){
-    return ResponseEntity.ok().contentType(JSON).body(iMainCategoryService.getMainCategoryByName(mainCategoryName));
+  public ResponseEntity<MainCategory> getByName(@PathVariable String mainCategoryName){
+    return ResponseEntity.ok().contentType(JSON).body(mainCategoryService.getByName(mainCategoryName));
   }
 
   @GetMapping
-  public ResponseEntity<Set<String>> getAllMainCategory(Pageable pageable){
-    return ResponseEntity.ok().contentType(JSON).body(iMainCategoryService.getAllMainCategory(pageable));
+  public ResponseEntity<Set<String>> getAll(Pageable pageable){
+    return ResponseEntity.ok().contentType(JSON).body(mainCategoryService.getAll(pageable));
   }
 }

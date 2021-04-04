@@ -6,8 +6,8 @@ import javax.validation.Valid;
 
 import com.sirnoob.productservice.dto.SubCategoryRequest;
 import com.sirnoob.productservice.dto.SubCategoryResponse;
-import com.sirnoob.productservice.service.IMainCategoryService;
-import com.sirnoob.productservice.service.ISubCategoryService;
+import com.sirnoob.productservice.service.MainCategoryService;
+import com.sirnoob.productservice.service.SubCategoryService;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -32,36 +32,36 @@ public class SubCategoryController {
 
   private static final MediaType JSON = MediaType.APPLICATION_JSON;
 
-  private final IMainCategoryService iMainCategoryService;
-  private final ISubCategoryService iSubCategoryService;
+  private final MainCategoryService mainCategoryService;
+  private final SubCategoryService subCategoryService;
 
   @PostMapping
-  public ResponseEntity<SubCategoryResponse> createSubCategory(@Valid @RequestBody SubCategoryRequest subCategoryRequest) {
+  public ResponseEntity<SubCategoryResponse> create(@Valid @RequestBody SubCategoryRequest subCategoryRequest) {
     return ResponseEntity.status(HttpStatus.CREATED).contentType(JSON)
-      .body(iSubCategoryService.createSubCategory(subCategoryRequest.getSubCategoryName(),
-        iMainCategoryService.getMainCategoryByName(subCategoryRequest.getMainCategoryName())));
+      .body(subCategoryService.create(subCategoryRequest.getSubCategoryName(),
+        mainCategoryService.getByName(subCategoryRequest.getMainCategoryName())));
   }
 
   @PutMapping("/{subCategoryId}")
-  public ResponseEntity<Void> updateSubCategoryName(@PathVariable Long subCategoryId,
+  public ResponseEntity<Void> updateName(@PathVariable Long subCategoryId,
                                                     @RequestParam(required = true) String subCategoryName) {
-    iSubCategoryService.updateSubCategoryName(subCategoryId, subCategoryName);
+    subCategoryService.updateName(subCategoryId, subCategoryName);
     return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping("/{subCategoryId}")
-  public ResponseEntity<Void> deleteSubCategory(@PathVariable Long subCategoryId) {
-    iSubCategoryService.deleteSubCategory(subCategoryId);
+  public ResponseEntity<Void> deleteById(@PathVariable Long subCategoryId) {
+    subCategoryService.deleteById(subCategoryId);
     return ResponseEntity.noContent().build();
   }
 
   @GetMapping
-  public ResponseEntity<Set<String>> getAllSubCategories(Pageable pageable) {
-    return ResponseEntity.ok().contentType(JSON).body(iSubCategoryService.getAllSubCategories(pageable));
+  public ResponseEntity<Set<String>> getAll(Pageable pageable) {
+    return ResponseEntity.ok().contentType(JSON).body(subCategoryService.getAll(pageable));
   }
 
   @GetMapping("/{subCategoryName}")
-  public ResponseEntity<SubCategoryResponse> getSubCategoryResponseByName(@PathVariable String subCategoryName) {
-    return ResponseEntity.ok().contentType(JSON).body(iSubCategoryService.getSubCategoryResponseByName(subCategoryName));
+  public ResponseEntity<SubCategoryResponse> getByName(@PathVariable String subCategoryName) {
+    return ResponseEntity.ok().contentType(JSON).body(subCategoryService.getSubCategoryResponseByName(subCategoryName));
   }
 }

@@ -30,9 +30,9 @@ import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.mapper.ProductMapperImpl;
 import com.sirnoob.productservice.mapper.SubCategoryMapperImpl;
-import com.sirnoob.productservice.repository.IMainCategoryRepository;
-import com.sirnoob.productservice.repository.IProductRepository;
-import com.sirnoob.productservice.repository.ISubCategoryRepository;
+import com.sirnoob.productservice.repository.MainCategoryRepository;
+import com.sirnoob.productservice.repository.ProductRepository;
+import com.sirnoob.productservice.repository.SubCategoryRepository;
 import com.sirnoob.productservice.service.MainCategoryServiceImpl;
 import com.sirnoob.productservice.service.ProductServiceImpl;
 import com.sirnoob.productservice.service.SubCategoryServiceImpl;
@@ -55,13 +55,13 @@ import org.springframework.test.web.servlet.MockMvc;
 class ProductControllerTest {
 
   @MockBean
-  private IMainCategoryRepository iMainCategoryRepository;
+  private MainCategoryRepository mainCategoryRepository;
 
   @MockBean
-  private ISubCategoryRepository iSubCategoryRespository;
+  private SubCategoryRepository subCategoryRespository;
 
   @MockBean
-  private IProductRepository iProductRepository;
+  private ProductRepository productRepository;
 
   @Autowired
   private MockMvc mockMvc;
@@ -86,33 +86,33 @@ class ProductControllerTest {
 
     PageImpl<ProductListView> pageOfProducts = new PageImpl<>(listOfProducts);
 
-    BDDMockito.when(iMainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(mainCategory);
+    BDDMockito.when(mainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(mainCategory);
 
-    BDDMockito.when(iSubCategoryRespository.findBySubCategoryName(anyString())).thenReturn(subCategory);
+    BDDMockito.when(subCategoryRespository.findBySubCategoryName(anyString())).thenReturn(subCategory);
 
-    BDDMockito.when(iProductRepository.save(any(Product.class))).thenReturn(product);
+    BDDMockito.when(productRepository.save(any(Product.class))).thenReturn(product);
 
-    BDDMockito.when(iProductRepository.findById(anyLong())).thenReturn(Optional.of(product));
+    BDDMockito.when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
 
-    BDDMockito.when(iProductRepository.updateProductStockByProductBarCode(anyInt(), anyLong())).thenReturn(1);
+    BDDMockito.when(productRepository.updateStockByBarCode(anyInt(), anyLong())).thenReturn(1);
 
-    BDDMockito.when(iProductRepository.findByProductBarCodeOrProductName(anyLong(), anyString())).thenReturn(Optional.of(product));
+    BDDMockito.when(productRepository.findByProductBarCodeOrProductName(anyLong(), anyString())).thenReturn(Optional.of(product));
 
-    BDDMockito.when(iProductRepository.findProductForInvoice(anyLong(), anyString())).thenReturn(Optional.of(productInvoiceResponse));
+    BDDMockito.when(productRepository.findForInvoice(anyLong(), anyString())).thenReturn(Optional.of(productInvoiceResponse));
 
-    BDDMockito.doNothing().when(iProductRepository).delete(any(Product.class));
+    BDDMockito.doNothing().when(productRepository).delete(any(Product.class));
 
-    BDDMockito.when(iProductRepository.getAll(any(PageRequest.class))).thenReturn(pageOfProducts);
+    BDDMockito.when(productRepository.getAll(any(PageRequest.class))).thenReturn(pageOfProducts);
 
-    BDDMockito.when(iProductRepository.findByMainCategoryMainCategoryId(anyLong(), any(PageRequest.class))).thenReturn(pageOfProducts);
+    BDDMockito.when(productRepository.findByMainCategoryMainCategoryId(anyLong(), any(PageRequest.class))).thenReturn(pageOfProducts);
 
-    BDDMockito.when(iSubCategoryRespository.findBySubCategoryName(anyString())).thenReturn(subCategory);
+    BDDMockito.when(subCategoryRespository.findBySubCategoryName(anyString())).thenReturn(subCategory);
 
-    BDDMockito.when(iProductRepository.findBySubCategory(any(SubCategory.class))).thenReturn(listOfProducts);
+    BDDMockito.when(productRepository.findBySubCategory(any(SubCategory.class))).thenReturn(listOfProducts);
 
-    BDDMockito.when(iProductRepository.findByProductName(anyString())).thenReturn(Optional.of(product));
+    BDDMockito.when(productRepository.findByProductName(anyString())).thenReturn(Optional.of(product));
 
-    BDDMockito.when(iProductRepository.findByProductNameContainingIgnoreCase(anyString(), any(PageRequest.class))).thenReturn(pageOfProducts);
+    BDDMockito.when(productRepository.findByProductNameContainingIgnoreCase(anyString(), any(PageRequest.class))).thenReturn(pageOfProducts);
   }
 
   @Test
@@ -128,7 +128,7 @@ class ProductControllerTest {
 
   @Test
   public void createProduct_Return404StatusCode_WhenMainCategoryWasNotFound() throws Exception{
-    BDDMockito.when(iMainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.empty());
+    BDDMockito.when(mainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.empty());
 
     mockMvc.perform(post("/products").contentType(JSON)
                                       .content(OBJECT_MAPPER.writeValueAsString(createProductRequest())))
@@ -146,7 +146,7 @@ class ProductControllerTest {
 
   @Test
   public void createProduct_Return404StatusCode_WhenSubCategoryWasNotFound() throws Exception{
-    BDDMockito.when(iSubCategoryRespository.findBySubCategoryName(anyString())).thenReturn(Optional.empty());
+    BDDMockito.when(subCategoryRespository.findBySubCategoryName(anyString())).thenReturn(Optional.empty());
 
     mockMvc.perform(post("/products").contentType(JSON)
                                       .content(OBJECT_MAPPER.writeValueAsString(createProductRequest())))
@@ -167,7 +167,7 @@ class ProductControllerTest {
 
   @Test
   public void updateProduct_Return404StatusCode_WhenMainCategoryWasNotFound() throws Exception{
-    BDDMockito.when(iMainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.empty());
+    BDDMockito.when(mainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.empty());
 
     mockMvc.perform(put("/products/1").contentType(JSON)
                                       .content(OBJECT_MAPPER.writeValueAsString(createProductRequest())))
@@ -177,7 +177,7 @@ class ProductControllerTest {
 
   @Test
   public void updateProduct_Return404StatusCode_WhenSubCategoryWasNotFound() throws Exception{
-    BDDMockito.when(iSubCategoryRespository.findBySubCategoryName(anyString())).thenReturn(Optional.empty());
+    BDDMockito.when(subCategoryRespository.findBySubCategoryName(anyString())).thenReturn(Optional.empty());
 
     mockMvc.perform(put("/products/1").contentType(JSON)
                                       .content(OBJECT_MAPPER.writeValueAsString(createProductRequest())))
@@ -193,7 +193,7 @@ class ProductControllerTest {
 
   @Test
   public void updateProductStock_Return404StatusCode_WhenUpdateOperationsReturnsZero() throws Exception{
-    BDDMockito.when(iProductRepository.updateProductStockByProductBarCode(anyInt(), anyLong())).thenReturn(0);
+    BDDMockito.when(productRepository.updateStockByBarCode(anyInt(), anyLong())).thenReturn(0);
 
     mockMvc.perform(put("/products/1/stock?quantity=100"))
             .andExpect(status().isNotFound())
@@ -209,7 +209,7 @@ class ProductControllerTest {
 
   @Test
   public void getProductResponse_Return404StatusCode_WhenProductWasNotFound() throws Exception{
-    BDDMockito.when(iProductRepository.findByProductBarCodeOrProductName(anyLong(), anyString())).thenReturn(Optional.empty());
+    BDDMockito.when(productRepository.findByProductBarCodeOrProductName(anyLong(), anyString())).thenReturn(Optional.empty());
 
     mockMvc.perform(get("/products/responses?productBarCode=1&productName=product"))
             .andExpect(status().isNotFound())
@@ -225,7 +225,7 @@ class ProductControllerTest {
 
   @Test
   public void getProductForInvoice_Return404StatusCode_WhenProductWasNotFound() throws Exception{
-    BDDMockito.when(iProductRepository.findProductForInvoice(anyLong(), anyString())).thenReturn(Optional.empty());
+    BDDMockito.when(productRepository.findForInvoice(anyLong(), anyString())).thenReturn(Optional.empty());
 
     mockMvc.perform(get("/products/invoices?productBarCode=1&productName=product"))
             .andExpect(status().isNotFound())
@@ -239,7 +239,7 @@ class ProductControllerTest {
 
   @Test
   public void deleteProductById_Return404StatusCode_WhenProductWasNotFound() throws Exception{
-    BDDMockito.when(iProductRepository.findById(anyLong())).thenReturn(Optional.empty());
+    BDDMockito.when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
 
     mockMvc.perform(delete("/products/1")).andExpect(status().isNotFound());
   }
@@ -253,7 +253,7 @@ class ProductControllerTest {
 
   @Test
   public void listAllProducts_Return404StatusCode_WhenNoProductsAreFound() throws Exception{
-    BDDMockito.when(iProductRepository.getAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
+    BDDMockito.when(productRepository.getAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
 
     mockMvc.perform(get("/products?page=0&size=10"))
             .andExpect(status().isNotFound())
@@ -269,7 +269,7 @@ class ProductControllerTest {
 
   @Test
   public void listProductsByMainCategoryId_Return404StatusCode_WhenNoProductsAreFound() throws Exception{
-    BDDMockito.when(iProductRepository.findByMainCategoryMainCategoryId(anyLong(), any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
+    BDDMockito.when(productRepository.findByMainCategoryMainCategoryId(anyLong(), any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
 
     mockMvc.perform(get("/products/main-categories/1?page=0&size=10"))
             .andExpect(status().isNotFound())
@@ -289,7 +289,7 @@ class ProductControllerTest {
 
   @Test
   public void listProductsBySubCategories_Return404StatusCode_WhenThatSubCategoryHasNoProducts() throws Exception{
-    BDDMockito.when(iProductRepository.findBySubCategory(any(SubCategory.class))).thenReturn(List.of());
+    BDDMockito.when(productRepository.findBySubCategory(any(SubCategory.class))).thenReturn(List.of());
 
     String[] subCategories = {"SubCategory 1", "SubCategory2"};
 
@@ -308,7 +308,7 @@ class ProductControllerTest {
 
   @Test
   public void getProductByProductName_Return404StatusCode_WhenProductWasNotFound() throws Exception{
-    BDDMockito.when(iProductRepository.findByProductName(anyString())).thenReturn(Optional.empty());
+    BDDMockito.when(productRepository.findByProductName(anyString())).thenReturn(Optional.empty());
 
     mockMvc.perform(get("/products/names?productName=product"))
             .andExpect(status().isNotFound())
@@ -324,7 +324,7 @@ class ProductControllerTest {
 
   @Test
   public void listByProductNameCoincidences_Return404StatusCode_WhenNoProductsAreFound() throws Exception{
-    BDDMockito.when(iProductRepository.findByProductNameContainingIgnoreCase(anyString(), any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
+    BDDMockito.when(productRepository.findByProductNameContainingIgnoreCase(anyString(), any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
 
     mockMvc.perform(get("/products/names/search?productName=product&page=0&size=10"))
             .andExpect(status().isNotFound())

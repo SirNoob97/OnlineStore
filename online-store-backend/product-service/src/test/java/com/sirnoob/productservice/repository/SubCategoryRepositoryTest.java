@@ -6,8 +6,6 @@ import static com.sirnoob.productservice.util.RandomEntityGenerator.createProduc
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import com.sirnoob.productservice.entity.MainCategory;
@@ -15,8 +13,6 @@ import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,25 +21,23 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 @DataJpaTest
 class SubCategoryRepositoryTest {
 
-  Logger log = LoggerFactory.getLogger(SubCategoryRepositoryTest.class);
-
   @Autowired
-  private ISubCategoryRepository iSubCategoryRepository;
+  private SubCategoryRepository subCategoryRepository;
   @Autowired
-  private IMainCategoryRepository iMainCategoryRepository;
+  private MainCategoryRepository mainCategoryRepository;
   @Autowired
-  private IProductRepository iProductRepository;
+  private ProductRepository productRepository;
 
 
   @Test
   public void save_PersistSubCategory_WhenSuccessful() {
-    MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
+    MainCategory mainCategory = mainCategoryRepository.save(createMainCategory());
 
     SubCategory subCategory = createSubCategory();
 
     subCategory.setMainCategory(mainCategory);
 
-    SubCategory subCategorySaved = iSubCategoryRepository.save(subCategory);
+    SubCategory subCategorySaved = subCategoryRepository.save(subCategory);
 
     assertThat(subCategorySaved).isNotNull();
     assertThat(subCategorySaved.getSubCategoryId()).isNotEqualTo(subCategory.getSubCategoryId());
@@ -56,13 +50,13 @@ class SubCategoryRepositoryTest {
     SubCategory subCategory = new SubCategory();
 
     assertThatExceptionOfType(DataIntegrityViolationException.class)
-        .isThrownBy(() -> iSubCategoryRepository.save(subCategory));
+        .isThrownBy(() -> subCategoryRepository.save(subCategory));
   }
 
   @Test
   public void save_ThrowDataIntegrityViolationException_WhenTheSubCategoryDoesNotHaveAMainCategory() {
     assertThatExceptionOfType(DataIntegrityViolationException.class)
-        .isThrownBy(() -> iSubCategoryRepository.save(createSubCategory()));
+        .isThrownBy(() -> subCategoryRepository.save(createSubCategory()));
   }
 
   @Test
@@ -72,13 +66,13 @@ class SubCategoryRepositoryTest {
     subCategory.setMainCategory(null);
 
     assertThatExceptionOfType(DataIntegrityViolationException.class)
-        .isThrownBy(() -> iSubCategoryRepository.save(createSubCategory()));
+        .isThrownBy(() -> subCategoryRepository.save(createSubCategory()));
   }
 
   @Test
   public void save_ThrowInvalidDataAccessApiUsageException_WhenSubCategoryIsNull() {
     assertThatExceptionOfType(InvalidDataAccessApiUsageException.class)
-        .isThrownBy(() -> iSubCategoryRepository.save(null));
+        .isThrownBy(() -> subCategoryRepository.save(null));
   }
 
   @Test
@@ -90,16 +84,16 @@ class SubCategoryRepositoryTest {
     subCategory.setMainCategory(mainCategory);
 
     assertThatExceptionOfType(DataIntegrityViolationException.class)
-        .isThrownBy(() -> iSubCategoryRepository.save(subCategory));
+        .isThrownBy(() -> subCategoryRepository.save(subCategory));
   }
 
   @Test
   public void delete_RemoveSubCategory_WhenSuccessful() {
-    SubCategory subCategoryToDelete = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategoryToDelete = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
-    iSubCategoryRepository.delete(subCategoryToDelete);
+    subCategoryRepository.delete(subCategoryToDelete);
 
-    Optional<SubCategory> subCategoryOptional = iSubCategoryRepository.findById(subCategoryToDelete.getSubCategoryId());
+    var subCategoryOptional = subCategoryRepository.findById(subCategoryToDelete.getSubCategoryId());
 
     assertThat(subCategoryToDelete.getSubCategoryId()).isNotNull();
     assertThat(subCategoryOptional.isEmpty()).isTrue();
@@ -107,27 +101,27 @@ class SubCategoryRepositoryTest {
 
   @Test
   public void delete_ThrowInvalidDataAccessApiUsageException_WhenSubCategoryIsNull() {
-    assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> iSubCategoryRepository.delete(null));
+    assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> subCategoryRepository.delete(null));
   }
 
   @Test
   public void delete_Throw_WhenASubCategoryRelatedToAProductIsRemoved() {
-    SubCategory subCategoryToDelete = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategoryAndProducts());
+    SubCategory subCategoryToDelete = subCategoryRepository.save(createSubCategoryWithPersistedMainCategoryAndProducts());
 
-    iSubCategoryRepository.delete(subCategoryToDelete);
+    subCategoryRepository.delete(subCategoryToDelete);
 
-    Optional<SubCategory> subCategorySaved = iSubCategoryRepository.findById(subCategoryToDelete.getSubCategoryId());
+    var subCategorySaved = subCategoryRepository.findById(subCategoryToDelete.getSubCategoryId());
 
     assertThat(subCategorySaved.isEmpty()).isTrue();
   }
 
   @Test
   public void findBySubCategoryName_ReturnPresenwSubCategorywWhenSuccessful() {
-    SubCategory subCategorySaved = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategorySaved = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
     String name = subCategorySaved.getSubCategoryName();
 
-    Optional<SubCategory> subCategoryOptional = iSubCategoryRepository.findBySubCategoryName(name);
+    var subCategoryOptional = subCategoryRepository.findBySubCategoryName(name);
 
     assertThat(subCategoryOptional.isPresent()).isTrue();
     assertThat(subCategoryOptional.get().getSubCategoryName()).isEqualTo(name);
@@ -136,16 +130,16 @@ class SubCategoryRepositoryTest {
 
   @Test
   public void findBySubCategoryName_ReturnEmptwSubCategorywWhenNameIsNull() {
-    Optional<SubCategory> subCategoryOptional = iSubCategoryRepository.findBySubCategoryName(null);
+    var subCategoryOptional = subCategoryRepository.findBySubCategoryName(null);
 
     assertThat(subCategoryOptional.isEmpty()).isTrue();
   }
 
   @Test
   public void findBySubCategoryName_ReturnEmptwSubCategorywWhenNamesNotMatches() {
-    SubCategory subCategorySaved = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategorySaved = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
-    Optional<SubCategory> subCategoryOptional = iSubCategoryRepository.findBySubCategoryName(subCategorySaved.getSubCategoryName() + "TEST");
+    var subCategoryOptional = subCategoryRepository.findBySubCategoryName(subCategorySaved.getSubCategoryName() + "TEST");
 
     assertThat(subCategoryOptional.isEmpty()).isTrue();
   }
@@ -156,17 +150,17 @@ class SubCategoryRepositoryTest {
     SubCategory subCategory2 = createSubCategory();
     SubCategory subCategory3 = createSubCategory();
 
-    MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
+    MainCategory mainCategory = mainCategoryRepository.save(createMainCategory());
 
     subCategory.setMainCategory(mainCategory);
     subCategory2.setMainCategory(mainCategory);
     subCategory3.setMainCategory(mainCategory);
 
-    iSubCategoryRepository.save(subCategory);
-    iSubCategoryRepository.save(subCategory2);
-    iSubCategoryRepository.save(subCategory3);
+    subCategoryRepository.save(subCategory);
+    subCategoryRepository.save(subCategory2);
+    subCategoryRepository.save(subCategory3);
 
-    List<SubCategory> subCategories = iSubCategoryRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId());
+    var subCategories = subCategoryRepository.findByMainCategoryMainCategoryId(mainCategory.getMainCategoryId());
 
     assertThat(subCategories).isNotNull();
     assertThat(subCategories.isEmpty()).isFalse();
@@ -179,18 +173,18 @@ class SubCategoryRepositoryTest {
     SubCategory subCategory2 = createSubCategory();
     SubCategory subCategory3 = createSubCategory();
 
-    MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
-    MainCategory mainCategory2 = iMainCategoryRepository.save(createMainCategory());
+    MainCategory mainCategory = mainCategoryRepository.save(createMainCategory());
+    MainCategory mainCategory2 = mainCategoryRepository.save(createMainCategory());
 
     subCategory.setMainCategory(mainCategory);
     subCategory2.setMainCategory(mainCategory);
     subCategory3.setMainCategory(mainCategory);
 
-    iSubCategoryRepository.save(subCategory);
-    iSubCategoryRepository.save(subCategory2);
-    iSubCategoryRepository.save(subCategory3);
+    subCategoryRepository.save(subCategory);
+    subCategoryRepository.save(subCategory2);
+    subCategoryRepository.save(subCategory3);
 
-    List<SubCategory> subCategories = iSubCategoryRepository.findByMainCategoryMainCategoryId(mainCategory2.getMainCategoryId());
+    var subCategories = subCategoryRepository.findByMainCategoryMainCategoryId(mainCategory2.getMainCategoryId());
 
     assertThat(subCategories).isNotNull();
     assertThat(subCategories.isEmpty()).isTrue();
@@ -198,7 +192,7 @@ class SubCategoryRepositoryTest {
 
   @Test
   public void findByMainCategory_ReturnEmptyListOfSubCategories_WhenMainCategoryIsNull(){
-    List<SubCategory> subCategories = iSubCategoryRepository.findByMainCategoryMainCategoryId(null);
+    var subCategories = subCategoryRepository.findByMainCategoryMainCategoryId(null);
 
     assertThat(subCategories).isNotNull();
     assertThat(subCategories.isEmpty()).isTrue();
@@ -206,13 +200,13 @@ class SubCategoryRepositoryTest {
 
   @Test
   public void updateSubCategoryName_ReturnAnIntegerGreaterThanZero_WhenSuccessful() {
-    SubCategory subCategoryToUpdate = iSubCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
+    SubCategory subCategoryToUpdate = subCategoryRepository.save(createSubCategoryWithPersistedMainCategory());
 
     String name = subCategoryToUpdate.getSubCategoryName();
 
-    Integer returnFromUpdateOperation = iSubCategoryRepository.updateSubCategoryName("TEST", subCategoryToUpdate.getSubCategoryId());
+    Integer returnFromUpdateOperation = subCategoryRepository.updateName("TEST", subCategoryToUpdate.getSubCategoryId());
 
-    Optional<SubCategory> subCategoryWithUpdatedName = iSubCategoryRepository.findById(subCategoryToUpdate.getSubCategoryId());
+    var subCategoryWithUpdatedName = subCategoryRepository.findById(subCategoryToUpdate.getSubCategoryId());
 
     assertThat(returnFromUpdateOperation).isGreaterThan(0);
     assertThat(subCategoryWithUpdatedName).isNotNull();
@@ -222,7 +216,7 @@ class SubCategoryRepositoryTest {
 
   @Test
   public void updateSubCategoryName_ReturnZero_WhenNwSubCategorywasThatId() {
-    Integer returnFromUpdateOperation = iSubCategoryRepository.updateSubCategoryName("TEST", -1L);
+    Integer returnFromUpdateOperation = subCategoryRepository.updateName("TEST", -1L);
 
     assertThat(returnFromUpdateOperation).isNotNull();
     assertThat(returnFromUpdateOperation).isEqualTo(0);
@@ -230,7 +224,7 @@ class SubCategoryRepositoryTest {
 
   @Test
   public void updateSubCategoryName_ReturnZero_WhewSubCategorywdIsNull() {
-    Integer returnFromUpdateOperation = iSubCategoryRepository.updateSubCategoryName("TEST", null);
+    Integer returnFromUpdateOperation = subCategoryRepository.updateName("TEST", null);
 
     assertThat(returnFromUpdateOperation).isNotNull();
     assertThat(returnFromUpdateOperation).isEqualTo(0);
@@ -239,7 +233,7 @@ class SubCategoryRepositoryTest {
   private SubCategory createSubCategoryWithPersistedMainCategory(){
     SubCategory subCategory = createSubCategory();
 
-    MainCategory mainCategory = iMainCategoryRepository.save(createMainCategory());
+    MainCategory mainCategory = mainCategoryRepository.save(createMainCategory());
 
     subCategory.setMainCategory(mainCategory);
 
@@ -249,10 +243,10 @@ class SubCategoryRepositoryTest {
   private SubCategory createSubCategoryWithPersistedMainCategoryAndProducts(){
     SubCategory subCategory = createSubCategoryWithPersistedMainCategory();
 
-    Product product = iProductRepository.save(createProduct());
-    Product product2 = iProductRepository.save(createProduct());
-    Product product3 = iProductRepository.save(createProduct());
-    Product product4 = iProductRepository.save(createProduct());
+    Product product = productRepository.save(createProduct());
+    Product product2 = productRepository.save(createProduct());
+    Product product3 = productRepository.save(createProduct());
+    Product product4 = productRepository.save(createProduct());
 
     subCategory.setProducts(Set.of(product, product2, product3, product4));
 

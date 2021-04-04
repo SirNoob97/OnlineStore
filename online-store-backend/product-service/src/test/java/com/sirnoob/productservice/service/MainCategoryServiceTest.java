@@ -30,7 +30,7 @@ import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
-import com.sirnoob.productservice.repository.IMainCategoryRepository;
+import com.sirnoob.productservice.repository.MainCategoryRepository;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -40,20 +40,20 @@ public class MainCategoryServiceTest {
   private static final String NO_MAIN_CATEGORIES_FOUND = "No Main Categories Found";
 
   @Mock
-  private IMainCategoryRepository iMainCategoryRepository;
+  private MainCategoryRepository mainCategoryRepository;
 
   @Mock
-  private IProductService iProductService;
+  private ProductService productService;
 
   @Mock
-  private ISubCategoryService iSubCategoryService;
+  private SubCategoryService subCategoryService;
 
-  private IMainCategoryService iMainCategoryService;
+  private MainCategoryService mainCategoryService;
 
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
-    iMainCategoryService = new MainCategoryServiceImpl(iProductService, iSubCategoryService, iMainCategoryRepository);
+    mainCategoryService = new MainCategoryServiceImpl(productService, subCategoryService, mainCategoryRepository);
 
     MainCategory mainCategory = createMainCategoryStaticValues();
 
@@ -63,26 +63,26 @@ public class MainCategoryServiceTest {
 
     PageImpl<MainCategory> mainCategories = new PageImpl<>(List.of(mainCategory));
 
-    BDDMockito.when(iMainCategoryRepository.save(any(MainCategory.class))).thenReturn(mainCategory);
+    BDDMockito.when(mainCategoryRepository.save(any(MainCategory.class))).thenReturn(mainCategory);
 
-    BDDMockito.when(iMainCategoryRepository.updateMainCategoryName(anyString(), anyLong())).thenReturn(1);
+    BDDMockito.when(mainCategoryRepository.updateName(anyString(), anyLong())).thenReturn(1);
 
-    BDDMockito.doNothing().when(iMainCategoryRepository).delete(any(MainCategory.class));
+    BDDMockito.doNothing().when(mainCategoryRepository).delete(any(MainCategory.class));
 
-    BDDMockito.when(iSubCategoryService.getSubCategoryByMainCategory(anyLong())).thenReturn(subCategories);
+    BDDMockito.when(subCategoryService.getMainCategory(anyLong())).thenReturn(subCategories);
 
-    BDDMockito.when(iProductService.getProductByMainCategory(anyLong())).thenReturn(products);
+    BDDMockito.when(productService.getByMainCategory(anyLong())).thenReturn(products);
 
-    BDDMockito.when(iMainCategoryRepository.findById(anyLong())).thenReturn(Optional.of(mainCategory));
+    BDDMockito.when(mainCategoryRepository.findById(anyLong())).thenReturn(Optional.of(mainCategory));
 
-    BDDMockito.when(iMainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.of(mainCategory));
+    BDDMockito.when(mainCategoryRepository.findByMainCategoryName(anyString())).thenReturn(Optional.of(mainCategory));
 
-    BDDMockito.when(iMainCategoryRepository.findAll(any(Pageable.class))).thenReturn(mainCategories);
+    BDDMockito.when(mainCategoryRepository.findAll(any(Pageable.class))).thenReturn(mainCategories);
   }
 
   @Test
   public void createMainCategory_CreateMainCategory_WhenSuccessful() {
-    MainCategory mainCategory = iMainCategoryService.createMainCategory(createMainCategoryStaticValues());
+    MainCategory mainCategory = mainCategoryService.create(createMainCategoryStaticValues());
 
     assertThat(mainCategory).isNotNull();
     assertThat(mainCategory.getMainCategoryId()).isNotNull();
@@ -91,26 +91,26 @@ public class MainCategoryServiceTest {
 
   @Test
   public void updateMainCategoryName_UpdateTheNameOfAnExistingMainCategory_WhenSuccessful() {
-    assertThatCode(() -> iMainCategoryService.updateMainCategoryName(1L, "TEST")).doesNotThrowAnyException();
+    assertThatCode(() -> mainCategoryService.updateName(1L, "TEST")).doesNotThrowAnyException();
   }
 
   @Test
   public void updateMainCategoryName_ThrowResourceNotFoundEsception_WhenTheReturnOfTheQueryIsLessThanOne() {
-    BDDMockito.when(iMainCategoryRepository.updateMainCategoryName(anyString(), anyLong()))
+    BDDMockito.when(mainCategoryRepository.updateName(anyString(), anyLong()))
         .thenThrow(new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-      .isThrownBy(() -> iMainCategoryService.updateMainCategoryName(-1L, "")).withMessage(MAIN_CATEGORY_NOT_FOUND);
+      .isThrownBy(() -> mainCategoryService.updateName(-1L, "")).withMessage(MAIN_CATEGORY_NOT_FOUND);
   }
 
   @Test
   public void deleteMainCategory_DeleteMainCategory_WhenSuccessful() {
-    assertThatCode(() -> iMainCategoryService.deleteMainCategory(1L)).doesNotThrowAnyException();
+    assertThatCode(() -> mainCategoryService.deleteById(1L)).doesNotThrowAnyException();
   }
 
   @Test
   public void getMainCategoryById_ReturnAMainCategory_WhenSuccessful() {
-    MainCategory mainCategoryFetchedById = iMainCategoryService.getMainCategoryById(1L);
+    MainCategory mainCategoryFetchedById = mainCategoryService.getById(1L);
 
     assertThat(mainCategoryFetchedById).isNotNull();
     assertThat(mainCategoryFetchedById.getMainCategoryId()).isNotNull();
@@ -119,16 +119,16 @@ public class MainCategoryServiceTest {
 
   @Test
   public void getMainCategoryById_ThrowResourceNotFoundEsception_WhenMainCategoryWasNotFound() {
-    BDDMockito.when(iMainCategoryRepository.findById(anyLong()))
+    BDDMockito.when(mainCategoryRepository.findById(anyLong()))
         .thenThrow(new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
 
-    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> iMainCategoryService.getMainCategoryById(-1L))
+    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> mainCategoryService.getById(-1L))
       .withMessage(MAIN_CATEGORY_NOT_FOUND);
   }
 
   @Test
   public void getMainCategoryByName_ReturnAMainCategory_WhenSuccessful() {
-    MainCategory mainCategoryFetchedByName = iMainCategoryService.getMainCategoryByName("TEST");
+    MainCategory mainCategoryFetchedByName = mainCategoryService.getByName("TEST");
 
     assertThat(mainCategoryFetchedByName).isNotNull();
     assertThat(mainCategoryFetchedByName.getMainCategoryId()).isNotNull();
@@ -137,16 +137,16 @@ public class MainCategoryServiceTest {
 
   @Test
   public void getMainCategoryByName_ThrowResourceNotFoundEsception_WhenTheMainCategoryWasNotFound() {
-    BDDMockito.when(iMainCategoryRepository.findByMainCategoryName(anyString()))
+    BDDMockito.when(mainCategoryRepository.findByMainCategoryName(anyString()))
         .thenThrow(new ResourceNotFoundException(MAIN_CATEGORY_NOT_FOUND));
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-      .isThrownBy(() -> iMainCategoryService.getMainCategoryByName("@#$%%*&")).withMessage(MAIN_CATEGORY_NOT_FOUND);
+      .isThrownBy(() -> mainCategoryService.getByName("@#$%%*&")).withMessage(MAIN_CATEGORY_NOT_FOUND);
   }
 
   @Test
   public void getAllMainCategory_ReturnASetOfString_WhenSuccessful() {
-    Set<String> mainCategories = iMainCategoryService.getAllMainCategory(PageRequest.of(0, 10));
+    Set<String> mainCategories = mainCategoryService.getAll(PageRequest.of(0, 10));
 
     assertThat(mainCategories).isNotNull();
     assertThat(mainCategories.isEmpty()).isFalse();
@@ -154,10 +154,10 @@ public class MainCategoryServiceTest {
 
   @Test
   public void getAllMainCategory_ThrowResourceNotFoundEsception_WhenThereAreNoMainCategoriessInTheRegistry() {
-    BDDMockito.when(iMainCategoryRepository.findAll(PageRequest.of(0, 10)))
+    BDDMockito.when(mainCategoryRepository.findAll(PageRequest.of(0, 10)))
         .thenThrow(new ResourceNotFoundException(NO_MAIN_CATEGORIES_FOUND));
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-      .isThrownBy(() -> iMainCategoryService.getAllMainCategory(PageRequest.of(0, 10))).withMessage(NO_MAIN_CATEGORIES_FOUND);
+      .isThrownBy(() -> mainCategoryService.getAll(PageRequest.of(0, 10))).withMessage(NO_MAIN_CATEGORIES_FOUND);
   }
 }

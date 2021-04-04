@@ -12,10 +12,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class PageableWebMvcConfig implements WebMvcConfigurer {
 
   @Override
-  public void addArgumentResolvers(List<HandlerMethodArgumentResolver> handlerMethodArgumentResolvers) {
-    PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = new PageableHandlerMethodArgumentResolver();
-    pageableHandlerMethodArgumentResolver.setFallbackPageable(PageRequest.of(0, 10));
-    handlerMethodArgumentResolvers.add(pageableHandlerMethodArgumentResolver);
+  public void addArgumentResolvers(List<HandlerMethodArgumentResolver> hMAR) {
+    var pHMAR = new PageableHandlerMethodArgumentResolver();
+    pHMAR.setFallbackPageable(PageRequest.of(0, 10));
+    hMAR.add(pHMAR);
 
   }
 }

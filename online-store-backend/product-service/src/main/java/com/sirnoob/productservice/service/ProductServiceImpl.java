@@ -13,8 +13,8 @@ import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
-import com.sirnoob.productservice.mapper.IProductMapper;
-import com.sirnoob.productservice.repository.IProductRepository;
+import com.sirnoob.productservice.mapper.ProductMapper;
+import com.sirnoob.productservice.repository.ProductRepository;
 import com.sirnoob.productservice.util.CollectionValidator;
 
 import org.springframework.data.domain.Page;
@@ -26,32 +26,32 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class ProductServiceImpl implements IProductService {
+public class ProductServiceImpl implements ProductService {
 
-  private final ISubCategoryService iSubCategoryService;
-  private final IProductRepository iProductRepository;
-  private final IProductMapper iProductMapper;
+  private final SubCategoryService subCategoryService;
+  private final ProductRepository productRepository;
+  private final ProductMapper productMapper;
 
   private static final String PRODUCT_NOT_FOUND = "Product Not Found";
   private static final String NO_PRODUCTS_FOUND = "No Products Found";
 
   @Transactional
   @Override
-  public ProductResponse createProduct(ProductRequest productRequest, MainCategory mainCategory) {
-    Set<SubCategory> subCategories = iSubCategoryService.getSubcategoriesByName(productRequest.getSubCategoriesNames());
+  public ProductResponse create(ProductRequest productRequest, MainCategory mainCategory) {
+    Set<SubCategory> subCategories = subCategoryService.getSetByName(productRequest.getSubCategoriesNames());
 
-    Product product = iProductMapper.mapProductRequestToProduct(productRequest, mainCategory, subCategories);
+    Product product = productMapper.productRequestToProduct(productRequest, mainCategory, subCategories);
 
     product.setProductStatus("CREATED");
 
-    return iProductMapper.mapProductToProductResponse(iProductRepository.save(product));
+    return productMapper.productToProductResponse(productRepository.save(product));
   }
 
   @Transactional
   @Override
-  public ProductResponse updateProduct(Long productId, ProductRequest productRequest, MainCategory mainCategory) {
+  public ProductResponse update(Long productId, ProductRequest productRequest, MainCategory mainCategory) {
 
-    Product product = getProductById(productId);
+    Product product = getById(productId);
 
     product.setProductBarCode(productRequest.getProductBarCode());
     product.setProductName(productRequest.getProductName());
@@ -59,80 +59,80 @@ public class ProductServiceImpl implements IProductService {
     product.setProductStock(productRequest.getProductStock());
     product.setProductPrice(productRequest.getProductPrice());
     product.setMainCategory(mainCategory);
-    product.setSubCategories(iSubCategoryService.getSubcategoriesByName(productRequest.getSubCategoriesNames()));
+    product.setSubCategories(subCategoryService.getSetByName(productRequest.getSubCategoriesNames()));
 
-    return iProductMapper.mapProductToProductResponse(iProductRepository.save(product));
+    return productMapper.productToProductResponse(productRepository.save(product));
   }
 
   @Transactional
   @Override
-  public void updateProductStock(Long productBarCode, Integer quantity) {
-    if (iProductRepository.updateProductStockByProductBarCode(quantity, productBarCode) < 1)
+  public void updateStock(Long productBarCode, Integer quantity) {
+    if (productRepository.updateStockByBarCode(quantity, productBarCode) < 1)
       throw new ResourceNotFoundException(PRODUCT_NOT_FOUND);
   }
 
   @Transactional
   @Override
-  public void deleteProductById(Long productId) {
-    iProductRepository.delete(getProductById(productId));
+  public void deleteById(Long productId) {
+    productRepository.delete(getById(productId));
   }
 
   @Transactional(readOnly = true)
   @Override
   public ProductResponse getProductResponseByBarCodeOrProductName(Long productBarCode, String productName) {
-    return iProductMapper
-        .mapProductToProductResponse(iProductRepository.findByProductBarCodeOrProductName(productBarCode, productName)
+    return productMapper
+        .productToProductResponse(productRepository.findByProductBarCodeOrProductName(productBarCode, productName)
             .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND)));
   }
 
   @Override
-  public ProductInvoiceResponse getProductForInvoiceResponse(Long productBarCode, String productName) {
-    return iProductRepository.findProductForInvoice(productBarCode, productName)
+  public ProductInvoiceResponse getForInvoiceResponse(Long productBarCode, String productName) {
+    return productRepository.findForInvoice(productBarCode, productName)
         .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND));
   }
 
   @Override
-  public Product getProductById(Long productId) {
-    return iProductRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND));
+  public Product getById(Long productId) {
+    return productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND));
   }
 
   @Override
-  public List<Product> getProductByMainCategory(Long mainCategoryId) {
-     return iProductRepository.findByMainCategoryMainCategoryId(mainCategoryId);
+  public List<Product> getByMainCategory(Long mainCategoryId) {
+     return productRepository.findByMainCategoryMainCategoryId(mainCategoryId);
   }
 
   @Override
   public ProductView getProductViewByName(String productName) {
-    return iProductMapper.mapProductToProductView(iProductRepository.findByProductName(productName)
+    return productMapper.productToProductView(productRepository.findByProductName(productName)
         .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_NOT_FOUND)));
   }
 
   @Transactional(readOnly = true)
   @Override
-  public Page<ProductListView> getPageOfProductListViewByName(String productName, Pageable pageable) {
-    Page<ProductListView> products = iProductRepository.findByProductNameContainingIgnoreCase(productName, pageable);
+  public Page<ProductListView> getListViewByName(String productName, Pageable pageable) {
+    Page<ProductListView> products = productRepository.findByProductNameContainingIgnoreCase(productName, pageable);
     return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
   @Transactional(readOnly = true)
   @Override
-  public Page<ProductListView> getPageOfProductListView(Pageable pageable) {
-    Page<ProductListView> products = iProductRepository.getAll(pageable);
+  public Page<ProductListView> getListView(Pageable pageable) {
+    Page<ProductListView> products = productRepository.getAll(pageable);
     return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
   @Transactional(readOnly = true)
   @Override
-  public Page<ProductListView> getPageOfProductListViewByMainCategory(Long mainCategoryId, Pageable pageable) {
-    Page<ProductListView> products = iProductRepository.findByMainCategoryMainCategoryId(mainCategoryId, pageable);
+  public Page<ProductListView> getListViewByMainCategory(Long mainCategoryId, Pageable pageable) {
+    Page<ProductListView> products = productRepository.findByMainCategoryMainCategoryId(mainCategoryId, pageable);
     return CollectionValidator.throwExceptionIfPageIsEmpty(products, NO_PRODUCTS_FOUND);
   }
 
   @Transactional(readOnly = true)
   @Override
-  public Set<ProductListView> getSetOfProductListViewBySubCategory(String[] subCategoriesNames) {
-    Set<ProductListView> products = iSubCategoryService.getSubcategoriesByName(subCategoriesNames).stream()
-        .map(sc -> iProductRepository.findBySubCategory(sc))
+  public Set<ProductListView> getListViewBySubCategory(String[] subCategoriesNames) {
+    Set<ProductListView> products = subCategoryService.getSetByName(subCategoriesNames).stream()
+        .map(sc -> productRepository.findBySubCategory(sc))
         .flatMap(pdv -> pdv.stream())
         .collect(Collectors.toSet());
     return CollectionValidator.throwExceptionIfSetIsEmpty(products, NO_PRODUCTS_FOUND);

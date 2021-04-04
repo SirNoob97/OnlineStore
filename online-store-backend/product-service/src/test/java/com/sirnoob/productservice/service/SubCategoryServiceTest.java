@@ -19,8 +19,8 @@ import com.sirnoob.productservice.dto.SubCategoryResponse;
 import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.SubCategory;
 import com.sirnoob.productservice.exception.ResourceNotFoundException;
-import com.sirnoob.productservice.mapper.ISubCategoryMapper;
-import com.sirnoob.productservice.repository.ISubCategoryRepository;
+import com.sirnoob.productservice.mapper.SubCategoryMapper;
+import com.sirnoob.productservice.repository.SubCategoryRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,17 +45,17 @@ public class SubCategoryServiceTest {
 
 
   @Mock
-  ISubCategoryMapper iSubCategoryMapper;
+  SubCategoryMapper subCategoryMapper;
 
   @Mock
-  ISubCategoryRepository iSubCategoryRepository;
+  SubCategoryRepository subCategoryRepository;
 
-  ISubCategoryService iSubCategoryService;
+  SubCategoryService subCategoryService;
 
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
-    iSubCategoryService = new SubCategoryServiceImpl(iSubCategoryMapper, iSubCategoryRepository);
+    subCategoryService = new SubCategoryServiceImpl(subCategoryMapper, subCategoryRepository);
 
     MainCategory mainCategory = createMainCategoryStaticValues();
 
@@ -63,28 +63,28 @@ public class SubCategoryServiceTest {
 
     PageImpl<SubCategory> subCategories = new PageImpl<>(List.of(subCategory));
 
-    BDDMockito.when(iSubCategoryMapper.mapSubCategoryRequestToSubCategory(anyString(), any(MainCategory.class))).thenReturn(subCategory);
+    BDDMockito.when(subCategoryMapper.subCategoryRequestToSubCategory(anyString(), any(MainCategory.class))).thenReturn(subCategory);
 
-    BDDMockito.when(iSubCategoryRepository.save(any(SubCategory.class))).thenReturn(subCategory);
+    BDDMockito.when(subCategoryRepository.save(any(SubCategory.class))).thenReturn(subCategory);
 
-    BDDMockito.when(iSubCategoryMapper.mapSubCategoryToSubCategoryResponse(any(SubCategory.class))).thenReturn(createSubCategoryResponse());
+    BDDMockito.when(subCategoryMapper.subCategoryToSubCategoryResponse(any(SubCategory.class))).thenReturn(createSubCategoryResponse());
 
-    BDDMockito.when(iSubCategoryRepository.updateSubCategoryName(anyString(), anyLong())).thenReturn(1);
+    BDDMockito.when(subCategoryRepository.updateName(anyString(), anyLong())).thenReturn(1);
 
-    BDDMockito.doNothing().when(iSubCategoryRepository).delete(any(SubCategory.class));
+    BDDMockito.doNothing().when(subCategoryRepository).delete(any(SubCategory.class));
 
-    BDDMockito.when(iSubCategoryRepository.findById(anyLong())).thenReturn(Optional.of(subCategory));
+    BDDMockito.when(subCategoryRepository.findById(anyLong())).thenReturn(Optional.of(subCategory));
 
-    BDDMockito.when(iSubCategoryRepository.findBySubCategoryName(anyString())).thenReturn(Optional.of(subCategory));
+    BDDMockito.when(subCategoryRepository.findBySubCategoryName(anyString())).thenReturn(Optional.of(subCategory));
 
-    BDDMockito.when(iSubCategoryRepository.findAll(any(Pageable.class))).thenReturn(subCategories);
+    BDDMockito.when(subCategoryRepository.findAll(any(Pageable.class))).thenReturn(subCategories);
 
-    BDDMockito.when(iSubCategoryRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of(subCategory));
+    BDDMockito.when(subCategoryRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of(subCategory));
   }
 
   @Test
   public void createMainCategory_CreateMainCategory_WhenSuccessful() {
-    SubCategoryResponse subCategory = iSubCategoryService.createSubCategory("Sub Category", createMainCategoryStaticValues());
+    SubCategoryResponse subCategory = subCategoryService.create("Sub Category", createMainCategoryStaticValues());
 
     assertThat(subCategory).isNotNull();
     assertThat(subCategory.getSubCategoryId()).isNotNull();
@@ -96,32 +96,32 @@ public class SubCategoryServiceTest {
 
   @Test
   public void updateSubCategoryName_UpdateTheNameOfAnExistingSubCategory_WhenSuccessful() {
-    assertThatCode(() -> iSubCategoryService.updateSubCategoryName(1L, "TEST")).doesNotThrowAnyException();
+    assertThatCode(() -> subCategoryService.updateName(1L, "TEST")).doesNotThrowAnyException();
   }
 
   @Test
   public void updateSubCategoryName_ThrowResourceNotFoundEsception_WhenTheReturnOfTheQueryIsLessThanOne() {
-    BDDMockito.when(iSubCategoryRepository.updateSubCategoryName(anyString(), anyLong()))
+    BDDMockito.when(subCategoryRepository.updateName(anyString(), anyLong()))
         .thenThrow(new ResourceNotFoundException(SUB_CATEGORY_NOT_FOUND));
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-      .isThrownBy(() -> iSubCategoryService.updateSubCategoryName(-1L, "")).withMessage(SUB_CATEGORY_NOT_FOUND);
+      .isThrownBy(() -> subCategoryService.updateName(-1L, "")).withMessage(SUB_CATEGORY_NOT_FOUND);
   }
 
   @Test
   public void deleteSubCategory_DeleteSubCategoryEvenIfItIsRelatedToProducts_WhenSuccessful() {
-    BDDMockito.when(iSubCategoryRepository.findById(anyLong())).thenReturn(Optional.of(createSubCategoryForDeleteTest()));
+    BDDMockito.when(subCategoryRepository.findById(anyLong())).thenReturn(Optional.of(createSubCategoryForDeleteTest()));
 
-    assertThatCode(() -> iSubCategoryService.deleteSubCategory(1L)).doesNotThrowAnyException();
+    assertThatCode(() -> subCategoryService.deleteById(1L)).doesNotThrowAnyException();
   }
 
   @Test
   public void deleteSubCategory_DeleteSubCategoryEvenThoughItHasANullProductSet_WhenSuccessful() {
     MainCategory mainCategory = createMainCategoryStaticValues();
 
-    BDDMockito.when(iSubCategoryRepository.findById(anyLong())).thenReturn(Optional.of(createSubCategoryStaticValues(1, mainCategory)));
+    BDDMockito.when(subCategoryRepository.findById(anyLong())).thenReturn(Optional.of(createSubCategoryStaticValues(1, mainCategory)));
 
-    assertThatCode(() -> iSubCategoryService.deleteSubCategory(1L)).doesNotThrowAnyException();
+    assertThatCode(() -> subCategoryService.deleteById(1L)).doesNotThrowAnyException();
   }
 
   @Test
@@ -130,16 +130,16 @@ public class SubCategoryServiceTest {
 
     subCategory.getProducts().forEach(pr -> pr.setSubCategories(null));
 
-    BDDMockito.when(iSubCategoryRepository.findById(anyLong())).thenReturn(Optional.of(subCategory));
+    BDDMockito.when(subCategoryRepository.findById(anyLong())).thenReturn(Optional.of(subCategory));
 
-    assertThatCode(() -> iSubCategoryService.deleteSubCategory(1L)).doesNotThrowAnyException();
+    assertThatCode(() -> subCategoryService.deleteById(1L)).doesNotThrowAnyException();
   }
 
   @Test
   public void getSubCategoryById_ReturnAMainCategory_WhenSuccessful() {
     String expectedName = "Sub Category 1";
 
-    SubCategory subCategoryFetchedById = iSubCategoryService.getSubCategoryById(1L);
+    SubCategory subCategoryFetchedById = subCategoryService.getById(1L);
 
     assertThat(subCategoryFetchedById).isNotNull();
     assertThat(subCategoryFetchedById.getSubCategoryName()).isEqualTo(expectedName);
@@ -148,9 +148,9 @@ public class SubCategoryServiceTest {
 
   @Test
   public void getSubCategoryById_ThrowResourceNotFoundEsception_WhenSubCategoryWasNotFound() {
-    BDDMockito.when(iSubCategoryRepository.findById(anyLong())).thenThrow(new ResourceNotFoundException(SUB_CATEGORY_NOT_FOUND));
+    BDDMockito.when(subCategoryRepository.findById(anyLong())).thenThrow(new ResourceNotFoundException(SUB_CATEGORY_NOT_FOUND));
 
-    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> iSubCategoryService.getSubCategoryById(-1L))
+    assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> subCategoryService.getById(-1L))
       .withMessage(SUB_CATEGORY_NOT_FOUND);
   }
 
@@ -158,7 +158,7 @@ public class SubCategoryServiceTest {
   public void getSubCategoryResponseByName_ReturnASubCategoryResponse_WhenSuccessful() {
     String expectedName = "Sub Category";
 
-    SubCategoryResponse subCategoryFetchedByName = iSubCategoryService.getSubCategoryResponseByName(expectedName);
+    SubCategoryResponse subCategoryFetchedByName = subCategoryService.getSubCategoryResponseByName(expectedName);
 
     assertThat(subCategoryFetchedByName).isNotNull();
     assertThat(subCategoryFetchedByName.getSubCategoryName()).isEqualTo(expectedName);
@@ -171,7 +171,7 @@ public class SubCategoryServiceTest {
   public void getSubCategoryByName_ReturnAMainCategory_WhenSuccessful() {
     String expectedName = "Sub Category 1";
 
-    SubCategory subCategoryFetchedByName = iSubCategoryService.getSubCategoryByName(expectedName);
+    SubCategory subCategoryFetchedByName = subCategoryService.getByName(expectedName);
 
     assertThat(subCategoryFetchedByName).isNotNull();
     assertThat(subCategoryFetchedByName.getSubCategoryName()).isEqualTo(expectedName);
@@ -180,15 +180,15 @@ public class SubCategoryServiceTest {
 
   @Test
   public void getSubCategoryByName_ThrowResourceNotFoundEsception_WhenSubCategoryWasNotFound() {
-    BDDMockito.when(iSubCategoryRepository.findBySubCategoryName(anyString())).thenThrow(new ResourceNotFoundException(SUB_CATEGORY_NOT_FOUND));
+    BDDMockito.when(subCategoryRepository.findBySubCategoryName(anyString())).thenThrow(new ResourceNotFoundException(SUB_CATEGORY_NOT_FOUND));
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-      .isThrownBy(() -> iSubCategoryService.getSubCategoryByName("@#$%%*&")).withMessage(SUB_CATEGORY_NOT_FOUND);
+      .isThrownBy(() -> subCategoryService.getByName("@#$%%*&")).withMessage(SUB_CATEGORY_NOT_FOUND);
   }
 
   @Test
   public void getAllSubCategories_ReturnASetOfString_WhenSuccessful() {
-    Set<String> subCategories = iSubCategoryService.getAllSubCategories(PageRequest.of(0, 10));
+    Set<String> subCategories = subCategoryService.getAll(PageRequest.of(0, 10));
 
     assertThat(subCategories).isNotNull();
     assertThat(subCategories.isEmpty()).isFalse();
@@ -196,17 +196,17 @@ public class SubCategoryServiceTest {
 
   @Test
   public void getAllSubCategories_ThrowResourceNotFoundEsception_WhenThereAreNoSubCategoriessInTheRegistry() {
-    BDDMockito.when(iSubCategoryRepository.findAll(any(Pageable.class))).thenThrow(new ResourceNotFoundException(NO_SUB_CATEGORIES_FOUND));
+    BDDMockito.when(subCategoryRepository.findAll(any(Pageable.class))).thenThrow(new ResourceNotFoundException(NO_SUB_CATEGORIES_FOUND));
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-      .isThrownBy(() -> iSubCategoryService.getAllSubCategories(PageRequest.of(0, 10))).withMessage(NO_SUB_CATEGORIES_FOUND);
+      .isThrownBy(() -> subCategoryService.getAll(PageRequest.of(0, 10))).withMessage(NO_SUB_CATEGORIES_FOUND);
   }
 
   @Test
   public void getSubcategoriesByName_ReturnASetSubCategory_WhenSuccessful() {
     String[] names = { "Sub Category 1", "Sub Category 2", "Sub Category 3" };
 
-    Set<SubCategory> subCategoriesFetchedByName = iSubCategoryService.getSubcategoriesByName(names);
+    Set<SubCategory> subCategoriesFetchedByName = subCategoryService.getSetByName(names);
 
     assertThat(subCategoriesFetchedByName).isNotNull();
     assertThat(subCategoriesFetchedByName.isEmpty()).isFalse();
@@ -214,7 +214,7 @@ public class SubCategoryServiceTest {
 
   @Test
   public void getSubCategoryByMainCategory_ReturnAListSubCategory_WhenSuccessful() {
-    List<SubCategory> subCategories = iSubCategoryService.getSubCategoryByMainCategory(1L);
+    List<SubCategory> subCategories = subCategoryService.getMainCategory(1L);
 
     assertThat(subCategories).isNotNull();
     assertThat(subCategories.isEmpty()).isFalse();
@@ -222,9 +222,9 @@ public class SubCategoryServiceTest {
 
   @Test
   public void getSubCategoryByMainCategory_ReturnAnEmptyListSubCategory_WhenSuccessful() {
-    BDDMockito.when(iSubCategoryRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of());
+    BDDMockito.when(subCategoryRepository.findByMainCategoryMainCategoryId(anyLong())).thenReturn(List.of());
 
-    List<SubCategory> subCategoriesFetchedByName = iSubCategoryService.getSubCategoryByMainCategory(-1L);
+    List<SubCategory> subCategoriesFetchedByName = subCategoryService.getMainCategory(-1L);
 
     assertThat(subCategoriesFetchedByName).isNotNull();
     assertThat(subCategoriesFetchedByName.isEmpty()).isTrue();

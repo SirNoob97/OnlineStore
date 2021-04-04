@@ -9,13 +9,13 @@ import com.sirnoob.productservice.entity.MainCategory;
 import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 
-public interface IProductMapper {
+public interface ProductMapper {
 
-  public Product mapProductRequestToProduct(ProductRequest productRequest, MainCategory mainCategory,
+  public Product productRequestToProduct(ProductRequest productRequest, MainCategory mainCategory,
       Set<SubCategory> subCategories);
 
-  public ProductResponse mapProductToProductResponse(Product product);
+  public ProductResponse productToProductResponse(Product product);
 
-  public ProductView mapProductToProductView(Product product);
+  public ProductView productToProductView(Product product);
 
 }

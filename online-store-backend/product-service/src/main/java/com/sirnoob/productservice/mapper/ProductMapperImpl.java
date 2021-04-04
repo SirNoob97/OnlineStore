@@ -13,12 +13,11 @@ import com.sirnoob.productservice.entity.SubCategory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProductMapperImpl implements IProductMapper {
+public class ProductMapperImpl implements ProductMapper {
 
   @Override
-  public Product mapProductRequestToProduct(ProductRequest productRequest, MainCategory mainCategory,
+  public Product productRequestToProduct(ProductRequest productRequest, MainCategory mainCategory,
       Set<SubCategory> subCategories) {
-
     return Product.builder()
                   .productBarCode(productRequest.getProductBarCode())
                   .productName(productRequest.getProductName())
@@ -30,8 +29,7 @@ public class ProductMapperImpl implements IProductMapper {
   }
 
   @Override
-  public ProductResponse mapProductToProductResponse(Product product) {
-
+  public ProductResponse productToProductResponse(Product product) {
     return ProductResponse.builder()
                           .productId(product.getProductId())
                           .productBarCode(product.getProductBarCode())
@@ -48,8 +46,7 @@ public class ProductMapperImpl implements IProductMapper {
   }
 
   @Override
-  public ProductView mapProductToProductView(Product product) {
-
+  public ProductView productToProductView(Product product) {
     return ProductView.builder()
                       .productBarCode(product.getProductBarCode())
                       .productName(product.getProductName())

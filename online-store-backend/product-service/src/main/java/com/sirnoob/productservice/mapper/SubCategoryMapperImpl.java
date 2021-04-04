@@ -11,10 +11,10 @@ import com.sirnoob.productservice.entity.Product;
 import com.sirnoob.productservice.entity.SubCategory;
 
 @Component
-public class SubCategoryMapperImpl implements ISubCategoryMapper {
+public class SubCategoryMapperImpl implements SubCategoryMapper {
 
   @Override
-  public SubCategory mapSubCategoryRequestToSubCategory(String subCategoryName, MainCategory mainCategory) {
+  public SubCategory subCategoryRequestToSubCategory(String subCategoryName, MainCategory mainCategory) {
     return SubCategory.builder()
                       .subCategoryName(subCategoryName)
                       .mainCategory(mainCategory)
@@ -22,7 +22,7 @@ public class SubCategoryMapperImpl implements ISubCategoryMapper {
   }
 
   @Override
-  public SubCategoryResponse mapSubCategoryToSubCategoryResponse(SubCategory subCategory) {
+  public SubCategoryResponse subCategoryToSubCategoryResponse(SubCategory subCategory) {
     return subCategory.getProducts() == null || subCategory.getProducts().isEmpty()
     //@formatter:off
                 ? SubCategoryResponse.builder()

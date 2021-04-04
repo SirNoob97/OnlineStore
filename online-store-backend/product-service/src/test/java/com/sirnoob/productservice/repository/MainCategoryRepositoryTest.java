@@ -4,15 +4,11 @@ import static com.sirnoob.productservice.util.RandomEntityGenerator.createMainCa
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import java.util.Optional;
-
 import javax.validation.ConstraintViolationException;
 
 import com.sirnoob.productservice.entity.MainCategory;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -20,16 +16,13 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 @DataJpaTest
 class MainCategoryRepositoryTest {
 
-  Logger log = LoggerFactory.getLogger(MainCategoryRepositoryTest.class);
-
   @Autowired
-  private IMainCategoryRepository iMainCategoryRepository;
+  private MainCategoryRepository mainCategoryRepository;
 
   @Test
   public void save_PersistMainCategory_WhenSuccessful() {
     MainCategory mainCategory = createMainCategory();
-
-    MainCategory mainCategorySaved = iMainCategoryRepository.save(mainCategory);
+    MainCategory mainCategorySaved = mainCategoryRepository.save(mainCategory);
 
     assertThat(mainCategorySaved).isNotNull();
     assertThat(mainCategorySaved.getMainCategoryId()).isNotEqualTo(mainCategory.getMainCategoryId());
@@ -41,21 +34,19 @@ class MainCategoryRepositoryTest {
     MainCategory mainCategory = new MainCategory();
 
     assertThatExceptionOfType(ConstraintViolationException.class)
-        .isThrownBy(() -> iMainCategoryRepository.save(mainCategory));
+        .isThrownBy(() -> mainCategoryRepository.save(mainCategory));
   }
 
   @Test
   public void save_ThrowInvalidDataAccessApiUsageException_WhenMainCategoryIsNull() {
-    assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> iMainCategoryRepository.save(null));
+    assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> mainCategoryRepository.save(null));
   }
 
   @Test
   public void delete_RemoveMainCategory_WhenSuccessful() {
-    MainCategory mainCategoryToDelete = iMainCategoryRepository.save(createMainCategory());
-
-    iMainCategoryRepository.delete(mainCategoryToDelete);
-
-    Optional<MainCategory> mainCategoryOptional = iMainCategoryRepository.findById(mainCategoryToDelete.getMainCategoryId());
+    MainCategory mainCategoryToDelete = mainCategoryRepository.save(createMainCategory());
+    mainCategoryRepository.delete(mainCategoryToDelete);
+    var mainCategoryOptional = mainCategoryRepository.findById(mainCategoryToDelete.getMainCategoryId());
 
     assertThat(mainCategoryToDelete.getMainCategoryId()).isNotNull();
     assertThat(mainCategoryOptional.isEmpty()).isTrue();
@@ -63,16 +54,14 @@ class MainCategoryRepositoryTest {
 
   @Test
   public void delete_ThrowInvalidDataAccessApiUsageException_WhenMainCategoryIsNull() {
-    assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> iMainCategoryRepository.delete(null));
+    assertThatExceptionOfType(InvalidDataAccessApiUsageException.class).isThrownBy(() -> mainCategoryRepository.delete(null));
   }
 
   @Test
   public void findByMainCategoryName_ReturnPresentMainCategory_WhenSuccessful() {
-    MainCategory mainCategorySaved = iMainCategoryRepository.save(createMainCategory());
-
+    MainCategory mainCategorySaved = mainCategoryRepository.save(createMainCategory());
     String name = mainCategorySaved.getMainCategoryName();
-
-    Optional<MainCategory> mainCategoryOptional = iMainCategoryRepository.findByMainCategoryName(name);
+    var mainCategoryOptional = mainCategoryRepository.findByMainCategoryName(name);
 
     assertThat(mainCategoryOptional.isPresent()).isTrue();
     assertThat(mainCategoryOptional.get().getMainCategoryName()).isEqualTo(name);
@@ -81,29 +70,25 @@ class MainCategoryRepositoryTest {
 
   @Test
   public void findByMainCategoryName_ReturnEmptyMainCategory_WhenNameIsNull() {
-    Optional<MainCategory> mainCategoryOptional = iMainCategoryRepository.findByMainCategoryName(null);
+    var mainCategoryOptional = mainCategoryRepository.findByMainCategoryName(null);
 
     assertThat(mainCategoryOptional.isEmpty()).isTrue();
   }
 
   @Test
   public void findByMainCategoryName_ReturnEmptyMainCategory_WhenNamesNotMatches() {
-    MainCategory mainCategorySaved = iMainCategoryRepository.save(createMainCategory());
-
-    Optional<MainCategory> mainCategoryOptional = iMainCategoryRepository.findByMainCategoryName(mainCategorySaved.getMainCategoryName() + "TEST");
+    MainCategory mainCategorySaved = mainCategoryRepository.save(createMainCategory());
+    var mainCategoryOptional = mainCategoryRepository.findByMainCategoryName(mainCategorySaved.getMainCategoryName() + "TEST");
 
     assertThat(mainCategoryOptional.isEmpty()).isTrue();
   }
 
   @Test
   public void updateMainCategoryName_ReturnAnIntegerGreaterThanZero_WhenSuccessful() {
-    MainCategory mainCategoryToUpdate = iMainCategoryRepository.save(createMainCategory());
-
+    MainCategory mainCategoryToUpdate = mainCategoryRepository.save(createMainCategory());
     String name = mainCategoryToUpdate.getMainCategoryName();
-
-    Integer returnFromUpdateOperation = iMainCategoryRepository.updateMainCategoryName("TEST", mainCategoryToUpdate.getMainCategoryId());
-
-    Optional<MainCategory> mainCategoryWithUpdatedName = iMainCategoryRepository.findById(mainCategoryToUpdate.getMainCategoryId());
+    Integer returnFromUpdateOperation = mainCategoryRepository.updateName("TEST", mainCategoryToUpdate.getMainCategoryId());
+    var mainCategoryWithUpdatedName = mainCategoryRepository.findById(mainCategoryToUpdate.getMainCategoryId());
 
     assertThat(returnFromUpdateOperation).isGreaterThan(0);
     assertThat(mainCategoryWithUpdatedName).isNotNull();
@@ -113,7 +98,7 @@ class MainCategoryRepositoryTest {
 
   @Test
   public void updateMainCategoryName_ReturnZero_WhenNoMainCategoryHasThatId() {
-    Integer returnFromUpdateOperation = iMainCategoryRepository.updateMainCategoryName("TEST", -1L);
+    Integer returnFromUpdateOperation = mainCategoryRepository.updateName("TEST", -1L);
 
     assertThat(returnFromUpdateOperation).isNotNull();
     assertThat(returnFromUpdateOperation).isEqualTo(0);
@@ -121,7 +106,7 @@ class MainCategoryRepositoryTest {
 
   @Test
   public void updateMainCategoryName_ReturnZero_WhenMainCategoryIdIsNull() {
-    Integer returnFromUpdateOperation = iMainCategoryRepository.updateMainCategoryName("TEST", null);
+    Integer returnFromUpdateOperation = mainCategoryRepository.updateName("TEST", null);
 
     assertThat(returnFromUpdateOperation).isNotNull();
     assertThat(returnFromUpdateOperation).isEqualTo(0);
