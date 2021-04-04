@@ -24,6 +24,24 @@ services:
       retries: 2
       start_period: 15s
 
+  common:
+    image: alpine:3.13
+    env_file:
+      - ./env/postgresql.env
+      - ./env/config-service.env
+      - ./env/registry-service.env
+    cap_drop:
+      - ALL
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 170M
+    volumes:
+      - ./logs:/var/log/online-store
+
   config-service:
     container_name: config-service
     env_file: ./env/config-service.env
@@ -34,8 +52,9 @@ services:
     hostname: config-service
     volumes:
       - ./logs:/var/log/online-store
+    user: config-service
     cap_drop:
-      - "all"
+      - ALL
     deploy:
       mode: global
       resources:
@@ -51,7 +70,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 20s
 
   registry-service:
     container_name: registry-service
@@ -63,10 +82,11 @@ services:
       dockerfile: ./registry-service/Dockerfile
     image: registry-service:latest
     hostname: registry-service
+    user: registry-service
     volumes:
       - ./logs:/var/log/online-store
     cap_drop:
-      - "all"
+      - ALL
     deploy:
       mode: global
       resources:
@@ -74,6 +94,9 @@ services:
           memory: 256M
         reservations:
           memory: 170M
+    depends_on:
+      config-service:
+        condition: service_healthy
     networks:
       online-store:
         ipv4_address: 192.168.0.3
@@ -82,86 +105,74 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 20s
 
   auth-service:
     env_file:
-      - ./env/postgresql.env
       - ./env/auth-service.env
-      - ./env/config-service.env
-      - ./env/registry-service.env
     container_name: auth-service
     build:
       context: ./online-store-backend
       dockerfile: ./auth-service/Dockerfile
     image: auth-service:latest
     hostname: auth-service
+    user: auth-service
     ports:
       - "127.0.0.1:8090:8090"
-    volumes:
-      - ./logs:/var/log/online-store
-    cap_drop:
-      - "all"
-    deploy:
-      mode: global
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 170M
+    extends:
+      service: common
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      registry-service:
+        condition: service_healthy
     networks:
       online-store:
 
   product-service:
     env_file:
-      - ./env/postgresql.env
       - ./env/product-service.env
-      - ./env/config-service.env
-      - ./env/registry-service.env
     container_name: product-service
     build:
       context: ./online-store-backend
       dockerfile: ./product-service/Dockerfile
     image: product-service:latest
     hostname: product-service
-    volumes:
-      - ./logs:/var/log/online-store
-    cap_drop:
-      - "all"
-    deploy:
-      mode: global
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 170M
+    user: product-service
+    extends:
+      service: common
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      registry-service:
+        condition: service_healthy
     networks:
       online-store:
         ipv4_address: 192.168.0.12
 
   shopping-service:
     env_file:
-      - ./env/postgresql.env
       - ./env/shopping-service.env
-      - ./env/config-service.env
-      - ./env/registry-service.env
     container_name: shopping-service
     build:
       context: ./online-store-backend
       dockerfile: ./shopping-service/Dockerfile
     image: shopping-service:latest
     hostname: shopping-service
-    volumes:
-      - ./logs:/var/log/online-store
-    cap_drop:
-      - "all"
-    deploy:
-      mode: global
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 170M
+    user: shopping-service
+    extends:
+      service: common
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      registry-service:
+        condition: service_healthy
     networks:
       online-store:
         ipv4_address: 192.168.0.13
