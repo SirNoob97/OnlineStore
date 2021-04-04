@@ -7,11 +7,11 @@ TARGETS:=$(shell find ./online-store-backend/ -path */dependency -prune -o -path
 .PHONY: cd results clean test package build run
 
 run: package
-	@./run.sh >./results/run
+	@sudo docker-compose up -d >./results/run
 	@echo $(END-MESSAGE)
 
 build: package
-	@docker-compose build >./results/build
+	@sudo docker-compose build >./results/build
 	@echo $(END-MESSAGE)
 
 package: clean
