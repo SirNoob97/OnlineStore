@@ -7,8 +7,8 @@ import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
-import com.sirnoob.authservice.mapper.IUserMapper;
-import com.sirnoob.authservice.repository.IUserRepository;
+import com.sirnoob.authservice.mapper.UserMapper;
+import com.sirnoob.authservice.repository.UserRepository;
 import com.sirnoob.authservice.security.JwtProvider;
 
 import org.springframework.http.HttpStatus;
@@ -25,21 +25,21 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @Service
-public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService {
+public class AuthServiceImpl implements ReactiveUserDetailsService, AuthService {
 
   private static final String USER_NOT_FOUND = "User Not Found!!";
   private static final String WRONG_PASSWORD = "Wrong Password!!";
   private static final String INVALID_TOKEN = "Invalid Token!!";
 
-  private final ITokenService iTokenService;
-  private final IUserRepository iUserRepository;
-  private final IUserMapper iUserMapper;
+  private final TokenService tokenService;
+  private final UserRepository userRepository;
+  private final UserMapper userMapper;
   private final JwtProvider jwtProvider;
   private final PasswordEncoder passwordEncoder;
 
   @Override
   public Mono<UserDetails> findByUsername(String username) {
-    return iUserRepository.findByUserName(username)
+    return userRepository.findByUserName(username)
            .switchIfEmpty(getMonoError(HttpStatus.NOT_FOUND, USER_NOT_FOUND))
            .cast(UserDetails.class);
   }
@@ -47,7 +47,7 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
   @Transactional
   @Override
   public Mono<Token> signup(SignUpRequest signUpRequest) {
-    return iUserRepository.save(iUserMapper.mapSignUpRequestToUser(signUpRequest))
+    return userRepository.save(userMapper.signUpRequestToUser(signUpRequest))
            .flatMap(user -> persistToken(user, UUID.randomUUID().toString()));
   }
 
@@ -61,23 +61,23 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
   }
 
   @Override
-  public Mono<AccountView> getCurrentUser() {
+  public Mono<AccountView> currentUser() {
     return ReactiveSecurityContextHolder.getContext()
           .map(sc -> sc.getAuthentication().getName())
           .flatMap(name -> findByUsername(name))
           .cast(User.class)
-          .map(user -> iUserMapper.maptUserToAccountView(user));
+          .map(user -> userMapper.userToAccountView(user));
   }
 
   @Override
   public Mono<Token> refreshToken(Token token) {
-    return iTokenService.getTokensByRefreshToken(token.getRefreshToken())
+    return tokenService.getByRefreshToken(token.getRefreshToken())
             .flatMap(dbToken -> jwtProvider.validateToken(token, dbToken.getAccessToken()))
             .switchIfEmpty(getMonoError(HttpStatus.NOT_ACCEPTABLE, INVALID_TOKEN))
             .map(accessToken -> jwtProvider.getUsernameFromJwt(accessToken))
             .flatMap(userName -> findByUsername(userName)
               .cast(User.class)
-              .flatMap(userDb -> iTokenService.deleteToken(token.getRefreshToken())
+              .flatMap(userDb -> tokenService.delete(token.getRefreshToken())
                                 .then(persistToken(userDb, UUID.randomUUID().toString())))
             );
   }
@@ -85,7 +85,7 @@ public class AuthServiceImpl implements ReactiveUserDetailsService, IAuthService
 
   private Mono<Token> persistToken(User user, String issuer) {
     return Mono.just(buildTokenEntity(user, issuer))
-          .flatMap(token -> iTokenService.persistToken(token));
+          .flatMap(token -> tokenService.persist(token));
   }
 
   private Token buildTokenEntity(User user, String issuer) {

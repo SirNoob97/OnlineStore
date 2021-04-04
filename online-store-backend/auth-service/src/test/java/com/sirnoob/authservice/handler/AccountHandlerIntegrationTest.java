@@ -11,9 +11,9 @@ import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountPayload;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
-import com.sirnoob.authservice.mapper.IUserMapper;
-import com.sirnoob.authservice.repository.ITokenRepository;
-import com.sirnoob.authservice.repository.IUserRepository;
+import com.sirnoob.authservice.mapper.UserMapper;
+import com.sirnoob.authservice.repository.TokenRepository;
+import com.sirnoob.authservice.repository.UserRepository;
 import com.sirnoob.authservice.security.AuthenticationManager;
 import com.sirnoob.authservice.security.JwtProvider;
 import com.sirnoob.authservice.security.SecurityContextRepository;
@@ -49,16 +49,16 @@ import reactor.core.publisher.Mono;
 class AccountHandlerIntegrationTest{
 
   @MockBean
-  private ITokenRepository iRefreshTokenRepository;
+  private TokenRepository refreshTokenRepository;
 
   @MockBean
-  private IUserRepository iUserRepository;
+  private UserRepository userRepository;
 
   @MockBean
   private PasswordEncoder passwordEncoder;
 
   @MockBean
-  private IUserMapper iUserMapper;
+  private UserMapper userMapper;
 
   @Autowired
   private ApplicationContext applicationContext;
@@ -76,21 +76,21 @@ class AccountHandlerIntegrationTest{
 
     Mono<User> user = Mono.just(staticUser);
 
-    BDDMockito.when(iUserRepository.findByUserName(TEST)).thenReturn(user);
+    BDDMockito.when(userRepository.findByUserName(TEST)).thenReturn(user);
 
     BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
 
-    BDDMockito.when(iUserMapper.mapAccountPayloadToUser(any(AccountPayload.class))).thenReturn(staticUser);
+    BDDMockito.when(userMapper.accountPayloadToUser(any(AccountPayload.class))).thenReturn(staticUser);
 
-    BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(user);
+    BDDMockito.when(userRepository.save(any(User.class))).thenReturn(user);
 
-    BDDMockito.when(iUserMapper.maptUserToAccountView(any(User.class))).thenReturn(staticAccountView);
+    BDDMockito.when(userMapper.userToAccountView(any(User.class))).thenReturn(staticAccountView);
 
-    BDDMockito.when(iUserRepository.findAll()).thenReturn(Flux.just(staticUser));
+    BDDMockito.when(userRepository.findAll()).thenReturn(Flux.just(staticUser));
 
-    BDDMockito.when(iUserRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(1));
+    BDDMockito.when(userRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(1));
 
-    BDDMockito.when(iUserRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(1));
+    BDDMockito.when(userRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(1));
   }
 
   @Test
@@ -159,7 +159,7 @@ class AccountHandlerIntegrationTest{
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = ADMIN)
   public void updatePassword_Return404StatusCode_WhenRepositoryUpdateOperationReturnZero() {
-    BDDMockito.when(iUserRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(0));
+    BDDMockito.when(userRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(0));
 
     webTestClient.put()
                   .uri("/accounts/passwords")
@@ -193,7 +193,7 @@ class AccountHandlerIntegrationTest{
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = ADMIN)
   public void deleteByUserId_Return404StatusCode_WhenRepositoryDeleteOperationReturnZero() {
-    BDDMockito.when(iUserRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(0));
+    BDDMockito.when(userRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(0));
 
     webTestClient.delete()
                   .uri("/accounts/1")
@@ -225,7 +225,7 @@ class AccountHandlerIntegrationTest{
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = ADMIN)
   public void getAllAccounts_Return404StatusCode_WhenFluxUserIsEmpty() {
-    BDDMockito.when(iUserRepository.findAll()).thenReturn(Flux.empty());
+    BDDMockito.when(userRepository.findAll()).thenReturn(Flux.empty());
 
     webTestClient.get()
                   .uri("/accounts")
@@ -248,7 +248,7 @@ class AccountHandlerIntegrationTest{
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities  = EMPLOYEE)
   public void getAllAccounts_Return401StatusCode_WhenAccesIsDenied() {
-    BDDMockito.when(iUserRepository.findAll()).thenReturn(Flux.empty());
+    BDDMockito.when(userRepository.findAll()).thenReturn(Flux.empty());
 
     webTestClient.get()
                   .uri("/accounts")

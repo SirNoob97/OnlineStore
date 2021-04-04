@@ -3,8 +3,8 @@ package com.sirnoob.authservice.service;
 import com.sirnoob.authservice.dto.AccountPayload;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
-import com.sirnoob.authservice.mapper.IUserMapper;
-import com.sirnoob.authservice.repository.IUserRepository;
+import com.sirnoob.authservice.mapper.UserMapper;
+import com.sirnoob.authservice.repository.UserRepository;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,41 +18,41 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @Service
-public class AccountServiceImpl implements IAccountService {
+public class AccountServiceImpl implements AccountService {
 
   private static final String USER_NOT_FOUND = "User Not Found!!";
   private static final String NO_USERS_FOUND = "No Users Found!!";
   private static final String USER_SUCCESSFULLY_PERSISTED ="User was successfully persisted!";
 
   private final PasswordEncoder passwordEncoder;
-  private final IUserRepository iUserRepository;
-  private final IUserMapper iUserMapper;
+  private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
   @Transactional
   @Override
-  public Mono<String> persistAccount(AccountPayload accountPayload) {
-    return iUserRepository.save(iUserMapper.mapAccountPayloadToUser(accountPayload)).flatMap(u -> Mono.just(USER_SUCCESSFULLY_PERSISTED));
+  public Mono<String> persist(AccountPayload accountPayload) {
+    return userRepository.save(userMapper.accountPayloadToUser(accountPayload)).flatMap(u -> Mono.just(USER_SUCCESSFULLY_PERSISTED));
   }
 
   @Transactional
   @Override
   public Mono<Void> updatePassword(PasswordUpdateDto password) {
-    return iUserRepository.updatePasswordById(password.getUserId(), passwordEncoder.encode(password.getPassword()))
+    return userRepository.updatePasswordById(password.getUserId(), passwordEncoder.encode(password.getPassword()))
       .flatMap(num -> verifyOperation(num));
   }
 
   @Transactional
   @Override
-  public Mono<Void> deleteAccount(Long userId) {
-    return iUserRepository.deleteByUserId(userId)
+  public Mono<Void> delete(Long userId) {
+    return userRepository.deleteByUserId(userId)
       .flatMap(num -> verifyOperation(num));
   }
 
   @Override
-  public Flux<AccountView> getAllAccounts(){
-    return iUserRepository.findAll()
+  public Flux<AccountView> getAll(){
+    return userRepository.findAll()
            .switchIfEmpty(Flux.error(new ResponseStatusException(HttpStatus.NOT_FOUND, NO_USERS_FOUND)))
-           .map(user -> iUserMapper.maptUserToAccountView(user));
+           .map(user -> userMapper.userToAccountView(user));
   }
 
   private <T> Mono<T> verifyOperation(Integer num){

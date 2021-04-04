@@ -15,8 +15,8 @@ import com.sirnoob.authservice.domain.Token;
 import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
-import com.sirnoob.authservice.mapper.IUserMapper;
-import com.sirnoob.authservice.repository.IUserRepository;
+import com.sirnoob.authservice.mapper.UserMapper;
+import com.sirnoob.authservice.repository.UserRepository;
 import com.sirnoob.authservice.security.JwtProvider;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -35,13 +35,13 @@ import reactor.test.StepVerifier;
 class AuthServiceTest {
 
   @Mock
-  private ITokenService iTokenService;
+  private TokenService tokenService;
 
   @Mock
-  private IUserRepository iUserRepository;
+  private UserRepository userRepository;
 
   @Mock
-  private IUserMapper iUserMapper;
+  private UserMapper userMapper;
 
   @Mock
   private JwtProvider jwtProvider;
@@ -49,7 +49,7 @@ class AuthServiceTest {
   @Mock
   private PasswordEncoder passwordEncoder;
 
-  private IAuthService iAuthService;
+  private AuthService authService;
 
 
   private static final User staticUser = generateUserForSignUpTest();
@@ -60,7 +60,7 @@ class AuthServiceTest {
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
-    iAuthService = new AuthServiceImpl(iTokenService, iUserRepository, iUserMapper, jwtProvider, passwordEncoder);
+    authService = new AuthServiceImpl(tokenService, userRepository, userMapper, jwtProvider, passwordEncoder);
 
     Mono<User> monoUser = Mono.just(staticUser);
 
@@ -68,17 +68,17 @@ class AuthServiceTest {
 
     Mono<String> accessToken = Mono.just(staticToken.getAccessToken());
 
-    BDDMockito.when(iUserMapper.mapSignUpRequestToUser(any(SignUpRequest.class))).thenReturn(staticUser);
+    BDDMockito.when(userMapper.signUpRequestToUser(any(SignUpRequest.class))).thenReturn(staticUser);
 
-    BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(monoUser);
+    BDDMockito.when(userRepository.save(any(User.class))).thenReturn(monoUser);
 
-    BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(monoUser);
+    BDDMockito.when(userRepository.findByUserName(anyString())).thenReturn(monoUser);
 
-    BDDMockito.when(iTokenService.persistToken(any(Token.class))).thenReturn(token);
+    BDDMockito.when(tokenService.persist(any(Token.class))).thenReturn(token);
 
-    BDDMockito.when(iTokenService.getTokensByRefreshToken(anyString())).thenReturn(token);
+    BDDMockito.when(tokenService.getByRefreshToken(anyString())).thenReturn(token);
 
-    BDDMockito.when(iTokenService.deleteToken(anyString())).thenReturn(Mono.empty());
+    BDDMockito.when(tokenService.delete(anyString())).thenReturn(Mono.empty());
 
     BDDMockito.when(jwtProvider.generateAccessToken(any(User.class), anyString())).thenReturn(staticToken.getAccessToken());
 
@@ -95,7 +95,7 @@ class AuthServiceTest {
 
   @Test
   public void signup_ReturnAMonoTokenEntity_WhenSuccessful(){
-    StepVerifier.create(iAuthService.signup(staticSignUpRequest))
+    StepVerifier.create(authService.signup(staticSignUpRequest))
                 .expectSubscription()
                 .assertNext(token -> {
                   assertThat(token.getClass()).isEqualTo(Token.class);
@@ -106,7 +106,7 @@ class AuthServiceTest {
 
   @Test
   public void login_ReturnAMonoTokenEntity_WhenSuccessful(){
-    StepVerifier.create(iAuthService.login(staticLoginRequest))
+    StepVerifier.create(authService.login(staticLoginRequest))
                 .expectSubscription()
                 .assertNext(token -> {
                   assertThat(token.getClass()).isEqualTo(Token.class);
@@ -117,9 +117,9 @@ class AuthServiceTest {
 
   @Test
   public void login_ReturnAMonoErrorResponseStatusException_WhenTheRepositoryReturnsAnMonoEmpty(){
-    BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(Mono.empty());
+    BDDMockito.when(userRepository.findByUserName(anyString())).thenReturn(Mono.empty());
 
-    StepVerifier.create(iAuthService.login(staticLoginRequest))
+    StepVerifier.create(authService.login(staticLoginRequest))
                 .expectSubscription()
                 .expectError(ResponseStatusException.class)
                 .verify();
@@ -129,7 +129,7 @@ class AuthServiceTest {
   public void login_ReturnAMonoErrorResponseStatusException_WhenPasswordsDoNotMatch(){
     BDDMockito.when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
-    StepVerifier.create(iAuthService.login(staticLoginRequest))
+    StepVerifier.create(authService.login(staticLoginRequest))
                 .expectSubscription()
                 .expectError(ResponseStatusException.class)
                 .verify();
@@ -137,7 +137,7 @@ class AuthServiceTest {
 
   @Test
   public void refreshToken_ReturnAMonoToken_WhenSuccessful() {
-    StepVerifier.create(iAuthService.refreshToken(staticToken))
+    StepVerifier.create(authService.refreshToken(staticToken))
                 .expectSubscription()
                 .assertNext(token -> {
                   assertThat(token.getClass()).isEqualTo(Token.class);

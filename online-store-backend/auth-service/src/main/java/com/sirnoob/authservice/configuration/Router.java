@@ -54,7 +54,7 @@ public class Router {
   public RouterFunction<ServerResponse> authEndPoints(AuthHandler authHandler) {
     return RouterFunctions.route(POST("/auth/signup").and(contentType(JSON)), authHandler::signup)
         .andRoute(POST("/auth/login").and(contentType(JSON)), authHandler::login)
-        .andRoute(GET("/auth/users").and(accept(JSON)), authHandler::getCurrentUser)
+        .andRoute(GET("/auth/users").and(accept(JSON)), authHandler::currentUser)
         .andRoute(POST("/auth/logout"), authHandler::logout)
         .andRoute(POST("/auth/refresh-token"), authHandler::refreshToken);
   }
@@ -62,11 +62,11 @@ public class Router {
   @Bean
   public RouterFunction<ServerResponse> accountEndPoints(AccountHandler accountHandler) {
     return RouterFunctions
-        .route(POST("/accounts").and(accept(JSON)).and(contentType(JSON)), accountHandler::createAccount)
-        .andRoute(PUT("/accounts").and(accept(JSON)).and(contentType(JSON)), accountHandler::updateAccount)
+        .route(POST("/accounts").and(accept(JSON)).and(contentType(JSON)), accountHandler::create)
+        .andRoute(PUT("/accounts").and(accept(JSON)).and(contentType(JSON)), accountHandler::update)
         .andRoute(PUT("/accounts/passwords").and(contentType(JSON)), accountHandler::updatePassword)
-        .andRoute(DELETE("/accounts/{userId}"), accountHandler::deleteAccountById)
-        .andRoute(GET("/accounts").and(accept(JSON)), accountHandler::getAllAccounts);
+        .andRoute(DELETE("/accounts/{userId}"), accountHandler::deleteById)
+        .andRoute(GET("/accounts").and(accept(JSON)), accountHandler::getAll);
   }
 
 }

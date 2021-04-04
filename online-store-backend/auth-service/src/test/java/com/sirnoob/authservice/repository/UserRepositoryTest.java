@@ -24,7 +24,7 @@ import reactor.test.StepVerifier;
 class UserRepositoryTest {
 
   @Autowired
-  private IUserRepository iUserRepository;
+  private UserRepository userRepository;
 
   @Autowired
   private ConnectionFactory connectionFactory;
@@ -62,7 +62,7 @@ class UserRepositoryTest {
 
   @Test
   public void save_SavePersistANewUser_WhenSuccessful() {
-    StepVerifier.create(iUserRepository.save(generateUserRandomValues(Role.EMPLOYEE)))
+    StepVerifier.create(userRepository.save(generateUserRandomValues(Role.EMPLOYEE)))
                 .assertNext(user -> {
                   assertThat(user).isNotNull();
                   assertThat(user.getUserId()).isNotNull();
@@ -72,12 +72,12 @@ class UserRepositoryTest {
 
   @Test
   public void save_ThrowIllegalArgumentException_WhenUserIsNull(){
-    assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> iUserRepository.save(null).subscribe());
+    assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> userRepository.save(null).subscribe());
   }
 
   @Test
   public void save_ThrowIllegalArgumentException_WhenUserIsEmpty(){
-    StepVerifier.create(iUserRepository.save(User.builder().build()))
+    StepVerifier.create(userRepository.save(User.builder().build()))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
   }
@@ -86,7 +86,7 @@ class UserRepositoryTest {
   public void save_ThrowDataIntegrityViolationException_WhenThereIsAlreadyAUserSavedWithThatName(){
     User user = User.builder().userName(staticUser.getUsername()).password(PASSWORD).email("fake@email.com").role(Role.ADMIN).build();
 
-    StepVerifier.create(iUserRepository.save(user))
+    StepVerifier.create(userRepository.save(user))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
   }
@@ -95,14 +95,14 @@ class UserRepositoryTest {
   public void save_ThrowDataIntegrityViolationException_WhenThereIsAlreadyAUserSavedWithThatEmail(){
     User user = User.builder().userName("name").password(PASSWORD).email(staticUser.getEmail()).role(Role.ADMIN).build();
 
-    StepVerifier.create(iUserRepository.save(user))
+    StepVerifier.create(userRepository.save(user))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
   }
 
   @Test
   public void findAll_ReturnAUsersFlux_WhenSuccesful() {
-    StepVerifier.create(iUserRepository.findAll())
+    StepVerifier.create(userRepository.findAll())
                 .expectNextCount(1)
                 .expectComplete()
                 .verify();
@@ -110,11 +110,11 @@ class UserRepositoryTest {
 
   @Test
   public void findAll_ReturnAFluxEmpty_WhenSuccesful_() {
-    StepVerifier.create(iUserRepository.deleteAll())
+    StepVerifier.create(userRepository.deleteAll())
                 .expectSubscription()
                 .verifyComplete();
 
-    StepVerifier.create(iUserRepository.findAll())
+    StepVerifier.create(userRepository.findAll())
                 .expectSubscription()
                 .expectNextCount(0)
                 .expectComplete()
@@ -124,7 +124,7 @@ class UserRepositoryTest {
   @Test
   public void findByUserName_ReturnAUser_WhenSuccesfful(){
     String name = staticUser.getUsername();
-    StepVerifier.create(iUserRepository.findByUserName(name))
+    StepVerifier.create(userRepository.findByUserName(name))
                 .expectNextMatches(user -> user.getUsername().equals(name))
                 .expectComplete()
                 .verify();
@@ -132,7 +132,7 @@ class UserRepositoryTest {
 
   @Test
   public void findByUserName_DoesNotThrowException_WhenNameParameterIsNull(){
-    StepVerifier.create(iUserRepository.findByUserName(null))
+    StepVerifier.create(userRepository.findByUserName(null))
                 .expectSubscription()
                 .expectComplete()
                 .verify();
@@ -143,11 +143,11 @@ class UserRepositoryTest {
     String name = staticUser.getUsername();
     User defaultUser = User.builder().userId(0L).userName(DEFAULT).email(DEFAULT).role(Role.CUSTOMER).build();
 
-    StepVerifier.create(iUserRepository.deleteAll())
+    StepVerifier.create(userRepository.deleteAll())
                 .expectSubscription()
                 .verifyComplete();
 
-    StepVerifier.create(iUserRepository.findByUserName(name).defaultIfEmpty(defaultUser))
+    StepVerifier.create(userRepository.findByUserName(name).defaultIfEmpty(defaultUser))
                 .expectSubscription()
                 .assertNext(defaultU -> {
                     assertThat(defaultU).isEqualTo(defaultUser);
@@ -159,9 +159,9 @@ class UserRepositoryTest {
 
   @Test
   public void deleteByUserId_DeleteRemoveAnUserLog_WhenSuccessful(){
-    Long userId = iUserRepository.save(generateUserRandomValues(Role.EMPLOYEE)).map(User::getUserId).block();
+    Long userId = userRepository.save(generateUserRandomValues(Role.EMPLOYEE)).map(User::getUserId).block();
 
-    StepVerifier.create(iUserRepository.deleteByUserId(userId))
+    StepVerifier.create(userRepository.deleteByUserId(userId))
                 .expectNextMatches(num -> num.equals(1))
                 .expectComplete()
                 .verify();
@@ -169,7 +169,7 @@ class UserRepositoryTest {
 
   @Test
   public void deleteByUserId_ReturnZeroAndDoesNotThrowException_WhenUserIdParameterIsNull(){
-    StepVerifier.create(iUserRepository.deleteByUserId(null))
+    StepVerifier.create(userRepository.deleteByUserId(null))
                 .expectSubscription()
                 .assertNext(num -> assertThat(num).isGreaterThan(-1))
                 .verifyComplete();
@@ -177,11 +177,11 @@ class UserRepositoryTest {
 
   @Test
   public void deleteByUserId_ReturnZero_WhenThereIsNoUsersInTheRegistry(){
-    StepVerifier.create(iUserRepository.deleteAll())
+    StepVerifier.create(userRepository.deleteAll())
                 .expectSubscription()
                 .verifyComplete();
 
-    StepVerifier.create(iUserRepository.deleteByUserId(1L))
+    StepVerifier.create(userRepository.deleteByUserId(1L))
                 .expectSubscription()
                 .expectNextMatches(num -> num.equals(0))
                 .verifyComplete();
@@ -189,16 +189,16 @@ class UserRepositoryTest {
 
   @Test
   public void updatePasswordById_ReturnAIntegerEqualsToOneAndUpdateThePasswordOfAUserLog_WhenSuccessful(){
-    User userDB = iUserRepository.findByUserName(staticUser.getUsername()).block();
+    User userDB = userRepository.findByUserName(staticUser.getUsername()).block();
     Long id = userDB.getUserId();
     String oldPassword = userDB.getPassword();
 
-    StepVerifier.create(iUserRepository.updatePasswordById(id, NEW_PASSWORD))
+    StepVerifier.create(userRepository.updatePasswordById(id, NEW_PASSWORD))
                 .expectNextMatches(num -> num.equals(1))
                 .expectComplete()
                 .verify();
 
-    StepVerifier.create(iUserRepository.findByUserName(userDB.getUsername()))
+    StepVerifier.create(userRepository.findByUserName(userDB.getUsername()))
                 .expectNextMatches(user -> user.getPassword().equals(NEW_PASSWORD) && !user.getPassword().equals(oldPassword))
                 .expectComplete()
                 .verify();
@@ -206,7 +206,7 @@ class UserRepositoryTest {
 
   @Test
   public void updatePasswordById_ReturnZeroAndDoesNotThrowException_WhenParametersAreNull(){
-    StepVerifier.create(iUserRepository.updatePasswordById(null, null))
+    StepVerifier.create(userRepository.updatePasswordById(null, null))
                 .expectNextMatches(num -> num.equals(0))
                 .expectComplete()
                 .verify();
@@ -214,11 +214,11 @@ class UserRepositoryTest {
 
   @Test
   public void updatePasswordById_ReturnZero_WhenThereIsNoUsersInTheRegistry(){
-    StepVerifier.create(iUserRepository.deleteAll())
+    StepVerifier.create(userRepository.deleteAll())
                 .expectSubscription()
                 .verifyComplete();
 
-    StepVerifier.create(iUserRepository.updatePasswordById(1L, PASSWORD))
+    StepVerifier.create(userRepository.updatePasswordById(1L, PASSWORD))
                 .expectSubscription()
                 .expectNextMatches(num -> num.equals(0))
                 .verifyComplete();

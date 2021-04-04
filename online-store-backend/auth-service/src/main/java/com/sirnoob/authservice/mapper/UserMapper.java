@@ -5,11 +5,11 @@ import com.sirnoob.authservice.dto.AccountPayload;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.SignUpRequest;
 
-public interface IUserMapper {
+public interface UserMapper {
 
-  public User mapAccountPayloadToUser(AccountPayload accountPayload);
+  public User accountPayloadToUser(AccountPayload accountPayload);
 
-  public User mapSignUpRequestToUser(SignUpRequest signUpRequest);
+  public User signUpRequestToUser(SignUpRequest signUpRequest);
 
-  public AccountView maptUserToAccountView (User user);
+  public AccountView userToAccountView(User user);
 }

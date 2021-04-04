@@ -8,8 +8,8 @@ import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountPayload;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.PasswordUpdateDto;
-import com.sirnoob.authservice.mapper.IUserMapper;
-import com.sirnoob.authservice.repository.IUserRepository;
+import com.sirnoob.authservice.mapper.UserMapper;
+import com.sirnoob.authservice.repository.UserRepository;
 import static com.sirnoob.authservice.util.Provider.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,19 +31,19 @@ class AccountServiceTest {
   private PasswordEncoder passwordEncoder;
 
   @Mock
-  private IUserRepository iUserRepository;
+  private UserRepository userRepository;
 
   @Mock
-  private IUserMapper iUserMapper;
+  private UserMapper userMapper;
 
-  private IAccountService iAccountService;
+  private AccountService accountService;
 
   private static final User user = generateUserStaticValues();
   private static final AccountView accountView = new AccountView(1L, TEST, TEST_EMAIL, EMPLOYEE);
 
   @BeforeEach
   public void setUp() {
-    iAccountService = new AccountServiceImpl(passwordEncoder, iUserRepository, iUserMapper);
+    accountService = new AccountServiceImpl(passwordEncoder, userRepository, userMapper);
 
     Mono<User> monoUser = Mono.just(user);
 
@@ -51,22 +51,22 @@ class AccountServiceTest {
 
     BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
 
-    BDDMockito.when(iUserMapper.mapAccountPayloadToUser(any(AccountPayload.class))).thenReturn(user);
+    BDDMockito.when(userMapper.accountPayloadToUser(any(AccountPayload.class))).thenReturn(user);
 
-    BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(monoUser);
+    BDDMockito.when(userRepository.save(any(User.class))).thenReturn(monoUser);
 
-    BDDMockito.when(iUserRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(1));
+    BDDMockito.when(userRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(1));
 
-    BDDMockito.when(iUserRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(1));
+    BDDMockito.when(userRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(1));
 
-    BDDMockito.when(iUserMapper.maptUserToAccountView(any(User.class))).thenReturn(accountView);
+    BDDMockito.when(userMapper.userToAccountView(any(User.class))).thenReturn(accountView);
 
-    BDDMockito.when(iUserRepository.findAll()).thenReturn(fluxUser);
+    BDDMockito.when(userRepository.findAll()).thenReturn(fluxUser);
   }
 
   @Test
   public void persistAccount_ReturnAConfirmationMessage_WhenSuccessful() {
-    StepVerifier.create(iAccountService.persistAccount(generateAccountPayloadStaticValues()))
+    StepVerifier.create(accountService.persist(generateAccountPayloadStaticValues()))
                 .expectSubscription()
                 .expectNext("User was successfully persisted!")
                 .verifyComplete();
@@ -74,39 +74,39 @@ class AccountServiceTest {
 
   @Test
   public void updatePassword_ReturnAMonoVoid_WheQueryOperationReturnAIntegerGreaterThanZero() {
-    StepVerifier.create(iAccountService.updatePassword(new PasswordUpdateDto(1L, PASSWORD)))
+    StepVerifier.create(accountService.updatePassword(new PasswordUpdateDto(1L, PASSWORD)))
                 .expectSubscription()
                 .verifyComplete();
   }
 
   @Test
   public void updatePassword_ReturnAMonoErrorResponseStatusException_WhenTheQueryOperationReturnsAnIntegerLessThanZero() {
-    BDDMockito.when(iUserRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(0));
+    BDDMockito.when(userRepository.updatePasswordById(anyLong(), anyString())).thenReturn(Mono.just(0));
 
-    StepVerifier.create(iAccountService.updatePassword(new PasswordUpdateDto(-1L, "")))
+    StepVerifier.create(accountService.updatePassword(new PasswordUpdateDto(-1L, "")))
                 .expectError(ResponseStatusException.class)
                 .verify();
   }
 
   @Test
   public void deleteAccount_ReturnAMonoVoid_WheQueryOperationReturnAIntegerGreaterThanZero() {
-    StepVerifier.create(iAccountService.deleteAccount(1L))
+    StepVerifier.create(accountService.delete(1L))
                 .expectSubscription()
                 .verifyComplete();
   }
 
   @Test
   public void deleteAccount_ReturnAMonoErrorResponseStatusException_WhenTheQueryOperationReturnsAnIntegerLessThanZero() {
-    BDDMockito.when(iUserRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(0));
+    BDDMockito.when(userRepository.deleteByUserId(anyLong())).thenReturn(Mono.just(0));
 
-    StepVerifier.create(iAccountService.deleteAccount(-1L))
+    StepVerifier.create(accountService.delete(-1L))
                 .expectError(ResponseStatusException.class)
                 .verify();
   }
 
   @Test
   public void getAllAccounts_ReturnAAccountViewsFlux_WhenSuccessful() {
-    StepVerifier.create(iAccountService.getAllAccounts())
+    StepVerifier.create(accountService.getAll())
                 .expectSubscription()
                 .expectNextCount(1)
                 .expectComplete()
@@ -115,9 +115,9 @@ class AccountServiceTest {
 
   @Test
   public void getAllAccounts_ReturnAFluxErrorResponseStatusException_WhenThereIsNoUsersInTheRegistry() {
-    BDDMockito.when(iUserRepository.findAll()).thenReturn(Flux.empty());
+    BDDMockito.when(userRepository.findAll()).thenReturn(Flux.empty());
 
-    StepVerifier.create(iAccountService.getAllAccounts())
+    StepVerifier.create(accountService.getAll())
                 .expectError(ResponseStatusException.class)
                 .verify();
   }

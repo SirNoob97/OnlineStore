@@ -7,13 +7,13 @@ import com.sirnoob.authservice.dto.PasswordUpdateDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface IAccountService {
+public interface AccountService {
 
-  public Mono<String> persistAccount(AccountPayload accountPayload);
+  public Mono<String> persist(AccountPayload accountPayload);
 
   public Mono<Void> updatePassword(PasswordUpdateDto password);
 
-  public Mono<Void> deleteAccount(Long userId);
+  public Mono<Void> delete(Long userId);
 
-  public Flux<AccountView> getAllAccounts();
+  public Flux<AccountView> getAll();
 }

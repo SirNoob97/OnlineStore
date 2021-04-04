@@ -13,12 +13,12 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component
-public class UserMapperImpl implements IUserMapper {
+public class UserMapperImpl implements UserMapper {
 
   private final PasswordEncoder passwordEncoder;
 
   @Override
-  public User mapAccountPayloadToUser(AccountPayload accountPayload) {
+  public User accountPayloadToUser(AccountPayload accountPayload) {
     return User.builder().userId(accountPayload.getUserId())
            .userName(accountPayload.getUserName())
            .password(passwordEncoder.encode(accountPayload.getPassword()))
@@ -27,7 +27,7 @@ public class UserMapperImpl implements IUserMapper {
   }
 
   @Override
-  public User mapSignUpRequestToUser(SignUpRequest signUpRequest) {
+  public User signUpRequestToUser(SignUpRequest signUpRequest) {
     return User.builder().userName(signUpRequest.getUserName())
            .password(passwordEncoder.encode(signUpRequest.getPassword()))
            .email(signUpRequest.getEmail())
@@ -35,7 +35,7 @@ public class UserMapperImpl implements IUserMapper {
   }
 
   @Override
-  public AccountView maptUserToAccountView(User user) {
+  public AccountView userToAccountView(User user) {
     return user.getRole().name().equals("CUSTOMER") ?  new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), "")
                                                     :  new AccountView(user.getUserId(), user.getUsername(), user.getEmail(), user.getRole().name());
   }

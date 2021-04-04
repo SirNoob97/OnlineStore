@@ -4,8 +4,8 @@ import com.sirnoob.authservice.domain.Token;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
-import com.sirnoob.authservice.service.IAuthService;
-import com.sirnoob.authservice.service.ITokenService;
+import com.sirnoob.authservice.service.AuthService;
+import com.sirnoob.authservice.service.TokenService;
 import com.sirnoob.authservice.validator.ConstraintValidator;
 
 import org.springframework.http.HttpCookie;
@@ -28,38 +28,38 @@ public class AuthHandler {
   private static final String CLEAR_SITE_DATA = "Clear-Site-Data";
   private static final String CLEAR_SITE_DATA_VALUES = "\"cache\", \"cookies\", \"storage\", \"executionContexts\"";
 
-  private final ITokenService iTokenService;
-  private final IAuthService iAuthService;
+  private final TokenService tokenService;
+  private final AuthService authService;
   private final ConstraintValidator constraintValidator;
 
   public Mono<ServerResponse> signup(ServerRequest serverRequest){
     return serverRequest.bodyToMono(SignUpRequest.class)
            .doOnNext(constraintValidator::validate)
-           .flatMap(iAuthService::signup)
+           .flatMap(authService::signup)
            .flatMap(data -> buildServerResponse(HttpStatus.CREATED, data));
   }
 
   public Mono<ServerResponse> login(ServerRequest serverRequest){
     return serverRequest.bodyToMono(LoginRequest.class)
            .doOnNext(constraintValidator::validate)
-           .flatMap(iAuthService::login)
+           .flatMap(authService::login)
            .flatMap(data -> buildServerResponse(HttpStatus.OK, data));
   }
 
-  public Mono<ServerResponse> getCurrentUser(ServerRequest serverRequest){
-    return  ServerResponse.ok().contentType(JSON).body(iAuthService.getCurrentUser(), AccountView.class);
+  public Mono<ServerResponse> currentUser(ServerRequest serverRequest){
+    return  ServerResponse.ok().contentType(JSON).body(authService.currentUser(), AccountView.class);
   }
 
   public Mono<ServerResponse> refreshToken(ServerRequest serverRequest){
     return getTokens(serverRequest.cookies())
-           .flatMap(iAuthService::refreshToken)
+           .flatMap(authService::refreshToken)
            .flatMap(data -> buildServerResponse(HttpStatus.OK, data));
   }
 
   public Mono<ServerResponse> logout(ServerRequest serverRequest){
     return getTokens(serverRequest.cookies())
            .map(Token::getRefreshToken)
-           .flatMap(token -> iTokenService.deleteToken(token))
+           .flatMap(token -> tokenService.delete(token))
            .then(ServerResponse.noContent().header(CLEAR_SITE_DATA, CLEAR_SITE_DATA_VALUES).build());
   }
 

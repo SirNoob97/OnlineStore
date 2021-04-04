@@ -20,7 +20,7 @@ import reactor.test.StepVerifier;
 class TokenRepositoryTest {
 
   @Autowired
-  private ITokenRepository iTokenRepository;
+  private TokenRepository tokenRepository;
 
   @Autowired
   private ConnectionFactory connectionFactory;
@@ -62,11 +62,11 @@ class TokenRepositoryTest {
     Token tokenEntity = generateTokenEntity();
     String refreshToken = tokenEntity.getRefreshToken();
 
-    StepVerifier.create(iTokenRepository.deleteAll())
+    StepVerifier.create(tokenRepository.deleteAll())
                 .expectSubscription()
                 .verifyComplete();
 
-    StepVerifier.create(iTokenRepository.save(tokenEntity))
+    StepVerifier.create(tokenRepository.save(tokenEntity))
                 .expectSubscription()
                 .assertNext(tokenDb -> {
                     assertThat(tokenDb).isNotNull();
@@ -78,12 +78,12 @@ class TokenRepositoryTest {
 
   @Test
   public void save_ThrowIllegalArgumentException_WhenTokenIsNull() {
-    assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> iTokenRepository.save(null).subscribe());
+    assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> tokenRepository.save(null).subscribe());
   }
 
   @Test
   public void save_ThrowDataIntegrityViolationException_WhenTokenIsEmpty(){
-    StepVerifier.create(iTokenRepository.save(Token.builder().build()))
+    StepVerifier.create(tokenRepository.save(Token.builder().build()))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
   }
@@ -94,7 +94,7 @@ class TokenRepositoryTest {
                     .accessToken(staticToken.getAccessToken())
                     .refreshToken(staticToken.getRefreshToken()).build();
 
-    StepVerifier.create(iTokenRepository.save(newToken))
+    StepVerifier.create(tokenRepository.save(newToken))
                 .expectError(DataIntegrityViolationException.class)
                 .verify();
   }
@@ -103,7 +103,7 @@ class TokenRepositoryTest {
   public void findByRefreshToken_ReturnATokenLog_WhenSuccessful(){
     String token = staticToken.getRefreshToken();
 
-    StepVerifier.create(iTokenRepository.findByRefreshToken(token))
+    StepVerifier.create(tokenRepository.findByRefreshToken(token))
                 .expectSubscription()
                 .assertNext(tokenDb -> {
                     assertThat(tokenDb).isNotNull();
@@ -115,7 +115,7 @@ class TokenRepositoryTest {
 
   @Test
   public void findByRefreshToken_DoesNotThrowException_WhenTokenParameterIsNull(){
-    StepVerifier.create(iTokenRepository.findByRefreshToken(null))
+    StepVerifier.create(tokenRepository.findByRefreshToken(null))
                 .expectSubscription()
                 .expectComplete()
                 .verify();
@@ -126,11 +126,11 @@ class TokenRepositoryTest {
     String token = staticToken.getRefreshToken();
     Token defaultToken = new Token();
 
-    StepVerifier.create(iTokenRepository.deleteAll())
+    StepVerifier.create(tokenRepository.deleteAll())
                 .expectSubscription()
                 .verifyComplete();
 
-    StepVerifier.create(iTokenRepository.findByRefreshToken(token).defaultIfEmpty(defaultToken))
+    StepVerifier.create(tokenRepository.findByRefreshToken(token).defaultIfEmpty(defaultToken))
                 .expectSubscription()
                 .assertNext(defaultT -> {
                     assertThat(defaultT).isEqualTo(defaultToken);
@@ -142,7 +142,7 @@ class TokenRepositoryTest {
   public void deleteByRefreshToken_DeleteRemoveAnTokenLog_WhenSuccessful(){
     String token = staticToken.getRefreshToken();
 
-    StepVerifier.create(iTokenRepository.deleteByRefreshToken(token))
+    StepVerifier.create(tokenRepository.deleteByRefreshToken(token))
                 .expectNextMatches(num -> num.equals(1))
                 .expectComplete()
                 .verify();
@@ -150,7 +150,7 @@ class TokenRepositoryTest {
 
   @Test
   public void deleteByRefreshToken_ReturnZeroAndDoesNotThrowException_WhenTokenParameterIsNull(){
-    StepVerifier.create(iTokenRepository.deleteByRefreshToken(null))
+    StepVerifier.create(tokenRepository.deleteByRefreshToken(null))
                 .expectSubscription()
                 .assertNext(num -> assertThat(num).isGreaterThan(-1))
                 .verifyComplete();
@@ -158,11 +158,11 @@ class TokenRepositoryTest {
 
   @Test
   public void deleteByRefreshToken_ReturnZero_WhenThereIsNoTokensInTheRegistry(){
-    StepVerifier.create(iTokenRepository.deleteAll())
+    StepVerifier.create(tokenRepository.deleteAll())
                 .expectSubscription()
                 .verifyComplete();
 
-    StepVerifier.create(iTokenRepository.deleteByRefreshToken(staticToken.getRefreshToken()))
+    StepVerifier.create(tokenRepository.deleteByRefreshToken(staticToken.getRefreshToken()))
                 .expectSubscription()
                 .expectNextMatches(num -> num.equals(0))
                 .verifyComplete();

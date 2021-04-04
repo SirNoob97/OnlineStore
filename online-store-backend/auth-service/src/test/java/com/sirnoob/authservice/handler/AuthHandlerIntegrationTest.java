@@ -22,9 +22,9 @@ import com.sirnoob.authservice.domain.User;
 import com.sirnoob.authservice.dto.AccountView;
 import com.sirnoob.authservice.dto.LoginRequest;
 import com.sirnoob.authservice.dto.SignUpRequest;
-import com.sirnoob.authservice.mapper.IUserMapper;
-import com.sirnoob.authservice.repository.ITokenRepository;
-import com.sirnoob.authservice.repository.IUserRepository;
+import com.sirnoob.authservice.mapper.UserMapper;
+import com.sirnoob.authservice.repository.TokenRepository;
+import com.sirnoob.authservice.repository.UserRepository;
 import com.sirnoob.authservice.security.AuthenticationManager;
 import com.sirnoob.authservice.security.JwtProvider;
 import com.sirnoob.authservice.security.SecurityContextRepository;
@@ -59,13 +59,13 @@ import reactor.core.publisher.Mono;
 class AuthHandlerIntegrationTest {
 
   @MockBean
-  private IUserRepository iUserRepository;
+  private UserRepository userRepository;
 
   @MockBean
-  private IUserMapper iUserMapper;
+  private UserMapper userMapper;
 
   @MockBean
-  private ITokenRepository iTokenRepository;
+  private TokenRepository tokenRepository;
 
   @MockBean
   private PasswordEncoder passwordEncoder;
@@ -93,23 +93,23 @@ class AuthHandlerIntegrationTest {
 
     Mono<String> accessToken = Mono.just(staticToken.getAccessToken());
 
-    BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(user);
+    BDDMockito.when(userRepository.findByUserName(anyString())).thenReturn(user);
 
-    BDDMockito.when(iUserRepository.save(any(User.class))).thenReturn(user);
+    BDDMockito.when(userRepository.save(any(User.class))).thenReturn(user);
 
-    BDDMockito.when(iUserMapper.mapSignUpRequestToUser(any(SignUpRequest.class))).thenReturn(staticUser);
+    BDDMockito.when(userMapper.signUpRequestToUser(any(SignUpRequest.class))).thenReturn(staticUser);
 
-    BDDMockito.when(iUserMapper.maptUserToAccountView(any(User.class))).thenReturn(staticAccountView);
+    BDDMockito.when(userMapper.userToAccountView(any(User.class))).thenReturn(staticAccountView);
 
     BDDMockito.when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
 
     BDDMockito.when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
-    BDDMockito.when(iTokenRepository.save(any(Token.class))).thenReturn(token);
+    BDDMockito.when(tokenRepository.save(any(Token.class))).thenReturn(token);
 
-    BDDMockito.when(iTokenRepository.findByRefreshToken(anyString())).thenReturn(token);
+    BDDMockito.when(tokenRepository.findByRefreshToken(anyString())).thenReturn(token);
 
-    BDDMockito.when(iTokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(1));
+    BDDMockito.when(tokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(1));
 
     BDDMockito.when(jwtProvider.validateToken(any(Token.class), anyString())).thenReturn(accessToken);
 
@@ -133,9 +133,9 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isCreated()
                   .expectBody(Void.class);
 
-    verify(iUserRepository, times(1)).save(any(User.class));
-    verify(iTokenRepository, times(1)).save(any(Token.class));
-    verify(iUserMapper, times(1)).mapSignUpRequestToUser(any(SignUpRequest.class));
+    verify(userRepository, times(1)).save(any(User.class));
+    verify(tokenRepository, times(1)).save(any(Token.class));
+    verify(userMapper, times(1)).signUpRequestToUser(any(SignUpRequest.class));
   }
 
   @Test
@@ -151,8 +151,8 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isBadRequest()
                   .expectBody(Void.class);
 
-    verify(iUserRepository, times(0)).save(any(User.class));
-    verify(iTokenRepository, times(0)).save(any(Token.class));
+    verify(userRepository, times(0)).save(any(User.class));
+    verify(tokenRepository, times(0)).save(any(Token.class));
     verify(passwordEncoder, times(0)).encode(anyString());
   }
 
@@ -167,14 +167,14 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isOk()
                   .expectBody(Void.class);
 
-    verify(iTokenRepository, times(1)).save(any(Token.class));
-    verify(iUserRepository, times(1)).findByUserName(anyString());
+    verify(tokenRepository, times(1)).save(any(Token.class));
+    verify(userRepository, times(1)).findByUserName(anyString());
     verify(passwordEncoder, times(1)).matches(anyString(), anyString());
   }
 
   @Test
   public void login_Return404StatusCode_WhenUserWasNotFoundInTheRegistry() {
-    BDDMockito.when(iUserRepository.findByUserName(anyString())).thenReturn(Mono.empty());
+    BDDMockito.when(userRepository.findByUserName(anyString())).thenReturn(Mono.empty());
 
     webTestClient.post()
                   .uri("/auth/login")
@@ -185,8 +185,8 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isNotFound()
                   .expectBody(Void.class);
 
-    verify(iUserRepository, times(1)).findByUserName(anyString());
-    verify(iTokenRepository, times(0)).save(any(Token.class));
+    verify(userRepository, times(1)).findByUserName(anyString());
+    verify(tokenRepository, times(0)).save(any(Token.class));
     verify(passwordEncoder, times(0)).matches(anyString(), anyString());
   }
 
@@ -203,9 +203,9 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isBadRequest()
                   .expectBody(Void.class);
 
-    verify(iUserRepository, times(1)).findByUserName(anyString());
+    verify(userRepository, times(1)).findByUserName(anyString());
     verify(passwordEncoder, times(1)).matches(anyString(), anyString());
-    verify(iTokenRepository, times(0)).save(any(Token.class));
+    verify(tokenRepository, times(0)).save(any(Token.class));
   }
 
   @Test
@@ -220,9 +220,9 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isBadRequest()
                   .expectBody(Void.class);
 
-    verify(iUserRepository, times(0)).findByUserName(anyString());
+    verify(userRepository, times(0)).findByUserName(anyString());
     verify(passwordEncoder, times(0)).matches(anyString(), anyString());
-    verify(iTokenRepository, times(0)).save(any(Token.class));
+    verify(tokenRepository, times(0)).save(any(Token.class));
   }
 
   @Test
@@ -240,7 +240,7 @@ class AuthHandlerIntegrationTest {
                     assertThat(ac.getRole()).isEqualTo(ADMIN);
                   });
 
-    verify(iUserRepository, times(1)).findByUserName(anyString());
+    verify(userRepository, times(1)).findByUserName(anyString());
   }
 
   @Test
@@ -252,7 +252,7 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isForbidden()
                   .expectBody(Void.class);
 
-    verify(iUserRepository, times(0)).findByUserName(anyString());
+    verify(userRepository, times(0)).findByUserName(anyString());
   }
 
   @Test
@@ -266,8 +266,8 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isOk()
                   .expectBody(Void.class);
 
-    verify(iTokenRepository, times(1)).findByRefreshToken(anyString());
-    verify(iUserRepository, times(1)).findByUserName(anyString());
+    verify(tokenRepository, times(1)).findByRefreshToken(anyString());
+    verify(userRepository, times(1)).findByUserName(anyString());
   }
 
   @Test
@@ -280,9 +280,9 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isForbidden()
                   .expectBody(Void.class);
 
-    verify(iTokenRepository, times(0)).save(any(Token.class));
-    verify(iTokenRepository, times(0)).findByRefreshToken(anyString());
-    verify(iUserRepository, times(0)).findByUserName(anyString());
+    verify(tokenRepository, times(0)).save(any(Token.class));
+    verify(tokenRepository, times(0)).findByRefreshToken(anyString());
+    verify(userRepository, times(0)).findByUserName(anyString());
     verify(passwordEncoder, times(0)).matches(anyString(), anyString());
   }
 
@@ -297,8 +297,8 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isBadRequest()
                   .expectBody(Void.class);
 
-    verify(iTokenRepository, times(0)).findByRefreshToken(anyString());
-    verify(iUserRepository, times(0)).findByUserName(anyString());
+    verify(tokenRepository, times(0)).findByRefreshToken(anyString());
+    verify(userRepository, times(0)).findByUserName(anyString());
   }
 
   @Test
@@ -312,13 +312,13 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isNoContent()
                   .expectBody(Void.class);
 
-    verify(iTokenRepository, times(1)).deleteByRefreshToken(anyString());
+    verify(tokenRepository, times(1)).deleteByRefreshToken(anyString());
   }
 
   @Test
   @WithMockUser(username = TEST, password = TEST, authorities = ADMIN)
   public void logout_Return404StatusCode_WhenTokenWasNotFound() {
-    BDDMockito.when(iTokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(0));
+    BDDMockito.when(tokenRepository.deleteByRefreshToken(anyString())).thenReturn(Mono.just(0));
 
     webTestClient.post()
                   .uri("/auth/logout")
@@ -328,7 +328,7 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isNotFound()
                   .expectBody(Void.class);
 
-    verify(iTokenRepository, times(1)).deleteByRefreshToken(anyString());
+    verify(tokenRepository, times(1)).deleteByRefreshToken(anyString());
   }
 
   @Test
@@ -341,6 +341,6 @@ class AuthHandlerIntegrationTest {
                   .expectStatus().isForbidden()
                   .expectBody(Void.class);
 
-    verify(iTokenRepository, times(0)).deleteByRefreshToken(anyString());
+    verify(tokenRepository, times(0)).deleteByRefreshToken(anyString());
   }
 }

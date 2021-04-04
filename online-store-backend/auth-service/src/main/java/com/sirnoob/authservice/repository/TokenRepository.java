@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface ITokenRepository extends ReactiveCrudRepository<Token, Long>{
+public interface TokenRepository extends ReactiveCrudRepository<Token, Long>{
 
   public Mono<Token> findByRefreshToken(String token);
 

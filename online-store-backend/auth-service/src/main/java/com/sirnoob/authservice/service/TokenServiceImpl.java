@@ -1,7 +1,7 @@
 package com.sirnoob.authservice.service;
 
 import com.sirnoob.authservice.domain.Token;
-import com.sirnoob.authservice.repository.ITokenRepository;
+import com.sirnoob.authservice.repository.TokenRepository;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,28 +13,28 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @Service
-public class TokenServiceImpl implements ITokenService {
+public class TokenServiceImpl implements TokenService {
 
     private static final String TOKEN_NOT_FOUND = "Token Not Found!!";
 
-    private final ITokenRepository iRefreshTokenRepository;
+    private final TokenRepository refreshTokenRepository;
 
     @Transactional
     @Override
-    public Mono<Token> persistToken(Token token) {
-      return iRefreshTokenRepository.save(token);
+    public Mono<Token> persist(Token token) {
+      return refreshTokenRepository.save(token);
     }
 
     @Override
-    public Mono<Token> getTokensByRefreshToken(String token) {
-      return iRefreshTokenRepository.findByRefreshToken(token)
+    public Mono<Token> getByRefreshToken(String token) {
+      return refreshTokenRepository.findByRefreshToken(token)
              .switchIfEmpty(tokenNotFound());
     }
 
     @Transactional
     @Override
-    public Mono<Void> deleteToken(String token) {
-      return iRefreshTokenRepository.deleteByRefreshToken(token)
+    public Mono<Void> delete(String token) {
+      return refreshTokenRepository.deleteByRefreshToken(token)
              .flatMap(num -> num > 0 ? Mono.empty() : tokenNotFound());
   }
 
