@@ -5,14 +5,14 @@ import java.text.DecimalFormat;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.sirnoob.shoppingservice.client.IProductClient;
+import com.sirnoob.shoppingservice.client.ProductClient;
 import com.sirnoob.shoppingservice.dto.InvoiceRequest;
 import com.sirnoob.shoppingservice.dto.ProductDto;
 import com.sirnoob.shoppingservice.entity.Invoice;
 import com.sirnoob.shoppingservice.entity.Item;
 import com.sirnoob.shoppingservice.exception.ResourceNotFoundException;
 import com.sirnoob.shoppingservice.model.Product;
-import com.sirnoob.shoppingservice.repository.IInvoiceRepository;
+import com.sirnoob.shoppingservice.repository.InvoiceRepository;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class InvoiceServiceImpl implements IInvoiceService{
+public class InvoiceServiceImpl implements InvoiceService{
 
   private static final String INVOICE_NOT_FOUND = "Invoice Not Found!!";
   private static final String THE_USER_HAS_NO_INVOICES = "The User Has No Invoices!!";
@@ -35,53 +35,53 @@ public class InvoiceServiceImpl implements IInvoiceService{
   private static final String INVOICE_NUMBER_UNIQUE_VIOLATION_TITLE = "Unique index violation: INVOICE.INVOICE_NUMBER";
   private static final String INVOICE_COULD_NOT_EXECUTE_OPERATION = "could not execute operation, " + INVOICE_NUMBER_MUST_BE_UNIQUE;
 
-  private final IInvoiceRepository iInvoiceRepository;
-  private final IProductClient iProductClient;
+  private final InvoiceRepository invoiceRepository;
+  private final ProductClient productClient;
 
   @Transactional
   @Override
-  public Invoice createInvoice(InvoiceRequest invoiceRequest) {
-    if(iInvoiceRepository.existsByInvoiceNumber(invoiceRequest.getInvoiceNumber())) getDataIntegrityViolationException();
+  public Invoice create(InvoiceRequest invoiceRequest) {
+    if(invoiceRepository.existsByInvoiceNumber(invoiceRequest.getInvoiceNumber())) getDataIntegrityViolationException();
 
-    Set<Item> items = invoiceRequest.getProducts()
+    var items = invoiceRequest.getProducts()
                                     .stream()
                                     .map(productDto -> buildItem(getProductAndUpdateStock(productDto), productDto))
                                     .collect(Collectors.toSet());
 
-    return iInvoiceRepository.save(buildInvoice(invoiceRequest, items));
+    return invoiceRepository.save(buildInvoice(invoiceRequest, items));
   }
 
   @Transactional
   @Override
-  public void deleteInvoice(Long invoiceId) {
-    Invoice invoice = iInvoiceRepository.findById(invoiceId).orElseThrow(() -> getResourceNotFoundException(INVOICE_NOT_FOUND));
-    iInvoiceRepository.delete(invoice);
+  public void deleteById(Long invoiceId) {
+    Invoice invoice = invoiceRepository.findById(invoiceId).orElseThrow(() -> getResourceNotFoundException(INVOICE_NOT_FOUND));
+    invoiceRepository.delete(invoice);
   }
 
   @Override
-  public Page<Invoice> getInvoiceByUserName(String userName, Pageable pageable) {
-    Page<Invoice> invoices = iInvoiceRepository.findByCustomerUserName(userName, pageable);
+  public Page<Invoice> getByUserName(String userName, Pageable pageable) {
+    var invoices = invoiceRepository.findByCustomerUserName(userName, pageable);
     return throwExceptionIfPageIsEmpty(invoices, THE_USER_HAS_NO_INVOICES);
   }
 
   @Override
-  public Invoice getInvoiceByInvoiceNumber(Long invoiceNumber) {
-    return iInvoiceRepository.findByInvoiceNumber(invoiceNumber).orElseThrow(() -> getResourceNotFoundException(INVOICE_NOT_FOUND));
+  public Invoice getByInvoiceNumber(Long invoiceNumber) {
+    return invoiceRepository.findByInvoiceNumber(invoiceNumber).orElseThrow(() -> getResourceNotFoundException(INVOICE_NOT_FOUND));
   }
 
   @Override
-  public Page<Invoice> getInvoiceByProductBarCode(Long productBarCode, Pageable pageable){
-    Page<Invoice> invoices = iInvoiceRepository.findByItemsProductBarCode(productBarCode, pageable);
+  public Page<Invoice> getByProductBarCode(Long productBarCode, Pageable pageable){
+    var invoices = invoiceRepository.findByItemsProductBarCode(productBarCode, pageable);
     return throwExceptionIfPageIsEmpty(invoices, NO_INVOICE_ARE_RELATED_WHITH_THATH_PRODUCT);
   }
 
 
 
   private Product getProductAndUpdateStock(ProductDto productDto){
-    var productRes = iProductClient.getProductForInvoice(productDto.getProductBarCode(), productDto.getProductName());
+    var productRes = productClient.getInfo(productDto.getProductBarCode(), productDto.getProductName());
 
     if (productRes.getStatusCode().is2xxSuccessful())
-    iProductClient.updateProductStock(productDto.getProductBarCode(), (productDto.getQuantity() * -1));
+    productClient.updateStock(productDto.getProductBarCode(), (productDto.getQuantity() * -1));
 
     return productRes.getBody();
   }
@@ -110,7 +110,7 @@ public class InvoiceServiceImpl implements IInvoiceService{
   }
 
   private Double getTotal(Double total) {
-    DecimalFormat dec = new DecimalFormat("#.00");
+    var dec = new DecimalFormat("#.00");
     return Double.valueOf(dec.format(total));
   }
 

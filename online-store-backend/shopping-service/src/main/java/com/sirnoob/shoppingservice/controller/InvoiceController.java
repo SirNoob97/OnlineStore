@@ -4,7 +4,7 @@ import javax.validation.Valid;
 
 import com.sirnoob.shoppingservice.dto.InvoiceRequest;
 import com.sirnoob.shoppingservice.entity.Invoice;
-import com.sirnoob.shoppingservice.service.IInvoiceService;
+import com.sirnoob.shoppingservice.service.InvoiceService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,32 +31,32 @@ public class InvoiceController {
   private static final String JSON_VALUE = MediaType.APPLICATION_JSON_VALUE;
   private static final MediaType JSON = MediaType.APPLICATION_JSON;
 
-  private final IInvoiceService iInvoiceService;
+  private final InvoiceService invoiceService;
 
   @PostMapping(consumes = JSON_VALUE)
-  public ResponseEntity<Invoice> createInvoice(@Valid @RequestBody InvoiceRequest invoiceRequest){
-    return ResponseEntity.status(HttpStatus.CREATED).contentType(JSON).body(iInvoiceService.createInvoice(invoiceRequest));
+  public ResponseEntity<Invoice> create(@Valid @RequestBody InvoiceRequest invoiceRequest){
+    return ResponseEntity.status(HttpStatus.CREATED).contentType(JSON).body(invoiceService.create(invoiceRequest));
   }
 
   @DeleteMapping("/{invoiceId}")
-  public ResponseEntity<Void> deleteInvoice(@PathVariable Long invoiceId){
-    iInvoiceService.deleteInvoice(invoiceId);
+  public ResponseEntity<Void> delete(@PathVariable Long invoiceId){
+    invoiceService.deleteById(invoiceId);
     return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/{invoiceNumber}")
-  public ResponseEntity<Invoice> getInvoiceByInvoiceNumber(@PathVariable Long invoiceNumber){
-    return getBodyBuilder().body(iInvoiceService.getInvoiceByInvoiceNumber(invoiceNumber));
+  public ResponseEntity<Invoice> getByInvoiceNumber(@PathVariable Long invoiceNumber){
+    return getBodyBuilder().body(invoiceService.getByInvoiceNumber(invoiceNumber));
   }
 
   @GetMapping("/users")
-  public ResponseEntity<Page<Invoice>> getInvoicesByUserName(@RequestParam(required = true) String userName, Pageable pageable){
-    return getBodyBuilder().body(iInvoiceService.getInvoiceByUserName(userName, pageable));
+  public ResponseEntity<Page<Invoice>> getByUserName(@RequestParam(required = true) String userName, Pageable pageable){
+    return getBodyBuilder().body(invoiceService.getByUserName(userName, pageable));
   }
 
   @GetMapping("/products/{productBarCode}")
-  public ResponseEntity<Page<Invoice>> getInvoiceByProductBarCode(@PathVariable Long productBarCode, Pageable pageable){
-    return getBodyBuilder().body(iInvoiceService.getInvoiceByProductBarCode(productBarCode, pageable));
+  public ResponseEntity<Page<Invoice>> getByProductBarCode(@PathVariable Long productBarCode, Pageable pageable){
+    return getBodyBuilder().body(invoiceService.getByProductBarCode(productBarCode, pageable));
   }
 
   private BodyBuilder getBodyBuilder(){

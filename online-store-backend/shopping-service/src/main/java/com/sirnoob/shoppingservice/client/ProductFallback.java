@@ -7,17 +7,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProductFallback implements IProductClient {
+public class ProductFallback implements ProductClient {
 
   @Override
-  public ResponseEntity<Product> getProductForInvoice(Long productBarCode, String productName) {
+  public ResponseEntity<Product> getInfo(Long productBarCode, String productName) {
     Product product = Product.builder().productName("none").productPrice(0.0).build();
 
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(product);
   }
 
   @Override
-  public ResponseEntity<Void> updateProductStock(Long productBarCode, Integer quantity) {
+  public ResponseEntity<Void> updateStock(Long productBarCode, Integer quantity) {
     return ResponseEntity.notFound().build();
   }
 }

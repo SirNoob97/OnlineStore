@@ -1,7 +1,6 @@
 package com.sirnoob.shoppingservice.exception;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -46,8 +45,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @Override
   protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
       HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-    List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
+    var fieldErrors = exception.getBindingResult().getFieldErrors();
     String fields = fieldErrors.stream().map(FieldError::getField).collect(Collectors.joining(", "));
     String fieldsMessage = fieldErrors.stream().map(FieldError::getDefaultMessage).collect(Collectors.joining(", "));
 
@@ -69,7 +67,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @Override
   protected ResponseEntity<Object> handleExceptionInternal(Exception exception, @Nullable Object body,
       HttpHeaders headers, HttpStatus status, WebRequest request) {
-
     return ResponseEntity.status(status).headers(headers).body(ExceptionDetails.builder()
                                                                                 .timestamp(LocalDateTime.now())
                                                                                 .status(status.value())

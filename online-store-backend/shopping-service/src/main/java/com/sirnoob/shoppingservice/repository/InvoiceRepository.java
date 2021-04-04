@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface IInvoiceRepository extends JpaRepository<Invoice, Long> {
+public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
   public Page<Invoice> findByCustomerUserName(String userName, Pageable pageable);
 

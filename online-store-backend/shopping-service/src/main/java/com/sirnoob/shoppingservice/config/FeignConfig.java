@@ -1,6 +1,6 @@
 package com.sirnoob.shoppingservice.config;
 
-import com.sirnoob.shoppingservice.client.IProductClient;
+import com.sirnoob.shoppingservice.client.ProductClient;
 import com.sirnoob.shoppingservice.client.ProductFallback;
 
 import org.springframework.context.annotation.Bean;
@@ -20,8 +20,8 @@ public class FeignConfig {
   @Bean
   @Scope("prototype")
   public Feign.Builder feignBuilder() {
-    var invoicesCircuitBreaker = circuitBreakerRegistry.circuitBreaker(IProductClient.INVOICES);
-    var stockCircuitBreaker = circuitBreakerRegistry.circuitBreaker(IProductClient.STOCK);    
+    var invoicesCircuitBreaker = circuitBreakerRegistry.circuitBreaker(ProductClient.INVOICES);
+    var stockCircuitBreaker = circuitBreakerRegistry.circuitBreaker(ProductClient.STOCK);    
     var decorator = FeignDecorators.builder()
                                     .withCircuitBreaker(invoicesCircuitBreaker)
                                     .withCircuitBreaker(stockCircuitBreaker)

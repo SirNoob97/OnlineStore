@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sirnoob.shoppingservice.client.IProductClient;
+import com.sirnoob.shoppingservice.client.ProductClient;
 import com.sirnoob.shoppingservice.dto.InvoiceRequest;
 import com.sirnoob.shoppingservice.entity.Invoice;
-import com.sirnoob.shoppingservice.repository.IInvoiceRepository;
+import com.sirnoob.shoppingservice.repository.InvoiceRepository;
 import com.sirnoob.shoppingservice.service.InvoiceServiceImpl;
 
 import org.junit.jupiter.api.Test;
@@ -40,9 +40,9 @@ import org.springframework.test.web.servlet.MockMvc;
 @Import({ InvoiceServiceImpl.class })
 class InvoiceControllerTest {
   @MockBean
-  private IInvoiceRepository invoiceRepository;
+  private InvoiceRepository invoiceRepository;
   @MockBean
-  private IProductClient productClient;
+  private ProductClient productClient;
 
   @Autowired
   private MockMvc mockMvc;
@@ -56,9 +56,9 @@ class InvoiceControllerTest {
   @Test
   public void create_Return201HttpStatus_WhenSuccessful() throws Exception {
     BDDMockito.when(invoiceRepository.existsByInvoiceNumber(anyLong())).thenReturn(false);
-    BDDMockito.when(productClient.getProductForInvoice(anyLong(), anyString()))
+    BDDMockito.when(productClient.getInfo(anyLong(), anyString()))
         .thenReturn(ResponseEntity.ok(createProductRandomPrice()));
-    BDDMockito.when(productClient.updateProductStock(anyLong(), anyInt()))
+    BDDMockito.when(productClient.updateStock(anyLong(), anyInt()))
         .thenReturn(ResponseEntity.noContent().build());
     BDDMockito.when(invoiceRepository.save(any())).thenReturn(INVOICE);
 

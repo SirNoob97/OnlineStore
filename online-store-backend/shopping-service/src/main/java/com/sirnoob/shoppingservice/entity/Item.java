@@ -2,7 +2,6 @@ package com.sirnoob.shoppingservice.entity;
 
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;

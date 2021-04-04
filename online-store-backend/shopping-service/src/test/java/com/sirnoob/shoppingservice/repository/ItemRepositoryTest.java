@@ -18,9 +18,9 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 @DataJpaTest
 class ItemRepositoryTest {
   @Autowired
-  private IInvoiceRepository invoiceRepository;
+  private InvoiceRepository invoiceRepository;
   @Autowired
-  private IItemRepository itemRepository;
+  private ItemRepository itemRepository;
 
   @Test
   public void save_ReturnAnItem_WhenSuccessfull() {

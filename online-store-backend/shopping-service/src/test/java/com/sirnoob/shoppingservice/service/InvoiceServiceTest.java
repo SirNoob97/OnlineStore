@@ -18,11 +18,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import java.util.List;
 import java.util.Optional;
 
-import com.sirnoob.shoppingservice.client.IProductClient;
+import com.sirnoob.shoppingservice.client.ProductClient;
 import com.sirnoob.shoppingservice.dto.InvoiceRequest;
 import com.sirnoob.shoppingservice.entity.Invoice;
 import com.sirnoob.shoppingservice.exception.ResourceNotFoundException;
-import com.sirnoob.shoppingservice.repository.IInvoiceRepository;
+import com.sirnoob.shoppingservice.repository.InvoiceRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,11 +43,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest
 class InvoiceServiceTest {
   @Mock
-  private IInvoiceRepository invoiceRepository;
+  private InvoiceRepository invoiceRepository;
   @Mock
-  private IProductClient productClient;
+  private ProductClient productClient;
 
-  private IInvoiceService invoiceService;
+  private InvoiceService invoiceService;
 
   private static Invoice staticInvoiceWithItems = createInvoiceRandomValuesItems();
   private static InvoiceRequest staticInvoiceRequest = createInvoiceRequestRandomValues();
@@ -62,13 +62,13 @@ class InvoiceServiceTest {
   @Test
   public void create_ReturnInvoice_WhenSuccessful() {
     BDDMockito.when(invoiceRepository.existsByInvoiceNumber(anyLong())).thenReturn(false);
-    BDDMockito.when(productClient.getProductForInvoice(anyLong(), anyString()))
+    BDDMockito.when(productClient.getInfo(anyLong(), anyString()))
         .thenReturn(ResponseEntity.ok(createProductRandomPrice()));
-    BDDMockito.when(productClient.updateProductStock(anyLong(), anyInt()))
+    BDDMockito.when(productClient.updateStock(anyLong(), anyInt()))
         .thenReturn(ResponseEntity.noContent().build());
     BDDMockito.when(invoiceRepository.save(any())).thenReturn(staticInvoiceWithItems);
 
-    var invoice = invoiceService.createInvoice(staticInvoiceRequest);
+    var invoice = invoiceService.create(staticInvoiceRequest);
 
     assertThat(invoice).isNotNull();
     assertThat(invoice.getCustomer()).isNotNull();
@@ -80,17 +80,17 @@ class InvoiceServiceTest {
     BDDMockito.when(invoiceRepository.existsByInvoiceNumber(anyLong())).thenReturn(true);
 
     assertThatExceptionOfType(DataIntegrityViolationException.class)
-        .isThrownBy(() -> invoiceService.createInvoice(staticInvoiceRequest));
+        .isThrownBy(() -> invoiceService.create(staticInvoiceRequest));
   }
 
   @Test
   public void create_NoExceptionIsTrowed_WhenProductsServiceIsNotAvailable() {
     BDDMockito.when(invoiceRepository.existsByInvoiceNumber(anyLong())).thenReturn(false);
-    BDDMockito.when(productClient.getProductForInvoice(anyLong(), anyString()))
+    BDDMockito.when(productClient.getInfo(anyLong(), anyString()))
         .thenReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).body(createProductRandomPrice()));
     BDDMockito.when(invoiceRepository.save(any())).thenReturn(staticInvoiceWithItems);
 
-    assertThatCode(() -> invoiceService.createInvoice(createInvoiceRequestRandomValues())).doesNotThrowAnyException();
+    assertThatCode(() -> invoiceService.create(createInvoiceRequestRandomValues())).doesNotThrowAnyException();
   }
 
   @Test
@@ -98,7 +98,7 @@ class InvoiceServiceTest {
     BDDMockito.when(invoiceRepository.findById(anyLong())).thenReturn(Optional.of(staticInvoiceWithItems));
     BDDMockito.doNothing().when(invoiceRepository).delete(any());
 
-    assertThatCode(() -> invoiceService.deleteInvoice(getRandomLongNumber())).doesNotThrowAnyException();
+    assertThatCode(() -> invoiceService.deleteById(getRandomLongNumber())).doesNotThrowAnyException();
   }
 
   @Test
@@ -106,7 +106,7 @@ class InvoiceServiceTest {
     BDDMockito.when(invoiceRepository.findById(anyLong())).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-        .isThrownBy(() -> invoiceService.deleteInvoice(getRandomLongNumber()));
+        .isThrownBy(() -> invoiceService.deleteById(getRandomLongNumber()));
   }
 
   @Test
@@ -114,7 +114,7 @@ class InvoiceServiceTest {
     BDDMockito.when(invoiceRepository.findByCustomerUserName(anyString(), any(Pageable.class)))
         .thenReturn(staticInvoicePage);
 
-    var invoices = invoiceService.getInvoiceByUserName(TEST, PAGE);
+    var invoices = invoiceService.getByUserName(TEST, PAGE);
 
     assertFalse(invoices.isEmpty());
     assertThat(invoices.getContent().contains(staticInvoiceWithItems));
@@ -126,14 +126,14 @@ class InvoiceServiceTest {
         .thenReturn(Page.empty());
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-        .isThrownBy(() -> invoiceService.getInvoiceByUserName(TEST, PAGE));
+        .isThrownBy(() -> invoiceService.getByUserName(TEST, PAGE));
   }
 
   @Test
   public void getByInvoiceNumber_ReturnInvoice_WhenSuccessful() {
     BDDMockito.when(invoiceRepository.findByInvoiceNumber(anyLong())).thenReturn(Optional.of(staticInvoiceWithItems));
 
-    var invoice = invoiceService.getInvoiceByInvoiceNumber(getRandomLongNumber());
+    var invoice = invoiceService.getByInvoiceNumber(getRandomLongNumber());
 
     assertThat(invoice).isNotNull();
     assertThat(invoice.getCustomer()).isNotNull();
@@ -145,7 +145,7 @@ class InvoiceServiceTest {
     BDDMockito.when(invoiceRepository.findByInvoiceNumber(anyLong())).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-        .isThrownBy(() -> invoiceService.getInvoiceByInvoiceNumber(getRandomLongNumber()));
+        .isThrownBy(() -> invoiceService.getByInvoiceNumber(getRandomLongNumber()));
   }
 
   @Test
@@ -153,7 +153,7 @@ class InvoiceServiceTest {
     BDDMockito.when(invoiceRepository.findByItemsProductBarCode(anyLong(), any(Pageable.class)))
         .thenReturn(staticInvoicePage);
 
-    var invoices = invoiceService.getInvoiceByProductBarCode(getRandomLongNumber(), PAGE);
+    var invoices = invoiceService.getByProductBarCode(getRandomLongNumber(), PAGE);
 
     assertFalse(invoices.isEmpty());
     assertThat(invoices.getContent().contains(staticInvoiceWithItems));
@@ -165,6 +165,6 @@ class InvoiceServiceTest {
         .thenReturn(Page.empty());
 
     assertThatExceptionOfType(ResourceNotFoundException.class)
-        .isThrownBy(() -> invoiceService.getInvoiceByProductBarCode(getRandomLongNumber(), PAGE));
+        .isThrownBy(() -> invoiceService.getByProductBarCode(getRandomLongNumber(), PAGE));
   }
 }
