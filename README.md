@@ -26,7 +26,7 @@ Spring Security and JWT for the users authentication and authorization.
 
 * [Java 11](https://openjdk.java.net/).
 * [Maven](https://maven.apache.org/).
-* [Docker and Docker Compose](https://www.docker.com/).
+* [Docker Engine 19.03.0+ and Docker Compose 1.27.0+](https://www.docker.com/).
 
 ## Gettin Started
 
@@ -40,23 +40,25 @@ The other microservices have their own README file that contains the commands to
 
 ### Docker
 
-To run the application with Docker(docker-compose), use the Makefile.
-
-Using the "depends_on" option of docker-compose does not ensure that the microservice or [PostgreSQL](https://www.postgresql.org/) are ready to receive requests, so I have created a little script (run.sh and healthcheck.sh) to ensure the order of execution and thus avoid conflicts.
+To run the application with Docker(docker-compose), use the Makefile, this file will compile and package the jar files that will be used to build the images.
 
     make run
 
-If you use this method you should use the respective ips of the microservices instead of "localhost".
+If you use this method you should use the respective ip of the microservice.
 
-* PostgreSQL: 192.168.0.21
-* Config-Service: 192.168.0.2
-* Resgistry-Service: 192.168.0.3
-* Auth-Service: 192.168.0.11 (Gateway)
-* Product-Service: 192.168.0.12
-* Shopping-Service: 192.168.0.13
+* PostgreSQL: 192.168.0.21:5432
+* Config-Service: 192.168.0.2:8081
+* Resgistry-Service: 192.168.0.3:8082
+* Auth-Service: localhost:8090 (Gateway)
+* Product-Service: 192.168.0.12:8091
+* Shopping-Service: 192.168.0.13:8092
 
 Ideally, only the auth-service ip should be set as it also acts as the application gateway (this is the reason why only this service exposes its port to one of my host).
 In this way, with all the services with fixed ip, I can test the application in a faster way for me and more friendly for my pc (without having to use the gateway to test the other services).
+
+### Database
+
+* PostgreSQL [ref](https://www.postgresql.org/) [docs](https://www.postgresql.org/docs/13/index.html)
 
 ### Dependencies
 
@@ -79,10 +81,8 @@ In this way, with all the services with fixed ip, I can test the application in 
   * Sleuth [docs](https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/)
 
 * Resilience4J [repo](https://github.com/resilience4j/resilience4j)
-* Zipkin [docs](https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/) [repo](https://github.com/openzipkin/zipkin)
 * JWT [repo](https://github.com/jwtk/jjwt)
 * H2 [ref](https://www.h2database.com/html/main.html) [repo](https://github.com/h2database/h2database)
-* PostgreSQL [docs](https://www.postgresql.org/docs/13/index.html)
 * Lombok [ref](https://projectlombok.org/) [repo](https://github.com/rzwitserloot/lombok)
 
 ### TODO
